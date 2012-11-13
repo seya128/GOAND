@@ -1,0 +1,25 @@
+body { background-color: #DDDDDD; font: 20px sans-serif; }
+
+#canvas {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    
+    background-color: #FFFFFF;
+}
+
+#stamp_bar {
+	position: fixed;
+    overflow:hidden;	/* はみ出した部分表示しない */
+	position:fixed;
+    bottom:0px;
+    left:0px;
+    background-color: #555;
+	
+}
+
+#body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}

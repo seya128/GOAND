@@ -1,0 +1,37 @@
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #DDDDDD; 
+    font: 20px sans-serif;
+}
+
+#bg {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
+
+#gohan {
+    position: fixed;
+    top: 420px;
+    left: 20px;
+}
+
+#stamp {
+    position: fixed;
+    top: 420px;
+    left: 360px;
+}
+
+#present {
+    position: fixed;
+    top: 650px;
+    left: 360px;
+}
+
+#help {
+    position: fixed;
+    top: 650px;
+    left: 40px;
+}
