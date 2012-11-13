@@ -1,11 +1,21 @@
 // This is a JavaScript file
+
         document.addEventListener("deviceready", onDeviceReady, false);
 
         // Cordova 準備完了
         //
-        function onDeviceReady() {
+        function onDeviceReady()
+        {
             //alert("準備完了");
+            document.addEventListener("backbutton", onBackbutton, false);
             playAudio(getBaseURL() + 'sound/bgm/main.ogg');
+        }
+
+        function onBackbutton(evevt)
+        {
+            alert("onBackbutton");
+            console.log("onBackbutton()");
+            return;
         }
 
         // オーディオプレイヤー
