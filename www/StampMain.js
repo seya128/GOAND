@@ -36,7 +36,7 @@ function canvas_Init() {
     
     //背景ロード
     canvas_img.onload = canvas_Draw;
-    canvas_img.src = "img/stamp/s_s01_bgd_a000.png";
+    canvas_img.src = "img/stamp/s_s01_sta_a/s_s01_bgd_b000.png";
 }
 
 function canvas_Draw() {
@@ -84,9 +84,9 @@ function stampBar_Init() {
 
 	//初期描画
 	stampBar_Draw();
-    stamp1_ImageLoad("img/stamp/s_s01_a000.png");
-    stamp2_ImageLoad("img/stamp/s_s01_b000.png");
-    stamp3_ImageLoad("img/stamp/s_s01_c000.png");
+    stamp1_ImageLoad("img/stamp/s_s01_sta_a/s_s01_sta_a000.png");
+    stamp2_ImageLoad("img/stamp/s_s01_sta_a/s_s01_sta_b000.png");
+    stamp3_ImageLoad("img/stamp/s_s01_sta_a/s_s01_sta_c000.png");
     
     selectedStampImg = stampImg1;
 }
