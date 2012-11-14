@@ -36,7 +36,7 @@
         <activity android:name="mobi.monaca.framework.MonacaSplashActivity"
                   android:label="%%%APPLICATION_NAME%%%"
                   android:theme="@android:style/Theme.Translucent.NoTitleBar"
-                  android:screenOrientation="unspecified">
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -46,13 +46,13 @@
         <activity android:name="mobi.monaca.framework.MonacaActivity"
                   android:label="MonacaActivity"
                   android:theme="@android:style/Theme.Translucent.NoTitleBar"
-                  android:screenOrientation="unspecified">
+                  android:screenOrientation="portrait">
         </activity>
         <activity android:name="mobi.monaca.framework.MonacaPageActivity"
                   android:label="MonacaPageActivity"
                   android:theme="@android:style/Theme.Translucent.NoTitleBar"
                   android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
-                  android:screenOrientation="unspecified">
+                  android:screenOrientation="portrait">
         </activity>
 
     </application>
