@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <title>ごちそうさま：スタンプシート選択</title>
+        <script type="text/javascript" src="plugins/plugin-loader.js"></script>
+        <script type="text/javascript">
+            // Set virtual screen width size to 640 pixels (横幅640pxに設定)
+            monaca.viewport({width: 640});
+
+            function goStamp()  {document.location="StampMain.html"; event.preventDefault();};
+            function goTitle()  {document.location="index.html"; event.preventDefault();};
+
+        </script>
+        <link rel="stylesheet" type="text/css" href="StampSelect.css"
+    </head>
+    <body>
+        <canvas id="canvas" width="640" height="1200"></canvas>
+        <div id="ok"><img src="img/stamp/s_btn_d000.png" onMouseDown=goStamp() onTouchStart=goStamp()/></div>
+        <div id="cancel"><img src="img/stamp/s_btn_e000.png" onMouseDown=goTitle() onTouchStart=goTitle()/></div>
+        <section id="body">
+        </section>    
+
+
+    //    <script type="text/javascript" src="StampSelect.js"></script>
+    </body>
+</html>

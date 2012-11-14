@@ -7,15 +7,20 @@
         <script type="text/javascript">
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
             monaca.viewport({width: 640});
+            
+            function goGohan()  {document.location="KamiSelect.html"; event.preventDefault();};
+            function goStamp()  {document.location="StampSelect.html"; event.preventDefault();};
+            function goHelp()   {document.location="#"; event.preventDefault();};
+            function goPresent(){document.location="#"; event.preventDefault();};
         </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
     <body>
         <img id="bg" src="img/title/t_ten_a000.png"></img>
-        <a href="KamiSelect.html"><img id="gohan" src="img/title/t_btn_a000.png" onclick="playAudioSE_OK();"></img></a>
-        <a href="StampMain.html"><img id="stamp" src="img/title/t_btn_b000.png" onclick="playAudioSE_OK();"></img></a>
-        <a href="#"><img id="help" src="img/title/t_btn_c000.png" onclick="playAudioSE_OK();"></img></a>
-        <a href="#"><img id="present" src="img/title/t_btn_d000.png" onclick="playAudioSE_OK();"></img></a>
+        <img id="gohan" src="img/title/t_btn_a000.png" onMouseDown=goGohan() onTouchStart=goGohan()></img>
+        <img id="stamp" src="img/title/t_btn_b000.png" onMouseDown=goStamp() onTouchStart=goStamp()></img>
+        <img id="help" src="img/title/t_btn_c000.png" onMouseDown=goHelp() onTouchStart=goHelp()></img>
+        <img id="present" src="img/title/t_btn_d000.png" onMouseDown=goPresent() onTouchStart=goPresent()></img>
 
         <script type="text/javascript" src="sound.js"></script>
     </body>

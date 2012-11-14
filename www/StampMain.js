@@ -105,7 +105,7 @@ function stampBar_onTouchEvent(e) {
             case 0: selectedStampImg = stampImg1;   break;
             case 1: selectedStampImg = stampImg2;   break;
             case 2: selectedStampImg = stampImg3;   break;
-            default: document.location = "index.html"; break;
+            default: document.location = "StampSelect.html"; break;
         }
     }    
     event.preventDefault(); //デフォルトイベント処理をしない

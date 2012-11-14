@@ -1,0 +1,29 @@
+body { background-color: #DDDDDD; font: 10px sans-serif; }
+
+#canvas {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    
+    background-color: #FFFFFF;
+}
+
+#ok {
+    position: fixed;
+    bottom:5px;
+    left:20px;
+}
+
+#cancel {
+    position: fixed;
+    bottom:5px;
+    left:340px;
+	
+}
+
+#body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
