@@ -2,7 +2,7 @@
 //
 // スタンプシート
 //
-var StampSheet = function(canvas_ctx){
+var StampSheet = function(canvas_ctx, src){
     var _this = this;
     var ctx = canvas_ctx;
     var img = new Image();
@@ -16,10 +16,11 @@ var StampSheet = function(canvas_ctx){
         ofsX = ofs;
         
         if (isLoaded) {
-            var w = img.naturalWidth * 0.65;
-            var h = img.naturalHeight * 0.65;
-            var x = (640 - w) / 2 + ofsX;
-            var y = (800 - h);
+            var rate = Math.abs(ofsX)/320 * 0.25 ;
+            var w = img.naturalWidth * (0.65 - rate);
+            var h = img.naturalHeight * (0.65 - rate);
+            var x = (640 - w) / 2 + ofsX - rate*ofsX ;
+            var y = (800 - h) / 2 + 20;
             ctx.drawImage(img, x,y, w,h);
             isDraw = false;
         }
@@ -28,18 +29,18 @@ var StampSheet = function(canvas_ctx){
     //イメージセット
     this.setImage = function(src) {
         //ソースが違う場合のみロード
-        if (img.src!=src) {
-            isLoaded = false;
-            img.onload = function() {
-                isLoaded = true;
-                if (isDraw){
-                    _this.draw(ofsX); //描画指示がある場合のみ表示
-                }
-            };
-            img.src = src;
-        }
+        isLoaded = false;
+        img.onload = function() {
+            isLoaded = true;
+            if (isDraw){
+                _this.draw(ofsX); //描画指示がある場合のみ表示
+            }
+        };
+        img.src = src;
     };
     
+    
+    this.setImage(src);
     
 };
 
@@ -49,7 +50,7 @@ var StampSheet = function(canvas_ctx){
 //
 var MainCanvas = function(){
     var _this = this;
-    this.SelectIx = 0;
+    this.selectIx = 0;
     var startX=0;
     var ofsX=0;
     var isTouch = false;
@@ -62,8 +63,21 @@ var MainCanvas = function(){
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
 
+    //debug
+    function dubugDisp() {
+        document.getElementById("body").innerHTML = 
+            "startX = " + startX + "<br>" +
+            "ofsX = " + ofsX + "<br>" +
+            "isTouch = " + isTouch;
+    }
+    
     //スタンプシート準備
-    var sheet = new StampSheet(ctx);
+    var sheet = new Array();
+    sheet[0] = new StampSheet(ctx,bgImgName[0]);
+    sheet[1] = new StampSheet(ctx,bgImgName[1]);
+    sheet[2] = new StampSheet(ctx,bgImgName[2]);
+    sheet[4] = new StampSheet(ctx,bgImgName[bgImgName.length-1]);
+    sheet[3] = new StampSheet(ctx,bgImgName[bgImgName.length-2]);
     
     //キャンバスクリア
     this.clear = function(){
@@ -71,7 +85,7 @@ var MainCanvas = function(){
         //グラデーション領域をセット
         var grad  = ctx.createLinearGradient(0,0, 0,1200);
         //グラデーション終点のオフセットと色をセット
-        grad.addColorStop(0,'rgb(0, 0, 0)');
+        grad.addColorStop(0,'rgb(150, 150, 150)');
         grad.addColorStop(0.7,'rgb(150, 150, 240)');
         //グラデーションをfillStyleプロパティにセット
         ctx.fillStyle = grad;
@@ -82,9 +96,24 @@ var MainCanvas = function(){
     
     //描画
     this.draw = function() {
+        var ofsMax = 376;
+
+        if (ofsX < -ofsMax/2){
+            startX -= ofsMax;
+            ofsX += ofsMax;
+            this.selectIx += 1;
+            this.selectIx %= 5;
+        }
+        if (ofsX > ofsMax/2){
+            startX += ofsMax;
+            ofsX -= ofsMax;
+            this.selectIx += 5-1;
+            this.selectIx %= 5;
+        }
         this.clear();
-        sheet.setImage(bgImgName[1]);
-        sheet.draw(ofsX);
+        sheet[(this.selectIx + 4)%5].draw(ofsX-ofsMax);
+        sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
+        sheet[this.selectIx].draw(ofsX);
     };
     
     //タッチ座標取得
@@ -114,6 +143,9 @@ var MainCanvas = function(){
         startX = pos.x;
         ofsX = 0;
         isTouch = true;
+        _this.draw();
+        
+        dubugDisp();
         
         event.preventDefault(); //デフォルトイベント処理をしない
     };
@@ -123,11 +155,13 @@ var MainCanvas = function(){
             ofsX = pos.x - startX;
             _this.draw();
         }
+        dubugDisp();
 
         event.preventDefault(); //デフォルトイベント処理をしない
     };
     this.onTouchEnd = function(e){
         isTouch = false;
+        dubugDisp();
 
         event.preventDefault(); //デフォルトイベント処理をしない
     };
