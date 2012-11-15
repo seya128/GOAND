@@ -151,30 +151,9 @@ var MainCanvas = function(no){
 //        this.dubugDisp();
     };
     
-    //タッチ座標取得
-    this.getTouchPos = function(e){
-        var r = { x:0, y:0};
-        var x,y;
-        if (e.type=="touchstart" || e.type=="touchmove") {
-            x = e.touches[0].pageX;
-            y = e.touches[0].pageY;
-        } else if (e.type=="mousedown" || e.type=="mousemove") {
-            x = e.pageX;
-            y = e.pageY;
-        } else
-            return r;
-   
-        var rect = e.target.getBoundingClientRect();
-    
-        r.x = Math.round(x / monaca.viewport.zoomRatio - rect.left);
-        r.y = Math.round(y / monaca.viewport.zoomRatio - rect.top);
-        
-        return r;
-    };
-    
     //マウスイベント
     this.onTouchStart = function(e){
-        var pos = _this.getTouchPos(e);
+        var pos = getTouchPos(e);
         startX = pos.x - ofsX * ofsRate;
         isTouch = true;
         
@@ -182,7 +161,7 @@ var MainCanvas = function(no){
     };
     this.onTouchMove = function(e) {
         if (isTouch) {
-            var pos = _this.getTouchPos(e);
+            var pos = getTouchPos(e);
             ofsX = (pos.x - startX) * ofsRate;
         }
 

@@ -152,25 +152,3 @@ function stamp3_Draw() {
 
 
 
-// タッチ座標処理
-function getTouchPos(e) {
-    var r = { x:0, y:0};
-    var x,y;
-    if (e.type=="touchstart" || e.type=="touchmove") {
-        x = e.touches[0].pageX;
-        y = e.touches[0].pageY;
-    } else if (e.type=="mousedown" || e.type=="mousemove") {
-        x = e.pageX;
-        y = e.pageY;
-    } else
-        return r;
-    
-    rect = e.target.getBoundingClientRect();
-
-    r.x = Math.round(x / monaca.viewport.zoomRatio - rect.left);
-    r.y = Math.round(y / monaca.viewport.zoomRatio - rect.top);
-    
-    return r;
-}
-
-function $(id) { return document.getElementById(id); }
