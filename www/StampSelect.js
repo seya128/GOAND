@@ -1,61 +1,49 @@
-var bgImgName = [
-    "img/stamp/s_s01_sta_a/s_s01_bgd_a000.png",
-    "img/stamp/s_s01_sta_a/s_s01_bgd_b000.png",
-    "img/stamp/s_s01_sta_a/s_s01_bgd_c000.png",
-    "img/stamp/s_s02_sta_a/s_s02_bgd_a000.png",
-    "img/stamp/s_s02_sta_a/s_s02_bgd_b000.png",
-    "img/stamp/s_s02_sta_a/s_s02_bgd_c000.png",
-    "img/stamp/s_s03_sta_a/s_s03_bgd_a000.png",
-    "img/stamp/s_s03_sta_a/s_s03_bgd_b000.png",
-    "img/stamp/s_s03_sta_a/s_s03_bgd_c000.png"
-    
-    ];
-
-
 
 //
 // スタンプシート
 //
-var StampSheet = function(canvas_ctx, no){
+function StampSheet(canvas_ctx, no){
     var _this = this;
-    var ctx = canvas_ctx;
-    var img = new Image();
-    var isLoaded = false;
-    this.sheetNo;
-    
-    //描画
-    this.draw = function(ofs) {
-        if (isLoaded) {
-            var rate = Math.abs(ofs)/320 * 0.25 ;
-            var w = img.naturalWidth * (0.65 - rate);
-            var h = img.naturalHeight * (0.65 - rate);
-            var x = (640 - w) / 2 + ofs - rate*ofs ;
-            var y = (800 - h) / 2 + 20;
-            ctx.drawImage(img, x,y, w,h);
-        }
-    };
-
-    //イメージセット
-    this.setImage = function(no) {
-        if (no < 0) no+=bgImgName.length;
-        this.sheetNo = no % bgImgName.length;
-        isLoaded = false;
-        img.onload = function() {
-            isLoaded = true;
-        };
-        img.src = bgImgName[this.sheetNo];
-    };
-    
+    this.ctx = canvas_ctx;
+    this.img = new Image();
+    this.isLoaded = false;
+    this.sheetNo = no;
+    this.sheetSrc = "";
     
     this.setImage(no);
-    
+}
+//描画
+StampSheet.prototype.draw = function(ofs) {
+    if (this.isLoaded) {
+        var rate = Math.abs(ofs)/320 * 0.25 ;
+        var w = this.img.naturalWidth * (0.65 - rate);
+        var h = this.img.naturalHeight * (0.65 - rate);
+        var x = (640 - w) / 2 + ofs - rate*ofs ;
+        var y = (800 - h) / 2 + 20;
+        this.ctx.drawImage(this.img, x,y, w,h);
+    }
 };
+//イメージセット
+StampSheet.prototype.setImage = function(no) {
+    var _this = this;
+    if (no < 0) no+=bgImgName.length;
+    this.sheetNo = no % bgImgName.length;
+    this.isLoaded = false;
+    this.img.onload = function() {
+        _this.isLoaded = true;
+    };
+    this.sheetSrc = bgImgName[this.sheetNo];
+    this.img.src = this.sheetSrc;
+};
+    
+
+
 
 
 //
 // メインキャンバス
 //
-var MainCanvas = function(){
+var MainCanvas = function(no){
     var _this = this;
     this.selectIx = 0;
     var startX=0;
@@ -67,22 +55,28 @@ var MainCanvas = function(){
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
 
+    //スタンプシート準備
+    var sheet = new Array();
+    sheet[0] = new StampSheet(ctx,no);
+    sheet[1] = new StampSheet(ctx,no+1);
+    sheet[2] = new StampSheet(ctx,no+2);
+    sheet[4] = new StampSheet(ctx,no+bgImgName.length-1);
+    sheet[3] = new StampSheet(ctx,no+bgImgName.length-2);
+    
     //debug
-    function dubugDisp() {
+    this.dubugDisp = function() {
         document.getElementById("body").innerHTML = 
+            "select = " + sheet[this.selectIx].sheetNo + "<br>" +
             "startX = " + startX + "<br>" +
             "ofsX = " + ofsX + "<br>" +
             "addX = " + addX + "<br>" +
             "isTouch = " + isTouch;
-    }
+    };
     
-    //スタンプシート準備
-    var sheet = new Array();
-    sheet[0] = new StampSheet(ctx,0);
-    sheet[1] = new StampSheet(ctx,1);
-    sheet[2] = new StampSheet(ctx,2);
-    sheet[4] = new StampSheet(ctx,bgImgName.length-1);
-    sheet[3] = new StampSheet(ctx,bgImgName.length-2);
+    //選択されているシート取得
+    this.getSelectSheet = function() {
+        return sheet[this.selectIx];
+    };
     
     //キャンバスクリア
     this.clear = function(){
@@ -154,7 +148,7 @@ var MainCanvas = function(){
         sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
         sheet[this.selectIx].draw(ofsX);
         
-//        dubugDisp();
+//        this.dubugDisp();
     };
     
     //タッチ座標取得
@@ -221,12 +215,25 @@ var MainCanvas = function(){
 var timerID;
 var mainCanvas;
 window.onload = function() {
-    mainCanvas = new MainCanvas();    
+    var select = load();
+    mainCanvas = new MainCanvas(select);    
     clearInterval(timerID);
     timerID = setInterval('draw()', 50);
 };
 
+//描画
 function draw() {
     mainCanvas.draw();
 }
 
+//ロード
+function load() {
+    var select = localStorage.getItem("SelectedStampSheet");
+    if (!select)    select = 0;
+    
+    return select*1;
+} 
+//セーブ
+function save() {
+    localStorage.setItem("SelectedStampSheet",mainCanvas.getSelectSheet().sheetNo);
+}
