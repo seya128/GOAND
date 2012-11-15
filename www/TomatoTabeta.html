@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <title>ごちそうさま</title>
+        <script type="text/javascript" src="plugins/plugin-loader.js"></script>
+        <script type="text/javascript">
+            // Set virtual screen width size to 640 pixels (横幅640pxに設定)
+            monaca.viewport({width: 640});
+         
+            function goNext()  {document.location="TomatoGochi.html"; event.preventDefault();};            
+           </script>
+        <link rel="stylesheet" type="text/css" href="index.css"
+    </head>
+    <body>
+        <img id="bg" src="img/Gohan/h_h02_bgd_a_00000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+
+        <img id="tabeyou_kamisama" src="img/Gohan/g_g03_tom_a/g_g03_tom_a_00000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+
+        <!-- <img id="tabeyou_serifu" src="img/Gohan/g_g05_ser_a000.png" onMouseDown=goNext() onTouchStart=goNext()></img> -->
+
+        <img id="tabeta_serifu" src="img/Gohan/g_g08_btn_a000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+
+    </body>
+</html>
+

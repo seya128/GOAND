@@ -48,6 +48,7 @@ function canvas_onTouchEvent(e) {
 
     if (selectedStampImg !== 0) {
         canvas_ctx.drawImage(selectedStampImg, pos.x - STAMP_W/2, pos.y - STAMP_H/2, STAMP_W, STAMP_H);
+        playAudioSE_Stamp();
     }
     event.preventDefault(); //デフォルトイベント処理をしない
     

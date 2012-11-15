@@ -7,13 +7,23 @@
         <script type="text/javascript">
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
             monaca.viewport({width: 640});
-            
-            function goNext()  {document.location="KamiLoad.html"; event.preventDefault();};            
         </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
     <body>
-        <img id="bg" src="img/Gohan/g_g01_ten_a000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="bg" src="img/Gohan/h_h01_bgd_a_00000.png"></img>
+
+        <img id="select_megami" src="img/Gohan/g_g01_meg_a/g_g01_meg_a_00000.png"></img>
+        <img id="select_serifuwaku" src="img/common/k_wak_a000.png"></img>
+        <img id="select_serifu" src="img/Gohan/g_g01_ser_a000.png"></img>
+
+        <a href="NasuLoad.html"><img id="select_nasu" src="img/Gohan/g_g01_nas_a/g_g01_nas_a_00000.png" onclick="playAudioSE_OK();"></img></a>
+        <a href="NinjinLoad.html"><img id="select_ninjin" src="img/Gohan/g_g01_nin_a/g_g01_nin_a_00000.png" onclick="playAudioSE_OK();"></img></a>
+        <a href="PimanLoad.html"><img id="select_piman" src="img/Gohan/g_g01_pii_a/g_g01_pii_a_00000.png" onclick="playAudioSE_OK();"></img></a>
+        <a href="TomatoLoad.html"><img id="select_tomato" src="img/Gohan/g_g01_tom_a/g_g01_tom_a_00000.png" onclick="playAudioSE_OK();"></img></a>
+
+        <script type="text/javascript" src="common.js"></script>
+        <script type="text/javascript" src="se.js"></script>
 
     </body>
 </html>

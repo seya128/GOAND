@@ -6,6 +6,7 @@
         //
         function onDeviceReady()
         {
+            console.log("onDeviceReady()");
             //alert("準備完了");
             document.addEventListener("backbutton", onBackbutton, false);
             playAudio(getBaseURL() + 'sound/bgm/main.ogg');
@@ -74,30 +75,6 @@
                 //stopAudio();
                 playAudio(getBaseURL() + 'sound/bgm/main.ogg');            
             }
-        }
-
-        function playAudioSE_OK() {
-            playAudioSE(getBaseURL() + 'sound/se/ok.ogg');                        
-        }
-
-        function playAudioSE(src) {
-            // src から Media オブジェクトを作成
-            my_media2 = new Media(src, onSuccessSE, onErrorSE);
-
-            // オーディオ再生
-            my_media2.play();
-        }
-
-        // 成功時のコールバック関数
-        //
-        function onSuccessSE()
-        {
-        }
-
-        // エラー時のコールバック関数
-        //
-        function onErrorSE(error)
-        {
         }
 
         function getBaseURL() {

@@ -8,30 +8,203 @@ body {
 
 #bg {
     position: fixed;
+    z-index: 1;
     top: 0px;
     left: 0px;
 }
 
 #gohan {
     position: fixed;
+    z-index: 2;
     top: 420px;
     left: 20px;
 }
 
 #stamp {
     position: fixed;
+    z-index: 2;
     top: 420px;
     left: 360px;
 }
 
 #present {
     position: fixed;
+    z-index: 2;
     top: 650px;
     left: 360px;
 }
 
 #help {
     position: fixed;
+    z-index: 2;
     top: 650px;
     left: 40px;
+}
+
+#title {
+    position: fixed;
+    z-index: 3;
+    top: 180px;
+    left: 90px;
+}
+
+#megami {
+    position: fixed;
+    z-index: 2;
+    top:  -20px;
+    left:160px;
+}
+
+#nasu {
+    position: fixed;
+    z-index: 2;
+    top:  100px;
+    left: 480px;
+}
+
+#ninjin {
+    position: fixed;
+    z-index: 2;
+    top:   30px;
+    left:   0px;
+}
+
+#piman {
+    position: fixed;
+    z-index: 2;
+    top:   230px;
+    left:   0px;
+}
+
+#tomato {
+    position: fixed;
+    z-index: 2;
+    top:   300px;
+    left:  500px;
+}
+
+#select_serifuwaku {
+    position: fixed;
+    z-index: 2;
+    top:  10px;
+    left: 0px;
+}
+
+#select_serifu {
+    position: fixed;
+    z-index: 3;
+    top:  40px;
+    left: 80px;
+}
+
+#select_megami {
+    position: fixed;
+    z-index: 2;
+    top:  320px;
+    left:160px;
+}
+
+#select_nasu {
+    position: fixed;
+    z-index: 2;
+    top:  600px;
+    left: 400px;
+}
+
+#select_ninjin {
+    position: fixed;
+    z-index: 2;
+    top:   600px;
+    left:   50px;
+}
+
+#select_piman {
+    position: fixed;
+    z-index: 2;
+    top:   230px;
+    left:   50px;
+}
+
+#select_tomato {
+    position: fixed;
+    z-index: 2;
+    top:   250px;
+    left:  400px;
+}
+
+#load_kemuri {
+    position: fixed;
+    z-index: 2;
+    top:   250px;
+    left:  100px;
+}
+
+#select_yarinaoshi {
+    position: fixed;
+    z-index: 2;
+    top:   800px;
+    left:  140px;
+}
+
+#in_kamisama {
+    position: fixed;
+    z-index: 2;
+    top:   300px;
+    left:  150px;
+}
+
+#in_toujo {
+    position: fixed;
+    z-index: 2;
+    top:   100px;
+    left:  70px;
+}
+#in_serifuwaku {
+    position: fixed;
+    z-index: 2;
+    top:   750px;
+    left:    0px;
+}
+
+#in_serifu {
+    position: fixed;
+    z-index: 3;
+    top:   780px;
+    left:   120px;
+}
+
+#itadakimasu_kamisama {
+    position: fixed;
+    z-index: 3;
+    top:   380px;
+    left:  430px;
+}
+
+#itadakimasu_te {
+    position: fixed;
+    z-index: 2;
+    top:     0px;
+    left:    0px;
+}
+
+#tabeyou_kamisama {
+    position: fixed;
+    z-index: 2;
+    top:   300px;
+    left:  150px;
+}
+
+
+#tabeyou_serifu {
+    position: fixed;
+    z-index: 2;
+    top:    0px;
+    left:  80px;
+}
+
+#tabeta_serifu {
+    position: fixed;
+    z-index: 3;
+    top:   780px;
+    left:   120px;
 }
