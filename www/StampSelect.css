@@ -1,4 +1,4 @@
-body { background-color: #DDDDDD; font: 14px sans-serif; }
+body { background-color: #DDDDDD; font: 14px sans-serif; color:#FFFFFF;}
 
 #canvas {
     position: fixed;
@@ -25,5 +25,6 @@ body { background-color: #DDDDDD; font: 14px sans-serif; }
     position: absolute;
     top: 0px;
     left: 0px;
+    color: #FFFFFF;
 }
 
