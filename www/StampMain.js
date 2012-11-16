@@ -1,9 +1,3 @@
-window.onload = function() {
-    canvas_Init();
-    stampBar_Init();
-    
-};
-
 
 // 定義
 var STAMP_W = 160;
@@ -13,6 +7,73 @@ var STAMP_H = 160;
 //
 var selectedStampImg = 0;
 
+//スタンプ種類の数
+var NUM_STAMP_MAX = stampImgName.length;
+
+//持ってるスタンプ
+var NUM_HAS_STAMP_MAX = hasStampData.length;
+function getHasStampData(no){
+    if (no<0)   no+=NUM_HAS_STAMP_MAX;
+    no %= NUM_HAS_STAMP_MAX;
+    return hasStampData[no];
+}
+
+
+//
+// スタンプ
+//
+function Stamp(no, ink){
+    this.stampImageNo = -1;          //スタンプの画像番号
+    this.stampInk = ink;            //インク残量(0-100)
+    
+    this.img = new Image();
+    
+    this.loadStamp(no, ink);
+}
+// 画像ロード
+Stamp.prototype.loadStamp = function(no, ink){
+    
+    //範囲チェック
+    if (no < 0)  no += NUM_STAMP_MAX;
+    no %= NUM_STAMP_MAX;
+    if (ink < 0)    ink = 0;
+    if (ink > 100)  ink = 100;
+    
+    //イメージロード
+    if (this.stampImageNo != no) {
+        this.img.src = stampImgName[no];
+    }
+
+    //プロパティセット
+    this.stampImageNo = no;
+    this.stampInk = ink;
+};
+
+
+//
+// スタンプバー
+//
+var NUM_STAMPBAR_W = 5+2;   //スタンプバーが表示用に管理するスタンプの数
+
+function StampBar(no) {
+    this.leftHasStampNo = no;               //左端に表示されている所持スタンプ番号
+    this.stamp = array(NUM_STAMPBAR_W);     //スタンプオブジェクト
+    
+    this.canvas = document.getElementById("stamp_bar");
+    this.ctx = this.canvas.getContext("2d");
+    
+    for (i=0; i<NUM_STAMPBAR_W-1; i++){
+        var s = getHasStampData(this.leftHasStampNo+i);
+        stamp[i] = new Stamp(s.id, s.ink);
+    }
+    //左にはみ出る分
+    var s = getHasStampData(this.leftHasStampNo-1);
+    stamp[NUM_STAMPBAR_W-1] = new Stamp(s.id, s.ink);
+}
+//スタンプバー描画
+StampBar.prototype.draw = function(){
+    
+};
 
 //
 // キャンバス
@@ -151,4 +212,19 @@ function stamp3_Draw() {
 }
 
 
+
+function draw() {
+    
+}
+
+
+var timerID;
+
+
+
+window.onload = function() {
+    canvas_Init();
+    stampBar_Init();
+    
+};
 
