@@ -65,6 +65,7 @@ function StampBar(ofs) {
     
     this.isTouched = false;
     this.touchOffset = 0;
+    this.isSlide = false;
     
     this.canvas = document.getElementById("stamp_bar");
     this.ctx = this.canvas.getContext("2d");
@@ -168,7 +169,7 @@ StampBar.prototype.setTouchEvent = function() {
         if (_this.isTouched) {
             var pos =  getTouchPos(e);
             var ofs = pos.x - startX;
-            _this.touchOffset = startOffset + ofs;
+            _this.touchOffset = startOffset - ofs;
         }
         event.preventDefault(); //デフォルトイベント処理をしない
     };    
@@ -186,7 +187,7 @@ StampBar.prototype.setTouchEvent = function() {
         navigator.userAgent.indexOf('Android')>0) {
         this.canvas.addEventListener("touchstart",touchStartEvent,false);
         this.canvas.addEventListener("touchmove",touchMoveEvent,false);
-        this.canvas.addEventListener("touchend",_touchEndEvent,false);
+        this.canvas.addEventListener("touchend",touchEndEvent,false);
     } else {
         this.canvas.addEventListener("mousedown",touchStartEvent,false);
         this.canvas.addEventListener("mousemove",touchMoveEvent,false);
@@ -197,25 +198,39 @@ StampBar.prototype.setTouchEvent = function() {
 
 //スライド処理
 StampBar.prototype.slide = function(){
-    var isSliding = false;
     
-    if (isSliding){
+    if (this.isSlide){
         if (this.isTouched){
+            var ADD = 25;
             var d = this.touchOffset - this.offset;
             if (d < 0){
+            	if (this.offsetAdd > 0)		this.offsetAdd = 0;
                 if (d > this.offsetAdd)     this.offsetAdd = d;
-                else                        this.offsetAdd -= 5;
-            } else {
+                else                        this.offsetAdd -= ADD;
+            } else if (d > 0) {
+            	if (this.offsetAdd < 0)		this.offsetAdd = 0;
                 if (d < this.offsetAdd)     this.offsetAdd = d;
-                else                        this.offsetAdd += 5;
+                else                        this.offsetAdd += ADD;
+            } else {
+            	this.offsetAdd = 0;
             }
         }
         else {
-            isSliding = false;
+        	var BRK = 8;
+        	if (this.offsetAdd < 0) {
+        		this.offsetAdd += BRK;
+        		if (this.offsetAdd > 0) this.offsetAdd=0; 
+        	} else if (this.offsetAdd > 0) {
+        		this.offsetAdd -= BRK;
+        		if (this.offsetAdd < 0) this.offsetAdd=0; 
+        	}
+        	
+        	if (this.offsetAdd == 0)
+	            this.isSlide = false;
         }
     } else {
         if (this.isTouched){
-            isSliding = true;
+            this.isSlide = true;
         }
     }
 };
@@ -378,6 +393,7 @@ window.onload = function() {
     clearInterval(timerID);
     timerID = setInterval(
         function(){
+        	stampBar.slide();
             stampBar.updateDispInfo();
             stampBar.imageLoad();
             stampBar.draw();
