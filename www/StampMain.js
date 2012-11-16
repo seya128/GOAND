@@ -1,9 +1,3 @@
-window.onload = function() {
-    canvas_Init();
-    stampBar_Init();
-    
-};
-
 
 // 定義
 var STAMP_W = 160;
@@ -12,6 +6,221 @@ var STAMP_H = 160;
 
 //
 var selectedStampImg = 0;
+
+//スタンプ種類の数
+var NUM_STAMP_MAX = stampImgName.length;
+
+//持ってるスタンプ
+function getHasStampData(no){
+    if (no<0)   no+=hasStampData.length;
+    no %= hasStampData.length;
+    return hasStampData[no];
+}
+
+
+var imageLoadCounter = 0;  //デバッグ用
+
+//
+// スタンプ
+//
+function Stamp(){
+    this.stampImageNo = -1;          //スタンプの画像番号
+    this.isLoaded = false;
+    this.img = new Image();
+}
+// 画像ロード
+Stamp.prototype.loadImage = function(no){
+    var _this = this;
+
+    if (no == this.stampImageNo)
+        return;
+    
+    //範囲チェック
+    if (no < 0)  no += NUM_STAMP_MAX;
+    no %= NUM_STAMP_MAX;
+    
+    //イメージロード
+    this.isLoaded = false;
+    this.img.onload = function(){ _this.isLoaded = true; };
+    this.img.src = stampImgName[no];
+    this.stampImageNo = no;
+    
+    imageLoadCounter ++;    //デバッグ用
+};
+
+
+//
+// スタンプバー
+//
+var NUM_STAMPBAR_W = 5+2;   //スタンプバーが表示用に管理するスタンプの数
+
+function StampBar(ofs) {
+    this.offset = ofs;                      //オフセット座標
+    this.offsetAdd = 0;
+    this.stamp = Array(NUM_STAMPBAR_W);     //スタンプオブジェクト
+
+    this.leftHasStampId = 0;                //左端に表示されている所持スタンプＩＤ
+    this.leftStampIx = 0;                   //左端のスタンプオブジェクトのインデックス
+    this.leftDispOfs = 0;                   //表示オフセット
+    
+    this.isTouched = false;
+    this.touchOffset = 0;
+    
+    this.canvas = document.getElementById("stamp_bar");
+    this.ctx = this.canvas.getContext("2d");
+    
+    for (i=0; i<NUM_STAMPBAR_W; i++){
+        this.stamp[i] = new Stamp();
+    }
+    
+    this.updateDispInfo();
+    this.imageLoad();
+    this.setTouchEvent();
+}
+
+//スタンプバー表示情報更新
+StampBar.prototype.updateDispInfo = function(){
+    
+    if (this.offsetAdd < -STAMP_W)  this.offsetAdd = -STAMP_W;
+    if (this.offsetAdd > STAMP_W)  this.offsetAdd = STAMP_W;
+    this.offset += this.offsetAdd;
+
+    //計算用オフセット
+    var offset = this.offset;
+    offset %= hasStampData.length*STAMP_W;
+    if (offset < 0)    offset += hasStampData.length*STAMP_W;
+    
+    //左端に表示されている所持スタンプＩＤ
+    var idOld = this.leftHasStampId;
+    this.leftHasStampId = Math.floor(offset / STAMP_W);
+
+    //左端のスタンプオブジェクトのインデックス
+    if (idOld != this.leftHasStampId) {
+        if (this.offsetAdd < 0)     this.leftStampIx--;
+        else                        this.leftStampIx++;
+        
+        if (this.leftStampIx < 0)   this.leftStampIx += NUM_STAMPBAR_W;
+        this.leftStampIx %= NUM_STAMPBAR_W;
+    }
+    
+    //表示オフセット
+    this.leftDispOfs = -(offset % STAMP_W);
+    
+    
+};
+
+//表示情報にあわせてスタンプイメージロード
+StampBar.prototype.imageLoad = function(){
+    var s;
+    var ix = this.leftStampIx;
+
+    for (i=0; i<NUM_STAMPBAR_W-1; i++){
+        s = getHasStampData(this.leftHasStampId+i);
+        this.stamp[ix++].loadImage(s.id);
+        ix %= NUM_STAMPBAR_W;
+    }
+    //左にはみ出る分
+    s = getHasStampData(this.leftHasStampId-1);
+    this.stamp[ix].loadImage(s.id);
+};
+
+//スタンプバー描画
+StampBar.prototype.draw = function(){
+
+    var x = this.leftDispOfs;
+    var ix = this.leftStampIx;
+    
+    this.ctx.fillStyle = 'rgb(255, 255, 255)';
+    this.ctx.fillRect(0, 0, 640, STAMP_H);
+    
+    for (i=0; i<NUM_STAMPBAR_W-2; i++){
+        var s = getHasStampData(this.leftHasStampId-i);
+        
+        this.ctx.fillStyle = 'rgb(0, 0, 0)';
+        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMP_H-4);
+        this.ctx.drawImage(this.stamp[ix].img, x,0, STAMP_W,STAMP_H);
+        
+        x += STAMP_W;
+        ix ++;
+        ix %= NUM_STAMPBAR_W;
+    }
+};
+
+//タッチイベントリスナーの追加
+StampBar.prototype.setTouchEvent = function() {
+    var _this = this;
+    var startX = 0;
+    var startOffset;
+    
+    //タッチ開始
+    var touchStartEvent = function(e) {
+        _this.isTouched = true;
+        
+        var pos = getTouchPos(e);
+        startX = pos.x;
+        startOffset = _this.touchOffset = _this.offset;
+        
+        event.preventDefault(); //デフォルトイベント処理をしない
+    };    
+
+    //移動
+    var touchMoveEvent = function(e) {
+        if (_this.isTouched) {
+            var pos =  getTouchPos(e);
+            var ofs = pos.x - startX;
+            _this.touchOffset = startOffset + ofs;
+        }
+        event.preventDefault(); //デフォルトイベント処理をしない
+    };    
+
+    //タッチ終了
+    var touchEndEvent = function(e) {
+        _this.isTouched = false;
+        
+        event.preventDefault(); //デフォルトイベント処理をしない
+    };    
+
+    if (navigator.userAgent.indexOf('iPhone')>0 ||
+        navigator.userAgent.indexOf('iPod')>0 ||
+        navigator.userAgent.indexOf('iPad')>0 ||
+        navigator.userAgent.indexOf('Android')>0) {
+        this.canvas.addEventListener("touchstart",touchStartEvent,false);
+        this.canvas.addEventListener("touchmove",touchMoveEvent,false);
+        this.canvas.addEventListener("touchend",_touchEndEvent,false);
+    } else {
+        this.canvas.addEventListener("mousedown",touchStartEvent,false);
+        this.canvas.addEventListener("mousemove",touchMoveEvent,false);
+        this.canvas.addEventListener("mouseup",touchEndEvent,false);
+    }
+    
+};
+
+//スライド処理
+StampBar.prototype.slide = function(){
+    var isSliding = false;
+    
+    if (isSliding){
+        if (this.isTouched){
+            var d = this.touchOffset - this.offset;
+            if (d < 0){
+                if (d > this.offsetAdd)     this.offsetAdd = d;
+                else                        this.offsetAdd -= 5;
+            } else {
+                if (d < this.offsetAdd)     this.offsetAdd = d;
+                else                        this.offsetAdd += 5;
+            }
+        }
+        else {
+            isSliding = false;
+        }
+    } else {
+        if (this.isTouched){
+            isSliding = true;
+        }
+    }
+};
+
+
 
 
 //
@@ -150,5 +359,48 @@ function stamp3_Draw() {
     stampBar_ctx.drawImage(stampImg3, STAMP_W*2,0, STAMP_W,STAMP_H);
 }
 
+
+
+
+
+
+
+
+var timerID;
+var stampBar;
+
+window.onload = function() {
+
+    canvas_Init();
+    
+    stampBar = new StampBar(3);
+
+    clearInterval(timerID);
+    timerID = setInterval(
+        function(){
+            stampBar.updateDispInfo();
+            stampBar.imageLoad();
+            stampBar.draw();
+            
+            dubugDisp();
+        },
+        50);
+
+    
+    
+//    stampBar_Init();
+    
+};
+
+
+//debug
+function dubugDisp() {
+    document.getElementById("body").innerHTML = 
+        "offset = " + stampBar.offset + "<br/>" +
+        "imageLoadCounter = " + imageLoadCounter + "<br/>" +
+        "isTuched = " + stampBar.isTouched + "<br/>" +
+        "touchOffset = " + stampBar.touchOffset + "<br/>"
+        ;
+}
 
 
