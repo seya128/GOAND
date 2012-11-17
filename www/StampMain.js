@@ -409,6 +409,12 @@ window.onload = function() {
 };
 
 
+// MENUボタンクリック
+function menuButtonClick(){
+	document.location="StampSelect.html";
+}
+
+
 //debug
 function dubugDisp() {
     document.getElementById("body").innerHTML = 

@@ -23,3 +23,11 @@ body { background-color: #DDDDDD; font: 20px sans-serif; }
     top: 0px;
     left: 0px;
 }
+
+#menu_button {
+	position: absolute;
+	bottom:0px;
+	right:0px;
+	width: 120px;
+	height: 160px;
+}
