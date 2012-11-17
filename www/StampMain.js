@@ -5,7 +5,8 @@ var STAMP_H = 160;
 
 
 //
-var selectedStampImg = 0;
+var gStampSheetNo = 0;					//シート番号
+
 
 //スタンプ種類の数
 var NUM_STAMP_MAX = stampImgName.length;
@@ -310,7 +311,7 @@ function canvas_Init() {
     
     //背景ロード
     canvas_img.onload = canvas_Draw;
-    canvas_img.src = "img/stamp/s_s01_sta_a/s_s01_bgd_b000.png";
+    canvas_img.src = bgImgName[gStampSheetNo];
 }
 
 function canvas_Draw() {
@@ -346,8 +347,18 @@ function drawStamp(x,y){
 }
 
 
+//ロード
+function load(){
+    var sheet = localStorage.getItem("SelectedStampSheet");
+    if (!sheet)    sheet = 0;
+	
+	gStampSheetNo = sheet;
+}
+
 window.onload = function() {
 
+	load();
+	
     canvas_Init();
     
     stampBar = new StampBar(3);
