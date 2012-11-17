@@ -177,7 +177,6 @@ StampBar.prototype.setTouchEvent = function() {
     //タッチ開始
     var touchStartEvent = function(e) {
         _this.isTouched = true;
-    	isMoved = false;
     	    
         var pos = getTouchPos(e);
         startX = touchX = pos.x;
@@ -231,16 +230,14 @@ StampBar.prototype.slide = function(){
         if (this.isTouched){
             var ADD = 25;
             var d = this.touchOffset - this.offset;
-            if (d < 0){
+            if (d < -ADD){
+            	this.offsetAdd -= ADD;
             	if (this.offsetAdd > 0)		this.offsetAdd = 0;
-                if (d > this.offsetAdd)     this.offsetAdd = d;
-                else                        this.offsetAdd -= ADD;
-            } else if (d > 0) {
+            } else if (d > ADD) {
+            	this.offsetAdd += ADD;
             	if (this.offsetAdd < 0)		this.offsetAdd = 0;
-                if (d < this.offsetAdd)     this.offsetAdd = d;
-                else                        this.offsetAdd += ADD;
             } else {
-            	this.offsetAdd = 0;
+            	this.offsetAdd = d;
             }
         }
         else {
@@ -271,8 +268,6 @@ StampBar.prototype.selectStamp = function(x){
 	
 	var id = Math.floor(offset/STAMP_W);
 	this.selectedStampId = id;
-	
-	debugValue1 = id;
 }
 
 //選択スタンプ描画
@@ -280,10 +275,6 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 	var ix = this.selectedStampIx;
 	var id = this.selectesStampId;
 	
-	debugValue1 = x;
-	debugValue2 = y;
-	debugValue3 = ix;	
-
 	ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMP_H/2, STAMP_W,STAMP_H);
 
 }
@@ -371,7 +362,7 @@ window.onload = function() {
             stampBar.imageLoad();
             stampBar.draw();
             
-            dubugDisp();
+            //dubugDisp();
         },
         50);
 
