@@ -141,7 +141,7 @@ StampBar.prototype.draw = function(){
     this.ctx.fillRect(0, 0, 640, STAMP_H);
     
     for (i=0; i<NUM_STAMPBAR_W-2; i++){
-        var s = getHasStampData(this.id);
+        var s = getHasStampData(id);
         
 		//バック
 		if (id == this.selectedStampId) {
@@ -156,7 +156,14 @@ StampBar.prototype.draw = function(){
     	}
     	    
         //スタンプ
+        var a = Math.floor(s.ink / (STAMP_LIFE_MAX/5))+1;  //残りインクを５段階に(6-1)
+	    if (a >= 6)			a = 1.0;
+		else if (s.ink > 0)	a = a / 5;
+		else 				a = 0;
+        
+        this.ctx.globalAlpha = a;
         this.ctx.drawImage(this.stamp[ix].img, x,0, STAMP_W,STAMP_H);
+        this.ctx.globalAlpha = 1.0;
         
         x += STAMP_W;
         ix ++;
@@ -273,9 +280,19 @@ StampBar.prototype.selectStamp = function(x){
 //選択スタンプ描画
 StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 	var ix = this.selectedStampIx;
-	var id = this.selectesStampId;
+	var id = this.selectedStampId;
+    var s = getHasStampData(id);
 	
+    var a = Math.floor(s.ink / (STAMP_LIFE_MAX/5))+1;  //残りインクを５段階に(6-1)
+    if (a >= 6)			a = 1.0;
+    else if (s.ink > 0)	a = a / 5;
+    else 				a = 0;
+        
+    ctx.globalAlpha = a;
 	ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMP_H/2, STAMP_W,STAMP_H);
+    ctx.globalAlpha = 1.0;
+    
+    if (s.ink > 0)	s.ink --;
 
 }
 
