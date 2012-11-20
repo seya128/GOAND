@@ -8,7 +8,27 @@
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
             monaca.viewport({width: 640});
          
-            function goNext()  {document.location="Goodbye.html"; event.preventDefault();};            
+            function goNext()
+            {
+                var selectKamisama = window.localStorage.getItem("kamisama");
+
+                switch (parseInt(selectKamisama))
+                {
+                    case 1:
+                        document.location="PimanGoodbye.html";
+                        break;
+                    case 2:
+                        document.location="TomatoGoodbye.html";
+                        break;
+                    case 3:
+                        document.location="NinjinGoodbye.html";
+                        break;
+                    case 4:
+                        document.location="NasuGoodbye.html";
+                        break;
+                }
+                event.preventDefault();
+            };            
            </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>

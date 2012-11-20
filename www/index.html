@@ -10,8 +10,19 @@
             
             function goGohan()  {document.location="KamiSelect.html"; event.preventDefault();};
             function goStamp()  {document.location="StampSelect.html"; event.preventDefault();};
-            function goHelp()   {document.location="#"; event.preventDefault();};
-            function goPresent(){document.location="#"; event.preventDefault();};
+            function goHelp()
+            {
+                document.location="#";
+                event.preventDefault();
+                alert("未実装です。");
+            };
+            function goPresent()
+            {
+                document.location="#";
+                event.preventDefault();
+                window.localStorage.removeItem("CntGochi");
+                alert("ごちそうさました回数をリセットしました。");
+            };
         </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
@@ -26,10 +37,10 @@
         <img id="piman" src="img/title/t_pii_a/t_pii_a_00000.png"></img>
         <img id="tomato" src="img/title/t_tom_a/t_tom_a_00000.png"></img>
 
-        <img id="gohan" src="img/title/t_btn_a000.png" onMouseDown=goGohan() onTouchStart=goGohan()></img>
-        <img id="stamp" src="img/title/t_btn_b000.png" onMouseDown=goStamp() onTouchStart=goStamp()></img>
-        <img id="help" src="img/title/t_btn_c000.png" onMouseDown=goHelp() onTouchStart=goHelp()></img>
-        <img id="present" src="img/title/t_btn_d000.png" onMouseDown=goPresent() onTouchStart=goPresent()></img>
+        <img id="gohan" src="img/title/t_btn_a000.png" onClick=goGohan()></img>
+        <img id="stamp" src="img/title/t_btn_b000.png" onClick=goStamp()></img>
+        <img id="help" src="img/title/t_btn_c000.png" onClick=goHelp()></img>
+        <img id="present" src="img/title/t_btn_d000.png" onClick=goPresent()></img>
 
         <script type="text/javascript" src="common.js"></script>
         <script type="text/javascript" src="sound.js"></script>

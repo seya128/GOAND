@@ -197,9 +197,16 @@ body {
 
 #tabeyou_serifu {
     position: fixed;
+    z-index: 3;
+    top:   30px;
+    left:  80px;
+}
+
+#tabeyou_serifuwaku {
+    position: fixed;
     z-index: 2;
     top:    0px;
-    left:  80px;
+    left:   0px;
 }
 
 #tabeta_serifu {

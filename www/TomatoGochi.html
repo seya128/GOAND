@@ -8,19 +8,32 @@
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
             monaca.viewport({width: 640});
          
-            function goNext()  {document.location="TomatoHomeru.html"; event.preventDefault();};            
+            function goNext()
+            {
+                var Gochi = 0;
+                Gochi = window.localStorage.getItem("CntGochi");
+                if (!Gochi)
+                {
+                    Gochi = parseInt(0);
+                }
+                Gochi = parseInt(Gochi) + parseInt(1);
+                window.localStorage.setItem("CntGochi", Gochi);
+
+                document.location="TomatoHomeru.html";
+                event.preventDefault();
+            };            
            </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
     <body>
-        <img id="bg" src="img/Gohan/h_h02_bgd_b_00000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="bg" src="img/Gohan/h_h02_bgd_b_00000.png" onClick=goNext()></img>
 
-        <img id="itadakimasu_kamisama" src="img/Gohan/g_g04_tom_a/g_g04_tom_a_00000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="itadakimasu_kamisama" src="img/Gohan/g_g04_tom_a/g_g04_tom_a_00000.png" onClick=goNext()></img>
 
-        <img id="itadakimasu_te" src="img/Gohan/g_g09_obj_a/g_g09_obj_a_00002.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="itadakimasu_te" src="img/Gohan/g_g09_obj_a/g_g09_obj_a_00002.png" onClick=goNext()></img>
 
-        <img id="in_serifuwaku" src="img/common/k_wak_a000.png" onMouseDown=goNext() onTouchStart=goNext()"></img>
-        <img id="in_serifu" src="img/Gohan/g_g08_ser_a000.png" onMouseDown=goNext() onTouchStart=goNext()"></img>
+        <img id="in_serifuwaku" src="img/common/k_wak_a000.png" onClick=goNext()></img>
+        <img id="in_serifu" src="img/Gohan/g_g08_ser_a000.png" onClick=goNext()></img>
     </body>
 </html>
 
