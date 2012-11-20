@@ -228,7 +228,7 @@ StampBar.prototype.slide = function(){
     
     if (this.isSlide){
         if (this.isTouched){
-            var ADD = 25;
+            var ADD = 40;
             var d = this.touchOffset - this.offset;
             if (d < -ADD){
             	this.offsetAdd -= ADD;
