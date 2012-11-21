@@ -93,8 +93,8 @@ body {
 #select_serifu {
     position: fixed;
     z-index: 3;
-    top:  40px;
-    left: 80px;
+    top:  20px;
+    left: 30px;
 }
 
 #select_megami {
@@ -136,48 +136,48 @@ body {
     position: fixed;
     z-index: 2;
     top:   250px;
-    left:  100px;
+    left:   10px;
 }
 
 #select_yarinaoshi {
     position: fixed;
     z-index: 2;
-    top:   800px;
-    left:  140px;
+    top:   600px;
+    left:   60px;
 }
 
 #in_kamisama {
     position: fixed;
     z-index: 2;
-    top:   300px;
-    left:  150px;
+    top:   130px;
+    left:   80px;
 }
 
 #in_toujo {
     position: fixed;
-    z-index: 2;
-    top:   100px;
-    left:  70px;
+    z-index: 5;
+    top:   50px;
+    left:   0px;
 }
 #in_serifuwaku {
     position: fixed;
     z-index: 2;
-    top:   750px;
+    top:   550px;
     left:    0px;
 }
 
 #in_serifu {
     position: fixed;
     z-index: 3;
-    top:   780px;
-    left:   120px;
+    top:   550px;
+    left:   50px;
 }
 
 #itadakimasu_kamisama {
     position: fixed;
     z-index: 3;
-    top:   380px;
-    left:  430px;
+    top:   230px;
+    left:  280px;
 }
 
 #itadakimasu_te {
@@ -189,17 +189,17 @@ body {
 
 #tabeyou_kamisama {
     position: fixed;
-    z-index: 2;
-    top:   300px;
-    left:  150px;
+    z-index: 5;
+    top:   150px;
+    left:   80px;
 }
 
 
 #tabeyou_serifu {
     position: fixed;
     z-index: 3;
-    top:   30px;
-    left:  80px;
+    top:   0px;
+    left:  0px;
 }
 
 #tabeyou_serifuwaku {
@@ -212,6 +212,6 @@ body {
 #tabeta_serifu {
     position: fixed;
     z-index: 3;
-    top:   780px;
-    left:   120px;
+    top:   550px;
+    left:   50px;
 }
