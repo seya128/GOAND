@@ -215,3 +215,17 @@ body {
     top:   550px;
     left:   50px;
 }
+
+#item_coin {
+    position: fixed;
+    z-index: 3;
+    top:   0px;
+    left:  0px;
+}
+
+#item_get {
+    position: fixed;
+    z-index: 3;
+    top:   600px;
+    left:   0px;
+}

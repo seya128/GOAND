@@ -6,7 +6,7 @@
         <script type="text/javascript" src="plugins/plugin-loader.js"></script>
         <script type="text/javascript">
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
-            monaca.viewport({width: 640});
+            monaca.viewport({width: 480});
          
             function goNext()
             {
@@ -27,13 +27,25 @@
                         document.location="NasuGoodbye.html";
                         break;
                 }
+
+                var Coin = 0;
+                Coin = window.localStorage.getItem("CntCoin");
+                if (!Coin)
+                {
+                    Coin = parseInt(0);
+                }
+                Coin = parseInt(Coin) + parseInt(1);
+                window.localStorage.setItem("CntCoin", Coin);
+
                 event.preventDefault();
             };            
            </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
     <body>
-        <img id="bg" src="img/Gohan/g_g11_ten_a000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="bg" src="img/Gohan/h_h03_bgd_a_00000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="item_coin" src="img/Gohan/g_g11_txt_b000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
+        <img id="item_get" src="img/Gohan/g_g11_txt_a000.png" onMouseDown=goNext() onTouchStart=goNext()></img>
     </body>
 </html>
 
