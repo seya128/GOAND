@@ -100,21 +100,21 @@ body {
 #select_megami {
     position: fixed;
     z-index: 2;
-    top:  280px;
+    top:  230px;
     left:100px;
 }
 
 #select_nasu {
     position: fixed;
     z-index: 2;
-    top:  520px;
+    top:  490px;
     left: 300px;
 }
 
 #select_ninjin {
     position: fixed;
     z-index: 2;
-    top:   500px;
+    top:   470px;
     left:   20px;
 }
 
