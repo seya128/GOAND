@@ -93,43 +93,43 @@ body {
 #select_serifu {
     position: fixed;
     z-index: 3;
-    top:  20px;
-    left: 30px;
+    top:  10px;
+    left: 20px;
 }
 
 #select_megami {
     position: fixed;
     z-index: 2;
-    top:  320px;
-    left:160px;
+    top:  280px;
+    left:100px;
 }
 
 #select_nasu {
     position: fixed;
     z-index: 2;
-    top:  600px;
-    left: 400px;
+    top:  520px;
+    left: 300px;
 }
 
 #select_ninjin {
     position: fixed;
     z-index: 2;
-    top:   600px;
-    left:   50px;
+    top:   500px;
+    left:   20px;
 }
 
 #select_piman {
     position: fixed;
     z-index: 2;
-    top:   230px;
-    left:   50px;
+    top:   150px;
+    left:   20px;
 }
 
 #select_tomato {
     position: fixed;
     z-index: 2;
-    top:   250px;
-    left:  400px;
+    top:   170px;
+    left:  300px;
 }
 
 #load_kemuri {
