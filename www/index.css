@@ -83,6 +83,20 @@ body {
     left:  500px;
 }
 
+#icon_facebook {
+    position: fixed;
+    z-index: 5;
+    top:   10px;
+    left:  10px;
+}
+
+#icon_twitter {
+    position: fixed;
+    z-index: 5;
+    top:   10px;
+    left:  70px;
+}
+
 #select_serifuwaku {
     position: fixed;
     z-index: 2;
@@ -234,5 +248,5 @@ body {
     position: fixed;
     z-index: 10;
     top: 0px;
-    left: 0px;
+    left: 500px;
 }
