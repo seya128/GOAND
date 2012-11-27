@@ -12,8 +12,8 @@
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
             monaca.viewport({width: 640});
 
-            function goStamp()  {save(); document.location="StampMain.html"; event.preventDefault();};
-            function goTitle()  {document.location="index.html"; event.preventDefault();};
+            function goStamp(e)  {save(); document.location="StampMain.html"; e.preventDefault();};
+            function goTitle(e)  {document.location="index.html"; e.preventDefault();};
 
         </script>
         <link rel="stylesheet" type="text/css" href="StampSelect.css"

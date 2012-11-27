@@ -189,7 +189,7 @@ StampBar.prototype.setTouchEvent = function() {
         startX = touchX = pos.x;
         startOffset = _this.touchOffset = _this.offset;
         
-        event.preventDefault(); //デフォルトイベント処理をしない
+        e.preventDefault(); //デフォルトイベント処理をしない
     };    
 
     //移動
@@ -200,7 +200,7 @@ StampBar.prototype.setTouchEvent = function() {
             touchX = pos.x;
             _this.touchOffset = startOffset - ofs;
         }
-        event.preventDefault(); //デフォルトイベント処理をしない
+        e.preventDefault(); //デフォルトイベント処理をしない
     };    
 
     //タッチ終了
@@ -212,7 +212,7 @@ StampBar.prototype.setTouchEvent = function() {
         	_this.selectStamp(touchX);
 		}
 		        
-        event.preventDefault(); //デフォルトイベント処理をしない
+        e.preventDefault(); //デフォルトイベント処理をしない
     };    
 
     if (navigator.userAgent.indexOf('iPhone')>0 ||
@@ -331,7 +331,7 @@ function canvas_onTouchEvent(e) {
     
     drawStamp(pos.x, pos.y);
 
-    event.preventDefault(); //デフォルトイベント処理をしない
+    e.preventDefault(); //デフォルトイベント処理をしない
     
 }
 
@@ -387,8 +387,9 @@ window.onload = function() {
 
 
 // MENUボタンクリック
-function menuButtonClick(){
+function menuButtonClick(e){
 	document.location="StampSelect.html";
+    e.preventDefault(); //デフォルトイベント処理をしない
 }
 
 

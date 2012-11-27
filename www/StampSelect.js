@@ -157,7 +157,7 @@ var MainCanvas = function(no){
         startX = pos.x - ofsX * ofsRate;
         isTouch = true;
         
-        event.preventDefault(); //デフォルトイベント処理をしない
+        e.preventDefault(); //デフォルトイベント処理をしない
     };
     this.onTouchMove = function(e) {
         if (isTouch) {
@@ -165,12 +165,12 @@ var MainCanvas = function(no){
             ofsX = (pos.x - startX) * ofsRate;
         }
 
-        event.preventDefault(); //デフォルトイベント処理をしない
+        e.preventDefault(); //デフォルトイベント処理をしない
     };
     this.onTouchEnd = function(e){
         isTouch = false;
 
-        event.preventDefault(); //デフォルトイベント処理をしない
+        e.preventDefault(); //デフォルトイベント処理をしない
     };
     
     //マウスイベントリスナーの追加
