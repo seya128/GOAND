@@ -1,1 +1,1 @@
-{"version":"1.0","splash":{"android":{"background":"FFFFFF"}}}
+{"plugins":{"phonegap\/cordova.js":[],"monaca.js":[],"monaca.viewport.js":[],"winjs\/Microsoft.WinJS":{"ui-color":["CSS-UI-DARK"]},"phonegap-plugins\/childBrowser":[],"phonegap-plugins\/datePicker":[],"phonegap-plugins\/bluetooth":[],"phonegap-plugins\/share":[]},"splash":{"android":{"background":"FFFFFF"}},"version":"1.0"}
