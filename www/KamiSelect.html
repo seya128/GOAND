@@ -5,7 +5,7 @@
         <title>ごちそうさま</title>
         <script type="text/javascript" src="plugins/plugin-loader.js"></script>
         <script type="text/javascript">
-            // Set virtual screen width size to 640 pixels (横幅640pxに設定)
+            // Set virtual screen width size to 480 pixels (横幅480pxに設定)
             monaca.viewport({width: 480});
             
             function goNasuLoad()
@@ -36,7 +36,7 @@
         </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
-    <body>
+    <body onload = "setTimerkamiselect()">
         <img id="bg" src="img/Gohan/h_h01_bgd_a_00000.png"></img>
 
         <img id="select_megami" src="img/Gohan/g_g01_meg_a/g_g01_meg_a_00000.png"></img>
@@ -50,6 +50,7 @@
 
         <script type="text/javascript" src="common.js"></script>
         <script type="text/javascript" src="se.js"></script>
+        <script type="text/javascript" src="anime.js"></script>
 
     </body>
 </html>
