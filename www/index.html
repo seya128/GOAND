@@ -22,7 +22,8 @@
                 event.preventDefault();
                 window.localStorage.removeItem("CntGochi");
                 window.localStorage.removeItem("CntCoin");
-                alert("ごちそうさました回数をリセットしました。");
+                deleteHasStamp();
+                alert("ごちそうさました回数、スタンプデータをリセットしました。");
             };
 		    function writeTwitter()
 		    {
@@ -62,5 +63,6 @@
         <script type="text/javascript" src="sound.js"></script>
         <script type="text/javascript" src="se.js"></script>
         <script type="text/javascript" src="anime.js"></script>
+        <script type="text/javascript" src="StampData.js"></script>
     </body>
 </html>
