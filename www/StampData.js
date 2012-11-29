@@ -86,3 +86,24 @@ var hasStampData = [
     {"id":19, "ink":2},
     
 ];
+
+function loadHasStamp() {
+	var data = localStorage.getItem("HasStampData");
+	if (!data) return;
+	
+	hasStampData = JSON.parse(data);
+}
+
+function saveHasStamp() {
+	localStorage.setItem("HasStampData", JSON.stringify(hasStampData));
+	console.log("save hasStampData");
+}
+
+function deleteHasStamp() {
+	localStorage.removeItem("HasStampData");
+}
+
+
+
+
+//現在のシートの情報

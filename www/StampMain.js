@@ -330,7 +330,9 @@ function canvas_onTouchEvent(e) {
     var pos = getTouchPos(e);
     
     drawStamp(pos.x, pos.y);
-
+	
+	save();
+	
     e.preventDefault(); //デフォルトイベント処理をしない
     
 }
@@ -350,7 +352,7 @@ var stampBar;
 function drawStamp(x,y){
 	if (stampBar.selectedStampId >= 0){
 		stampBar.drawSelectedStamp(canvas_ctx, x,y);
-        playAudioSE_Stamp();
+        //playAudioSE_Stamp();
 	}
 }
 
@@ -359,9 +361,16 @@ function drawStamp(x,y){
 function load(){
     var sheet = localStorage.getItem("SelectedStampSheet");
     if (!sheet)    sheet = 0;
-	
 	gStampSheetNo = sheet;
+	
+	loadHasStamp();
 }
+
+//セーブ
+function save() {
+	saveHasStamp();
+}
+
 
 window.onload = function() {
 
