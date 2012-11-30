@@ -7,6 +7,8 @@ var STAMP_H = 160;
 //
 var gStampSheetNo = 0;					//シート番号
 
+// スタンプ描画データ
+var stampDrawData = new StampDrawData();
 
 //スタンプ種類の数
 var NUM_STAMP_MAX = stampImgName.length;
@@ -291,6 +293,10 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
     ctx.globalAlpha = a;
 	ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMP_H/2, STAMP_W,STAMP_H);
     ctx.globalAlpha = 1.0;
+    
+    //描画データ保存
+    stampDrawData.set(x,y, id, a);
+    stampDrawData.save(gStampSheetNo);	//オートセーブ
     
     if (s.ink > 0)	s.ink --;
 
