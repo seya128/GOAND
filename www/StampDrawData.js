@@ -31,7 +31,7 @@ StampDrawData.prototype.getSaveKey = function(hasSheetNo)
 StampDrawData.prototype.load = function(hasSheetNo) {
 	this.drawData = new Array();
 	var key = this.getSaveKey(hasSheetNo);
-	var data = localStorage.getItem("HasStampData");
+	var data = localStorage.getItem(key);
 	if (!data) {
 		console.log("ロード失敗!!: " + key);
 		return;
@@ -47,6 +47,22 @@ StampDrawData.prototype.save = function(hasSheetNo) {
 	var key = this.getSaveKey(hasSheetNo);
 	localStorage.setItem(key, JSON.stringify(this.drawData));
 	console.log("セーブ: " + key);
+};
+
+
+// データ取得
+StampDrawData.prototype.get = function(no) {
+	var r = {x:0, y:0, id:0, alpha:0};
+	var ix = no * 4;
+	if (ix >= this.drawData.length)
+		return null;
+	
+	r.x = this.drawData[ix++];
+	r.y = this.drawData[ix++];
+	r.id = this.drawData[ix++];
+	r.alpha = this.drawData[ix++];
+	
+	return r;
 };
 
 

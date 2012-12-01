@@ -309,6 +309,8 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 var canvas_canvas = document.getElementById("canvas");
 var canvas_ctx = canvas_canvas.getContext("2d");
 var canvas_img = new Image();
+var canvas_load_ix = 0;
+var canvas_stamp_img = new Image();
 
 // キャンバス：初期化
 function canvas_Init() {
@@ -327,10 +329,42 @@ function canvas_Init() {
     canvas_img.onload = canvas_Draw;
     canvas_img.src = bgImgName[gStampSheetNo];
 }
-
+//背景描画
 function canvas_Draw() {
     canvas_ctx.drawImage(canvas_img, 0,0);
+    
+    //スタンプ描画イメージ読み込み開始
+    canvas_load_ix = 0;
+    canvas_stamp_img.fname = null;
+    canvas_StampImageLoad();
 }
+//スタンプ描画イメージ読み込み開始
+function canvas_StampImageLoad() {
+	var d = stampDrawData.get(canvas_load_ix);
+	if (d == null)
+		return;
+	
+	if (canvas_stamp_img.fname == stampImgName[d.id]) {
+		canvas_StampDraw();
+	} else {
+		canvas_stamp_img.fname = stampImgName[d.id];
+		canvas_stamp_img.onload = canvas_StampDraw;
+		canvas_stamp_img.src = stampImgName[d.id];
+	}
+}
+function canvas_StampDraw() {
+	var d = stampDrawData.get(canvas_load_ix);
+	if (d == null)
+		return;
+
+    canvas_ctx.globalAlpha = d.alpha;
+	canvas_ctx.drawImage(canvas_stamp_img, d.x-STAMP_W/2,d.y-STAMP_H/2, STAMP_W,STAMP_H);
+    canvas_ctx.globalAlpha = 1.0;
+	
+	canvas_load_ix++;
+	canvas_StampImageLoad();	
+}
+
 // キャンバス：マウスタッチイベント
 function canvas_onTouchEvent(e) {
     var pos = getTouchPos(e);
@@ -370,6 +404,7 @@ function load(){
 	gStampSheetNo = sheet;
 	
 	loadHasStamp();
+	stampDrawData.load(sheet);
 }
 
 //セーブ
