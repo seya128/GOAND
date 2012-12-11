@@ -1,4 +1,101 @@
 
+
+// 定義
+var STAMP_W = 160;
+var STAMP_H = 160;
+
+// -------------------------------------
+// スタンプの最大数を取得しデバッグ表示
+// -------------------------------------
+var MAX_STAMP_IMAGE = stampImgName.length;
+//alert(MAX_STAMP_IMAGE);
+
+// -------------------------------------
+// ※勉強を兼ねて無駄にコメントを書きます
+// 　文法もC++風で書いてあるので、そのうちJava風に書き直します。
+// 　高速性はまったく考慮してません・・・。
+// -------------------------------------
+// -------------------------------------
+// データのロード
+// -------------------------------------
+function StampLoadData(no)
+{
+    this.stampImageNo 			= no;       	// スタンプの画像番号[一応持っておく]
+	this.stampDrawData  		= new StampDrawData();
+	this.stampLoadGetDataArray	= new Array();
+}
+// -------------------------------------
+// データのローダー
+// -------------------------------------
+StampLoadData.prototype.load = function()
+{
+	this.stampDrawData.load(iLoadDataIndex);
+	if (this.stampDrawData != null)
+	{
+		for(var i = 0;; i ++)
+		{
+			this.stampLoadGetDataArray[i] = this.stampDrawData.get(i);
+			if (this.stampLoadGetDataArray[i] == null) { break; }
+			// デバッグ表示
+			{
+				//var r = {x:0, y:0, id:0, alpha:0};
+				//alert("ようこそ！");
+				//console.log(stampTestData["x"] + " " + stampTestData["y"] + " " + stampTestData["id"] + " " + stampTestData["alpha"]);
+/*
+				alert(  this.stampLoadGetDataArray[i]["x"] + " " + 
+						this.stampLoadGetDataArray[i]["y"] + " " + 
+						this.stampLoadGetDataArray[i]["id"] + " " + 
+						this.stampLoadGetDataArray[i]["alpha"]);
+*/
+
+			}
+		}
+	}
+};
+
+// -------------------------------------
+// スタンプのロード
+// -------------------------------------
+function StampGraphic()
+{
+    this.stampImageNo = -1;       	// スタンプの画像番号[一応持っておく]
+    this.isLoaded = false;			// ロードフラグ
+    this.img = new Image();			// イメージクラス
+}
+// -------------------------------------
+// スタンプのローダー
+// -------------------------------------
+StampGraphic.prototype.loadImage = function(no)
+{
+	// 自分のポインタ
+    var _this = this;
+    
+    // ロード
+    this.isLoaded = false;																	// フラグの初期化				
+    this.img.onload = function(){ _this.isLoaded = true; /*alert("seikou" + no);*/ }		// ロードが終わっていたらフラグを立てる
+    this.img.src = stampImgName[no];														// イメージの名前を代入[StampData.js]
+    this.stampImageNo = no;																	// イメージ番号
+};
+
+// -------------------------------------
+// すべてのスタンプデータをロード
+// -------------------------------------   
+var StampLoadDataArray = new Array();
+for(var iLoadDataIndex = 0; iLoadDataIndex < 10; iLoadDataIndex ++)
+{
+	StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
+	StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
+}
+// -------------------------------------
+// すべてのスタンプ画像をロード
+// -------------------------------------   
+var stamp = new Array();
+for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
+{
+	stamp[i] = new StampGraphic(); 
+    stamp[i].loadImage(i);
+}
+
 //
 // スタンプシート
 //
@@ -16,11 +113,50 @@ function StampSheet(canvas_ctx, no){
 StampSheet.prototype.draw = function(ofs) {
     if (this.isLoaded) {
         var rate = Math.abs(ofs)/320 * 0.25 ;
-        var w = this.img.naturalWidth * (0.65 - rate);
+        var w = this.img.naturalWidth  * (0.65 - rate);
         var h = this.img.naturalHeight * (0.65 - rate);
         var x = (640 - w) / 2 + ofs - rate*ofs ;
         var y = (800 - h) / 2 + 20;
         this.ctx.drawImage(this.img, x,y, w,h);
+
+		// -------------------------------------
+		// シートに張り付けて描画
+		// -------------------------------------  
+		var iSheetNo = this.sheetNo;
+		if(StampLoadDataArray[iSheetNo] != null && iSheetNo >= 0)
+		{
+			for(var i = 0;; i ++)
+			{
+				// -------------------------------------
+				// 座標取得
+				// ------------------------------------- 
+				if (StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] == null) { break; }
+				var xx  = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["x"];
+				var yy  = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["y"];
+				var id  = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["id"];
+				var a   = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["alpha"];
+				// -------------------------------------
+				// 座標変換
+				// ------------------------------------- 
+				var r   = (0.65 - rate);
+				var ww  = (STAMP_W * r);
+				var hh  = (STAMP_H * r);
+				var ox  = x   + (xx * r);
+				var oy  = 400 + (yy * r) - (h / 2);
+				xx = (ox) -  (ww / 2);
+      		  	yy = ((oy) - (hh / 2) + 20);
+
+				// -------------------------------------
+				// 描画
+				// ------------------------------------- 
+				if(stamp[id] == null) { continue; }
+				if(stamp[id].isLoaded)
+				{
+					if(stamp[id].img == null) { continue; }
+					this.ctx.drawImage(stamp[id].img, xx, yy, ww, hh);
+				}
+			}
+		}
     }
 };
 //イメージセット
@@ -147,7 +283,8 @@ var MainCanvas = function(no){
         sheet[(this.selectIx + 4)%5].draw(ofsX-ofsMax);
         sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
         sheet[this.selectIx].draw(ofsX);
-        
+       
+
 //        this.dubugDisp();
     };
     
@@ -188,6 +325,7 @@ var MainCanvas = function(no){
     }
     //初期描画
     this.draw();
+
 };
 
 
