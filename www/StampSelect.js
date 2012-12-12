@@ -162,6 +162,7 @@ StampSheet.prototype.draw = function(ofs) {
 		}
     }
 };
+
 //イメージセット
 StampSheet.prototype.setImage = function(no) {
     var _this = this;

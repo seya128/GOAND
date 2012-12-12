@@ -4,6 +4,7 @@
         <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
         <title>ごちそうさま</title>
         <script type="text/javascript" src="plugins/plugin-loader.js"></script>
+		<script type="text/javascript" src="StampDrawData.js"></script>
         <script type="text/javascript">
             // Set virtual screen width size to 640 pixels (横幅640pxに設定)
             monaca.viewport({width: 640});
@@ -23,6 +24,7 @@
                 window.localStorage.removeItem("CntGochi");
                 window.localStorage.removeItem("CntCoin");
                 deleteHasStamp();
+				AllDeleteStampDrawData();	// スタンプしたデータを削除
                 alert("ごちそうさました回数、スタンプデータをリセットしました。");
             };
 		    function writeTwitter()
@@ -56,7 +58,7 @@
         <img id="present" src="img/title/t_btn_d000.png" onClick=goPresent()></img>
 
 	<div id="version">
-		version 0.0.15
+		version 0.0.16
 	</div>
 
         <script type="text/javascript" src="common.js"></script>

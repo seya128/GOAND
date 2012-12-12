@@ -53,9 +53,11 @@ var stampImgName = [
 //スタンプの最大回数
 var STAMP_LIFE_MAX = 30;
 
-//持ってるスタンプ
+// 持ってるスタンプ
+// スタンプの追加は「StampMain.jsのload()」へ移動
 var hasStampData = [
-    {"id":0, "ink":30},
+    {"id":0, "ink":30},		// ダミー
+/*
     {"id":1, "ink":30},
     {"id":2, "ink":30},
     {"id":3, "ink":30},
@@ -85,14 +87,50 @@ var hasStampData = [
     {"id":17, "ink":20},
     {"id":18, "ink":10},
     {"id":19, "ink":2},
-    
+*/
 ];
+
+// スタンプデータの追加
+function AddHasStamp(id, ink)
+{
+	var sData = {"id":id, "ink":ink };
+	hasStampData.push(sData);
+}
+// スタンプデータの削除
+function DelHasStamp(index)
+{ 
+	hasStampData.splice(index, 1);
+	// 削除
+/*
+	for(var i = index; i < hasStampData.length - 1; i ++)
+	{
+		hasStampData[i]["id"]  = hasStampData[i + 1]["id"];
+		hasStampData[i]["ink"] = hasStampData[i + 1]["ink"];
+	}
+*/
+}
+// スタンプデータの全て削除
+function AllDelHasStamp()
+{ 
+	hasStampData.splice(0);
+}
+// スタンプデータのダミーセット
+function DummyStampDataSet()
+{
+	// 複数追加
+	AllDelHasStamp();
+	for(var i = 0; i <= 26; i ++)
+	{
+		AddHasStamp(i, 30);
+	}
+}
 
 function loadHasStamp() {
 	var data = localStorage.getItem("HasStampData");
-	if (!data) return;
+	if (!data) { return false; }
 	
 	hasStampData = JSON.parse(data);
+	return true;
 }
 
 function saveHasStamp() {
@@ -102,6 +140,7 @@ function saveHasStamp() {
 
 function deleteHasStamp() {
 	localStorage.removeItem("HasStampData");
+	DummyStampDataSet();
 }
 
 

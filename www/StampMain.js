@@ -298,8 +298,14 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
     stampDrawData.set(x,y, id, a);
     stampDrawData.save(gStampSheetNo);	//オートセーブ
     
-    if (s.ink > 0)	s.ink --;
-
+	// インク切れの瞬間
+	if(s.ink == 1)      { s.ink = 0; DelHasStamp(id); }
+    // インクを引く
+	else if(s.ink > 0)	{ s.ink --; }
+	else
+	{
+		DelHasStamp(ix);
+	}
 }
 
 
@@ -403,7 +409,18 @@ function load(){
     if (!sheet)    sheet = 0;
 	gStampSheetNo = sheet;
 	
-	loadHasStamp();
+	// 持っているスタンプのロード
+	if(loadHasStamp() == true)
+	{
+		// 成功ならいじらないが、チートやエラーチェックをしたほうがいいかも
+	}
+	// 失敗したらとりあえず複数のスタンプを作る
+	else
+	{
+		// ダミー削除
+		//DelHasStamp(0);
+		DummyStampDataSet();
+	}
 	stampDrawData.load(sheet);
 }
 

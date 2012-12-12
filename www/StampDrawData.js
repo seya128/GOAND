@@ -49,6 +49,36 @@ StampDrawData.prototype.save = function(hasSheetNo) {
 	console.log("セーブ: " + key);
 };
 
+/*
+StampDrawData.prototype.DeleteSheetData = function(hasSheetNo) {
+	var key = this.getSaveKey(hasSheetNo);
+	localStorage.removeItem(key);
+}
+StampDrawData.prototype.AllDeleteSheetData = function() {
+	for(int i = 0;; i ++)
+	{
+		var key  = this.getSaveKey(i);
+		var data = localStorage.getItem(key);
+		if (!data) 
+		{
+			return;
+		}
+		localStorage.removeItem(key);
+	}
+}
+*/
+
+// すべてのスタンプデータを削除
+function AllDeleteStampDrawData()
+{
+	for(var i = 0;; i ++)
+	{
+		var key  = STAMPDRAWDATA_KEY_BASE + i;
+		var data = window.localStorage.getItem(key);
+		if (!data) { return; }
+		window.localStorage.removeItem(key);
+	}
+}
 
 // データ取得
 StampDrawData.prototype.get = function(no) {
