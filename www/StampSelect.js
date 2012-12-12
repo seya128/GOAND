@@ -112,6 +112,7 @@ function StampSheet(canvas_ctx, no){
 //描画
 StampSheet.prototype.draw = function(ofs) {
     if (this.isLoaded) {
+
         var rate = Math.abs(ofs)/320 * 0.25 ;
         var w = this.img.naturalWidth  * (0.65 - rate);
         var h = this.img.naturalHeight * (0.65 - rate);
@@ -153,7 +154,9 @@ StampSheet.prototype.draw = function(ofs) {
 				if(stamp[id].isLoaded)
 				{
 					if(stamp[id].img == null) { continue; }
+					this.ctx.globalAlpha = a;
 					this.ctx.drawImage(stamp[id].img, xx, yy, ww, hh);
+					this.ctx.globalAlpha = 1.0;
 				}
 			}
 		}
@@ -190,7 +193,15 @@ var MainCanvas = function(no){
     
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
-
+ /*   var canvas2 = document.getElementById("canvasS2");
+    var ctx2 = canvas2.getContext("2d");
+    var canvas3 = document.getElementById("canvasS3");
+    var ctx3 = canvas3.getContext("2d");
+    var canvas4 = document.getElementById("canvasS4");
+    var ctx4 = canvas4.getContext("2d");
+    var canvas5 = document.getElementById("canvasS5");
+    var ctx5 = canvas5.getContext("2d");
+*/
     //スタンプシート準備
     var sheet = new Array();
     sheet[0] = new StampSheet(ctx,no);
