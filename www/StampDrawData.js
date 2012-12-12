@@ -65,17 +65,16 @@ StampDrawData.prototype.AllDeleteSheetData = function() {
 		}
 		localStorage.removeItem(key);
 	}
-}
-*/
+}*/
 
 // すべてのスタンプデータを削除
 function AllDeleteStampDrawData()
 {
-	for(var i = 0;; i ++)
+	for(var i = 0; i < 100; i ++)
 	{
 		var key  = STAMPDRAWDATA_KEY_BASE + i;
 		var data = window.localStorage.getItem(key);
-		if (!data) { return; }
+		if (!data) { continue; }
 		window.localStorage.removeItem(key);
 	}
 }
