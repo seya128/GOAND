@@ -99,14 +99,18 @@ for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
 //
 // スタンプシート
 //
-function StampSheet(canvas_ctx, no){
+function StampSheet(canvas_ctx, no)
+{
+
     var _this = this;
     this.ctx = canvas_ctx;
     this.img = new Image();
     this.isLoaded = false;
     this.sheetNo = no;
     this.sheetSrc = "";
-    
+
+	// 動的キャンバス
+	this.CanvasSheet = document.createElement("canvas");	this.CanvasSheet.setAttribute("id","MoveCanvas" + no);	this.CanvasSheet.setAttribute("width","640");	this.CanvasSheet.setAttribute("height","1200");	this.CanvasSheet_2d = this.CanvasSheet.getContext("2d");    
     this.setImage(no);
 }
 //描画
@@ -119,7 +123,8 @@ StampSheet.prototype.draw = function(ofs)
         var h = this.img.naturalHeight * (0.65 - rate);
         var x = (640 - w) / 2 + ofs - rate*ofs ;
         var y = (800 - h) / 2 + 20;
-        this.ctx.drawImage(this.img, x, y, w, h);
+		// そのまま描画
+		this.CanvasSheet_2d.drawImage(this.img, 0, 0, 640, 1200);
 
 		// -------------------------------------
 		// シートに張り付けて描画
@@ -139,7 +144,8 @@ StampSheet.prototype.draw = function(ofs)
 				var a   = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["alpha"];
 				// -------------------------------------
 				// 座標変換
-				// ------------------------------------- 
+				// -------------------------------------
+/* 
 				var r   = (0.65 - rate);
 				var ww  = (STAMP_W * r);
 				var hh  = (STAMP_H * r);
@@ -147,7 +153,7 @@ StampSheet.prototype.draw = function(ofs)
 				var oy  = 400 + (yy * r) - (h / 2);
 				xx = (ox) -  (ww / 2);
       		  	yy = ((oy) - (hh / 2) + 20);
-
+*/
 				// -------------------------------------
 				// 描画
 				// ------------------------------------- 
@@ -155,12 +161,18 @@ StampSheet.prototype.draw = function(ofs)
 				if(stamp[id].isLoaded)
 				{
 					if(stamp[id].img == null) { continue; }
-					this.ctx.globalAlpha = a;
-					this.ctx.drawImage(stamp[id].img, xx, yy, ww, hh);
-					this.ctx.globalAlpha = 1.0;
+					this.CanvasSheet_2d.globalAlpha = a;
+					this.CanvasSheet_2d.drawImage(stamp[id].img, 
+						xx-STAMP_W/2, 
+						yy-STAMP_H/2, 
+						STAMP_W, 
+						STAMP_H);
+					this.CanvasSheet_2d.globalAlpha = 1.0;
 				}
 			}
 		}
+		// 最終描画
+        this.ctx.drawImage(this.CanvasSheet, x, y, w, h);
     }
 };
 
@@ -192,31 +204,11 @@ var MainCanvas = function(no){
     var addX=0, ofsXold=0;
     var ofsRate=1.2;
     var isTouch = false;
-   /* 
-    var canvas			= document.getElementById("canvas");
-	var ctx 			= canvas.getContext("2d");
-    var CanvasSheet1 	= document.getElementById("canvasS1");
-    var CanvasSheet1_2d = CanvasSheet1.getContext("2d");
-    var CanvasSheet2 	= document.getElementById("canvasS2");
-    var CanvasSheet2_2d = CanvasSheet2.getContext("2d");
-    var CanvasSheet3 	= document.getElementById("canvasS3");
-    var CanvasSheet3_2d = CanvasSheet3.getContext("2d");
-    var CanvasSheet4 	= document.getElementById("canvasS4");
-    var CanvasSheet4_2d = CanvasSheet4.getContext("2d");
-    var CanvasSheet5 	= document.getElementById("canvasS5");
-    var CanvasSheet5_2d = CanvasSheet5.getContext("2d");
 
+	// デフォルトキャンバス
+    var canvas = document.getElementById("canvas");
+	var ctx    = canvas.getContext("2d");
     //スタンプシート準備
-    var sheet = new Array();
-    sheet[0] = new StampSheet(CanvasSheet1_2d,no);
-    sheet[1] = new StampSheet(CanvasSheet2_2d,no+1);
-    sheet[2] = new StampSheet(CanvasSheet3_2d,no+2);
-    sheet[4] = new StampSheet(CanvasSheet4_2d,no+hasSheetData.length-1);
-    sheet[3] = new StampSheet(CanvasSheet5_2d,no+hasSheetData.length-2);*/
-
-    //スタンプシート準備
-    var canvas			= document.getElementById("canvas");
-	var ctx 			= canvas.getContext("2d");
     var sheet = new Array();
     sheet[0] = new StampSheet(ctx,no);
     sheet[1] = new StampSheet(ctx,no+1);
@@ -253,19 +245,6 @@ var MainCanvas = function(no){
         /* 矩形を描画 */
         ctx.rect(0,0, 640, 1200);
         ctx.fill();
-/*
-        CanvasSheet1_2d.beginPath();
-        //グラデーション領域をセット
-        var grad  = CanvasSheet1_2d.createLinearGradient(0,0, 0,1200);
-        //グラデーション終点のオフセットと色をセット
-        grad.addColorStop(0,'rgb(10, 10, 50)');
-        grad.addColorStop(0.7,'rgb(150, 150, 240)');
-        //グラデーションをfillStyleプロパティにセット
-        CanvasSheet1_2d.fillStyle = grad;
-        // 矩形を描画 
-        CanvasSheet1_2d.rect(0,0, 640, 1200);
-        CanvasSheet1_2d.fill();
-*/
     };
     
     //描画
@@ -322,9 +301,12 @@ var MainCanvas = function(no){
         sheet[(this.selectIx + 4)%5].draw(ofsX-ofsMax);
         sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
         sheet[this.selectIx].draw(ofsX);
-       
 
-//        this.dubugDisp();
+
+		// 合成して描画
+      	//ctx.drawImage(obj, 0, 0, 640, 1200);
+
+//      this.dubugDisp();
     };
     
     //マウスイベント
@@ -364,13 +346,6 @@ var MainCanvas = function(no){
     }
     // 初期描画
     this.draw();
-
-//	ctx.drawImage(CanvasSheet5, 0, 200, 320, 1000);
-	//ctx.drawImage(CanvasSheet4, 0, 400, 320, 1000);
-	//ctx.drawImage(CanvasSheet3, 400, 200, 320, 1000);
-	//ctx.drawImage(CanvasSheet2, -400, 200, 320, 1000);
-//	ctx.drawImage(CanvasSheet1, 0, 0, 640, 1000);
-
 };
 
 
