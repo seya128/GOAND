@@ -81,7 +81,7 @@ StampGraphic.prototype.loadImage = function(no)
 // すべてのスタンプデータをロード
 // -------------------------------------   
 var StampLoadDataArray = new Array();
-for(var iLoadDataIndex = 0; iLoadDataIndex < 10; iLoadDataIndex ++)
+for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
 {
 	StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
 	StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
@@ -99,25 +99,32 @@ for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
 //
 // スタンプシート
 //
-function StampSheet(canvas_ctx, no){
+function StampSheet(canvas_ctx, no)
+{
+
     var _this = this;
     this.ctx = canvas_ctx;
     this.img = new Image();
     this.isLoaded = false;
     this.sheetNo = no;
     this.sheetSrc = "";
-    
+
+	// 動的キャンバス
+	this.CanvasSheet = document.createElement("canvas");	this.CanvasSheet.setAttribute("id","MoveCanvas" + no);	this.CanvasSheet.setAttribute("width","640");	this.CanvasSheet.setAttribute("height","1200");	this.CanvasSheet_2d = this.CanvasSheet.getContext("2d");    
     this.setImage(no);
 }
 //描画
-StampSheet.prototype.draw = function(ofs) {
-    if (this.isLoaded) {
+StampSheet.prototype.draw = function(ofs)
+{
+	if (this.isLoaded) 
+	{
         var rate = Math.abs(ofs)/320 * 0.25 ;
         var w = this.img.naturalWidth  * (0.65 - rate);
         var h = this.img.naturalHeight * (0.65 - rate);
         var x = (640 - w) / 2 + ofs - rate*ofs ;
         var y = (800 - h) / 2 + 20;
-        this.ctx.drawImage(this.img, x,y, w,h);
+		// そのまま描画
+		this.CanvasSheet_2d.drawImage(this.img, 0, 0, 640, 1200);
 
 		// -------------------------------------
 		// シートに張り付けて描画
@@ -137,7 +144,8 @@ StampSheet.prototype.draw = function(ofs) {
 				var a   = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["alpha"];
 				// -------------------------------------
 				// 座標変換
-				// ------------------------------------- 
+				// -------------------------------------
+/* 
 				var r   = (0.65 - rate);
 				var ww  = (STAMP_W * r);
 				var hh  = (STAMP_H * r);
@@ -145,7 +153,7 @@ StampSheet.prototype.draw = function(ofs) {
 				var oy  = 400 + (yy * r) - (h / 2);
 				xx = (ox) -  (ww / 2);
       		  	yy = ((oy) - (hh / 2) + 20);
-
+*/
 				// -------------------------------------
 				// 描画
 				// ------------------------------------- 
@@ -153,22 +161,31 @@ StampSheet.prototype.draw = function(ofs) {
 				if(stamp[id].isLoaded)
 				{
 					if(stamp[id].img == null) { continue; }
-					this.ctx.drawImage(stamp[id].img, xx, yy, ww, hh);
+					this.CanvasSheet_2d.globalAlpha = a;
+					this.CanvasSheet_2d.drawImage(stamp[id].img, 
+						xx-STAMP_W/2, 
+						yy-STAMP_H/2, 
+						STAMP_W, 
+						STAMP_H);
+					this.CanvasSheet_2d.globalAlpha = 1.0;
 				}
 			}
 		}
+		// 最終描画
+        this.ctx.drawImage(this.CanvasSheet, x, y, w, h);
     }
 };
+
 //イメージセット
 StampSheet.prototype.setImage = function(no) {
     var _this = this;
-    if (no < 0) no+=bgImgName.length;
-    this.sheetNo = no % bgImgName.length;
-    this.isLoaded = false;
+    if (no < 0)    no +=hasSheetData.length;
+    this.sheetNo = no % hasSheetData.length;
+  //  this.isLoaded = false;
     this.img.onload = function() {
         _this.isLoaded = true;
     };
-    this.sheetSrc = bgImgName[this.sheetNo];
+    this.sheetSrc = bgImgName[hasSheetData[this.sheetNo]["id"]];
     this.img.src = this.sheetSrc;
 };
     
@@ -187,18 +204,18 @@ var MainCanvas = function(no){
     var addX=0, ofsXold=0;
     var ofsRate=1.2;
     var isTouch = false;
-    
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext("2d");
 
+	// デフォルトキャンバス
+    var canvas = document.getElementById("canvas");
+	var ctx    = canvas.getContext("2d");
     //スタンプシート準備
     var sheet = new Array();
     sheet[0] = new StampSheet(ctx,no);
     sheet[1] = new StampSheet(ctx,no+1);
     sheet[2] = new StampSheet(ctx,no+2);
-    sheet[4] = new StampSheet(ctx,no+bgImgName.length-1);
-    sheet[3] = new StampSheet(ctx,no+bgImgName.length-2);
-    
+    sheet[4] = new StampSheet(ctx,no+hasSheetData.length-1);
+    sheet[3] = new StampSheet(ctx,no+hasSheetData.length-2);
+
     //debug
     this.dubugDisp = function() {
         document.getElementById("body").innerHTML = 
@@ -215,7 +232,8 @@ var MainCanvas = function(no){
     };
     
     //キャンバスクリア
-    this.clear = function(){
+    this.clear = function()
+	{
         ctx.beginPath();
         //グラデーション領域をセット
         var grad  = ctx.createLinearGradient(0,0, 0,1200);
@@ -225,7 +243,7 @@ var MainCanvas = function(no){
         //グラデーションをfillStyleプロパティにセット
         ctx.fillStyle = grad;
         /* 矩形を描画 */
-        ctx.rect(0,0, 640,1200);
+        ctx.rect(0,0, 640, 1200);
         ctx.fill();
     };
     
@@ -283,9 +301,12 @@ var MainCanvas = function(no){
         sheet[(this.selectIx + 4)%5].draw(ofsX-ofsMax);
         sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
         sheet[this.selectIx].draw(ofsX);
-       
 
-//        this.dubugDisp();
+
+		// 合成して描画
+      	//ctx.drawImage(obj, 0, 0, 640, 1200);
+
+//      this.dubugDisp();
     };
     
     //マウスイベント
@@ -323,9 +344,8 @@ var MainCanvas = function(no){
         canvas.addEventListener("mousemove",this.onTouchMove,false);
         canvas.addEventListener("mouseup",this.onTouchEnd,false);
     }
-    //初期描画
+    // 初期描画
     this.draw();
-
 };
 
 

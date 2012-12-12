@@ -281,8 +281,10 @@ StampBar.prototype.selectStamp = function(x){
 
 //選択スタンプ描画
 StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
-	var ix = this.selectedStampIx;
-	var id = this.selectedStampId;
+	var ix = this.selectedStampIx;		//選択された手持ちスタンプのID
+	var id = this.selectedStampId;		//選択されたスタンプオブジェクトのインデックス
+
+	// 持っているスタンプデータの取得
     var s = getHasStampData(id);
 	
     var a = Math.floor(s.ink / (STAMP_LIFE_MAX/5))+1;  //残りインクを５段階に(6-1)
@@ -295,11 +297,19 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
     ctx.globalAlpha = 1.0;
     
     //描画データ保存
-    stampDrawData.set(x,y, id, a);
+    stampDrawData.set(x,y, s.id, a);
     stampDrawData.save(gStampSheetNo);	//オートセーブ
     
-    if (s.ink > 0)	s.ink --;
-
+	// インク切れの瞬間
+	if(s.ink == 1 || s.ink < 0)      
+	{ 
+		s.ink = 0; 
+		DelHasStamp(id);
+		//if(this.selectedStampId > 0) { this.selectedStampId --; }
+    	//this.selectedStampIx = getHasStampData(this.selectedStampId).id;
+	}
+    // インクを引く
+	else if(s.ink > 0)	{ s.ink --; }
 }
 
 
@@ -327,7 +337,7 @@ function canvas_Init() {
     
     //背景ロード
     canvas_img.onload = canvas_Draw;
-    canvas_img.src = bgImgName[gStampSheetNo];
+    canvas_img.src = bgImgName[hasSheetData[gStampSheetNo]["id"]];
 }
 //背景描画
 function canvas_Draw() {
@@ -403,7 +413,18 @@ function load(){
     if (!sheet)    sheet = 0;
 	gStampSheetNo = sheet;
 	
-	loadHasStamp();
+	// 持っているスタンプのロード
+	if(loadHasStamp() == true)
+	{
+		// 成功ならいじらないが、チートやエラーチェックをしたほうがいいかも
+	}
+	// 失敗したらとりあえず複数のスタンプを作る
+	else
+	{
+		// ダミー削除
+		//DelHasStamp(0);
+		DummyStampDataSet();
+	}
 	stampDrawData.load(sheet);
 }
 
