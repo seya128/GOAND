@@ -304,7 +304,7 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 	else if(s.ink > 0)	{ s.ink --; }
 	else
 	{
-		DelHasStamp(ix);
+		DelHasStamp(id);
 	}
 }
 
@@ -333,7 +333,7 @@ function canvas_Init() {
     
     //背景ロード
     canvas_img.onload = canvas_Draw;
-    canvas_img.src = bgImgName[gStampSheetNo];
+    canvas_img.src = bgImgName[hasSheetData[gStampSheetNo]["id"]];
 }
 //背景描画
 function canvas_Draw() {

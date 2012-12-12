@@ -81,7 +81,7 @@ StampGraphic.prototype.loadImage = function(no)
 // すべてのスタンプデータをロード
 // -------------------------------------   
 var StampLoadDataArray = new Array();
-for(var iLoadDataIndex = 0; iLoadDataIndex < 10; iLoadDataIndex ++)
+for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
 {
 	StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
 	StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
@@ -111,8 +111,7 @@ function StampSheet(canvas_ctx, no){
 }
 //描画
 StampSheet.prototype.draw = function(ofs) {
-    if (this.isLoaded) {
-
+	if (this.isLoaded) {
         var rate = Math.abs(ofs)/320 * 0.25 ;
         var w = this.img.naturalWidth  * (0.65 - rate);
         var h = this.img.naturalHeight * (0.65 - rate);
@@ -166,13 +165,13 @@ StampSheet.prototype.draw = function(ofs) {
 //イメージセット
 StampSheet.prototype.setImage = function(no) {
     var _this = this;
-    if (no < 0) no+=bgImgName.length;
-    this.sheetNo = no % bgImgName.length;
-    this.isLoaded = false;
+    if (no < 0)    no +=hasSheetData.length;
+    this.sheetNo = no % hasSheetData.length;
+  //  this.isLoaded = false;
     this.img.onload = function() {
         _this.isLoaded = true;
     };
-    this.sheetSrc = bgImgName[this.sheetNo];
+    this.sheetSrc = bgImgName[hasSheetData[this.sheetNo]["id"]];
     this.img.src = this.sheetSrc;
 };
     
@@ -208,8 +207,8 @@ var MainCanvas = function(no){
     sheet[0] = new StampSheet(ctx,no);
     sheet[1] = new StampSheet(ctx,no+1);
     sheet[2] = new StampSheet(ctx,no+2);
-    sheet[4] = new StampSheet(ctx,no+bgImgName.length-1);
-    sheet[3] = new StampSheet(ctx,no+bgImgName.length-2);
+    sheet[4] = new StampSheet(ctx,no+hasSheetData.length-1);
+    sheet[3] = new StampSheet(ctx,no+hasSheetData.length-2);
     
     //debug
     this.dubugDisp = function() {

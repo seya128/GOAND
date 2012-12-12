@@ -53,43 +53,31 @@ var stampImgName = [
 //スタンプの最大回数
 var STAMP_LIFE_MAX = 30;
 
-// 持ってるスタンプ
+// ------------------------------------------------------
+// 持ってるスタンプ[セーブ対象]
 // スタンプの追加は「StampMain.jsのload()」へ移動
+// ------------------------------------------------------
 var hasStampData = [
     {"id":0, "ink":30},		// ダミー
-/*
-    {"id":1, "ink":30},
-    {"id":2, "ink":30},
-    {"id":3, "ink":30},
-    {"id":4, "ink":30},
-    {"id":5, "ink":30},
-    {"id":6, "ink":30},
-    {"id":7, "ink":30},
-    {"id":8, "ink":30},
-    {"id":9, "ink":30},
-    {"id":10, "ink":30},
-    {"id":11, "ink":30},
-    {"id":12, "ink":30},
-    {"id":13, "ink":30},
-    {"id":14, "ink":30},
-    {"id":15, "ink":30},
-    {"id":16, "ink":30},
-    {"id":17, "ink":30},
-    {"id":18, "ink":30},
-    {"id":19, "ink":30},
-    {"id":20, "ink":30},
-    {"id":21, "ink":30},
-    {"id":22, "ink":30},
-    {"id":23, "ink":30},
-    {"id":24, "ink":30},
-    {"id":25, "ink":30},
-    {"id":26, "ink":30},
-    {"id":17, "ink":20},
-    {"id":18, "ink":10},
-    {"id":19, "ink":2},
-*/
+];
+// ------------------------------------------------------
+// シートデータ[セーブ対象]
+// ------------------------------------------------------
+var hasSheetData = [
+    {"id":0 },			// ダミー
+    {"id":0 },			// ダミー
+    {"id":5 },			// ダミー
+    {"id":6 },			// ダミー
+    {"id":0 },			// ダミー
+    {"id":3 },			// ダミー
+    {"id":0 },			// ダミー
+    {"id":0 },			// ダミー
+    {"id":0 },			// ダミー
 ];
 
+// ------------------------------------------------------
+// スタンプ操作
+// ------------------------------------------------------
 // スタンプデータの追加
 function AddHasStamp(id, ink)
 {
@@ -100,14 +88,6 @@ function AddHasStamp(id, ink)
 function DelHasStamp(index)
 { 
 	hasStampData.splice(index, 1);
-	// 削除
-/*
-	for(var i = index; i < hasStampData.length - 1; i ++)
-	{
-		hasStampData[i]["id"]  = hasStampData[i + 1]["id"];
-		hasStampData[i]["ink"] = hasStampData[i + 1]["ink"];
-	}
-*/
 }
 // スタンプデータの全て削除
 function AllDelHasStamp()
@@ -124,6 +104,36 @@ function DummyStampDataSet()
 		AddHasStamp(i, 30);
 	}
 }
+// ------------------------------------------------------
+// シート操作
+// ------------------------------------------------------
+// スタンプデータの追加
+function AddHasSheet(id)
+{
+	var sData = {"id":id };
+	hasSheetData.push(sData);
+}
+// スタンプデータの削除
+function DelHasSheet(index)
+{ 
+	hasStampData.splice(index, 1);
+}
+// スタンプデータの全て削除
+function AllDelHasSheet()
+{ 
+	hasSheetData.splice(0);
+}
+// スタンプデータのダミーセット
+function DummySheetDataSet()
+{
+	// 複数追加
+	AllDelHasSheet();
+	for(var i = 0; i <= 26; i ++)
+	{
+		AddHasSheet(i, 30);
+	}
+}
+
 
 function loadHasStamp() {
 	var data = localStorage.getItem("HasStampData");
