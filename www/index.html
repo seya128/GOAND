@@ -3,11 +3,11 @@
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
         <title>ごちそうさま</title>
-        <script type="text/javascript" src="plugins/plugin-loader.js"></script>
 		<script type="text/javascript" src="StampDrawData.js"></script>
+        <script type="text/javascript" src="lib/common.js"></script>
+        <script type="text/javascript" src="lib/common.viewport.js"></script>
         <script type="text/javascript">
-            // Set virtual screen width size to 640 pixels (横幅640pxに設定)
-            monaca.viewport({width: 640});
+            common.viewport({width: 640});
             
             function goGohan()  {document.location="KamiSelect.html"; event.preventDefault();};
             function goStamp()  {document.location="StampSelect.html"; event.preventDefault();};
@@ -27,20 +27,21 @@
 				AllDeleteStampDrawData();	// スタンプしたデータを削除
                 alert("ごちそうさました回数、スタンプデータをリセットしました。");
             };
-		    function writeTwitter()
-		    {
-				window.plugins.childBrowser.openExternal('http://twitter.com/?status='+encodeURIComponent("ああああああ"), true);
-		    };
-			function writeFacebook()
-			{
-				window.plugins.childBrowser.openExternal('http://www.facebook.com/sharer.php?u='+encodeURIComponent("ああああああ"), true);
-			};
+            
+            function onLoadIndex() {
+            	common.hideAddressbar();
+            	titleAddSceen();
+            	//setTimerindex();
+            }
+            
         </script>
         <link rel="stylesheet" type="text/css" href="index.css"
     </head>
-    <body onload = "setTimerindex()">
+    <body onload = "onLoadIndex()">
+    	<div id="sceen"></div>
+<!--
         <img id="bg" src="img/title/h_h00_bgd_a/h_h00_bgd_a_00000.png"></img>
-
+-->
         <img id="title" src="img/title/t_rgo_a000.png"></img>
 
         <img id="megami" src="img/title/t_meg_a/t_meg_a_00000.png"></img>
@@ -61,10 +62,10 @@
 		version 0.0.16
 	</div>
 
-        <script type="text/javascript" src="common.js"></script>
         <script type="text/javascript" src="sound.js"></script>
         <script type="text/javascript" src="se.js"></script>
         <script type="text/javascript" src="anime.js"></script>
         <script type="text/javascript" src="StampData.js"></script>
+        <script type="text/javascript" src="title.js"></script>
     </body>
 </html>
