@@ -1,8 +1,18 @@
 
-
+// -------------------------------------
 // 定義
+// -------------------------------------
 var STAMP_W = 160;
 var STAMP_H = 160;
+
+// -------------------------------------
+// リダクションサイズを設定する「処理を軽くするためサムネイル」
+// -------------------------------------
+var REDUCTION_SIZE = 2.0;
+var SCREEN_WIDTH   = 640;
+var SCREEN_HEIGHT  = 1200;
+var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
+var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
@@ -101,7 +111,6 @@ for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
 //
 function StampSheet(canvas_ctx, no)
 {
-
     var _this = this;
     this.ctx = canvas_ctx;
     this.img = new Image();
@@ -110,7 +119,7 @@ function StampSheet(canvas_ctx, no)
     this.sheetSrc = "";
 
 	// 動的キャンバス
-	this.CanvasSheet = document.createElement("canvas");	this.CanvasSheet.setAttribute("id","MoveCanvas" + no);	this.CanvasSheet.setAttribute("width","640");	this.CanvasSheet.setAttribute("height","1200");	this.CanvasSheet_2d = this.CanvasSheet.getContext("2d");    
+	this.CanvasSheet = document.createElement("canvas");	this.CanvasSheet.setAttribute("id","MoveCanvas" + no);	this.CanvasSheet.setAttribute("width", "" + CANVAS_WIDTH);	this.CanvasSheet.setAttribute("height","" + CANVAS_HEIGHT);	this.CanvasSheet_2d = this.CanvasSheet.getContext("2d");    
     this.setImage(no);
 }
 //描画
@@ -124,7 +133,7 @@ StampSheet.prototype.draw = function(ofs)
         var x = (640 - w) / 2 + ofs - rate*ofs ;
         var y = (800 - h) / 2 + 20;
 		// そのまま描画
-		this.CanvasSheet_2d.drawImage(this.img, 0, 0, 640, 1200);
+		this.CanvasSheet_2d.drawImage(this.img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
 		// -------------------------------------
 		// シートに張り付けて描画
@@ -163,10 +172,10 @@ StampSheet.prototype.draw = function(ofs)
 					if(stamp[id].img == null) { continue; }
 					this.CanvasSheet_2d.globalAlpha = a;
 					this.CanvasSheet_2d.drawImage(stamp[id].img, 
-						xx-STAMP_W/2, 
-						yy-STAMP_H/2, 
-						STAMP_W, 
-						STAMP_H);
+						(xx/REDUCTION_SIZE)-STAMP_W/2/REDUCTION_SIZE, 
+						(yy/REDUCTION_SIZE)-STAMP_H/2/REDUCTION_SIZE, 
+						STAMP_W / REDUCTION_SIZE, 
+						STAMP_H / REDUCTION_SIZE);
 					this.CanvasSheet_2d.globalAlpha = 1.0;
 				}
 			}
@@ -181,7 +190,7 @@ StampSheet.prototype.setImage = function(no) {
     var _this = this;
     if (no < 0)    no +=hasSheetData.length;
     this.sheetNo = no % hasSheetData.length;
-  //  this.isLoaded = false;
+    this.isLoaded = false;
     this.img.onload = function() {
         _this.isLoaded = true;
     };
