@@ -70,54 +70,22 @@ var nEffectA = 0;
 var nEffectID= 0;
 var nEffectNID= 0;
 var nEffectSwitch= 0;
+var nEffectWork= 0;
 
 // エフェクトコールバック
 function ExecEffect()
 {
-	if(nEffectSwitch == 0)
-	{
-		if(nEffectTime > 0)
-		{	
-			nEffectTime -= 10;
-			nEffectA -= 0.05;
-			nEffectCount += 10;
-			
-			// 描画
-			//var ww = nEffectW / 1.25 + (nEffectCount * 2.0);
-			//var hh = nEffectH / 1.25 + (nEffectCount * 2.0);
-			var ww = nEffectW / 1.0 - (nEffectCount * 2.0);
-			var hh = nEffectH / 1.0 - (nEffectCount * 2.0);
-	        sEffectCtx.globalAlpha = nEffectA;
-	        sEffectCtx.drawImage(	stampBar.stamp[nEffectID].img, 
-									nEffectX - (ww / 2) + nEffectW / 2, 
-									nEffectY - (hh / 2) + nEffectH / 2, 
-									ww, 
-									hh);
-	        sEffectCtx.globalAlpha = 1.0;
-
-		}
-		else
-		{
-			//sTimeHandle = false;
-			nEffectTime = 30;
-			nEffectCount = 0;
-			DelHasStamp(nEffectNID);
-			saveHasStamp();
-			stampBar.selectedStampId = -1;	//選択された手持ちスタンプのID
-			nEffectSwitch ++;
-		}
-	}
-	else
+	if(nEffectWork == 1)
 	{
 		if(nEffectTime > 0)
 		{	
 			nEffectTime -= 10;
 			nEffectA += 0.2;
-			nEffectCount += 10;
+			nEffectCount += 1;
 			
 			// 描画
-			var ww = nEffectW / 1.25 + (nEffectCount * 2.0);
-			var hh = nEffectH / 1.25 + (nEffectCount * 2.0);
+			var ww = nEffectW / 1.0 + (nEffectCount * 2.0);
+			var hh = nEffectH / 1.0 + (nEffectCount * 2.0);
 	        sEffectCtx.globalAlpha = nEffectA;
 	        sEffectCtx.drawImage(	stampBar.stamp[nEffectID].img, 
 									nEffectX - (ww / 2) + nEffectW / 2, 
@@ -132,14 +100,76 @@ function ExecEffect()
 			nEffectTime = 0;
 		}
 	}
+	else
+	{
+		if(nEffectSwitch == 0)
+		{
+			if(nEffectTime > 0)
+			{	
+				nEffectTime -= 10;
+				nEffectA -= 0.05;
+				nEffectCount += 10;
+				
+				// 描画
+				//var ww = nEffectW / 1.25 + (nEffectCount * 2.0);
+				//var hh = nEffectH / 1.25 + (nEffectCount * 2.0);
+				var ww = nEffectW / 1.0 - (nEffectCount * 2.0);
+				var hh = nEffectH / 1.0 - (nEffectCount * 2.0);
+		        sEffectCtx.globalAlpha = nEffectA;
+		        sEffectCtx.drawImage(	stampBar.stamp[nEffectID].img, 
+										nEffectX - (ww / 2) + nEffectW / 2, 
+										nEffectY - (hh / 2) + nEffectH / 2, 
+										ww, 
+										hh);
+		        sEffectCtx.globalAlpha = 1.0;
+
+			}
+			else
+			{
+				//sTimeHandle = false;
+				nEffectTime = 30;
+				nEffectCount = 0;
+				DelHasStamp(nEffectNID);
+				saveHasStamp();
+				stampBar.selectedStampId = -1;	//選択された手持ちスタンプのID
+				nEffectSwitch ++;
+			}
+		}
+		else
+		{
+			if(nEffectTime > 0)
+			{	
+				nEffectTime -= 10;
+				nEffectA += 0.2;
+				nEffectCount += 10;
+				
+				// 描画
+				var ww = nEffectW / 1.25 + (nEffectCount * 2.0);
+				var hh = nEffectH / 1.25 + (nEffectCount * 2.0);
+		        sEffectCtx.globalAlpha = nEffectA;
+		        sEffectCtx.drawImage(	stampBar.stamp[nEffectID].img, 
+										nEffectX - (ww / 2) + nEffectW / 2, 
+										nEffectY - (hh / 2) + nEffectH / 2, 
+										ww, 
+										hh);
+		        sEffectCtx.globalAlpha = 1.0;
+			}
+			else
+			{
+				sTimeHandle = false;
+				nEffectTime = 0;
+			}
+		}
+	}
 }
 
 // フェードエフェクトを発生させる
-function SetScaleAlphaFadeEffect(ctx, id, nid, x, y, w, h, time)
+function SetScaleAlphaFadeEffect(ctx, id, nid, x, y, w, h, work)
 {
 	sTimeHandle 	= true;
 	sEffectCtx  	= ctx
-	nEffectTime 	= time;
+	nEffectWork		= work;
+	nEffectTime 	= 30;
 	nEffectID 		= id;
 	nEffectNID		= nid;
 	nEffectX 		= x;
@@ -436,7 +466,7 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
     stampDrawData.save(gStampSheetNo);	//オートセーブ
     
 	// インク切れの瞬間
-//	if(s.ink == 1 || s.ink < 0)      
+	if(s.ink == 1 || s.ink < 0)      
 	{
 		// 拡大しつつアルファでフェード
 		//var dd = getHasStampIndex(id + 1);
@@ -448,7 +478,7 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 		0, 
 		STAMP_W, 
 		STAMP_H, 
-		30);
+		0);
 		// インクをなくし、スタンプを消す
 		s.ink = 0; 
 		// ここら辺の処理はエフェクト終了後にしたほうがいい・・・
@@ -456,7 +486,19 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 		stampBar.selectedStampId = -1;				//選択された手持ちスタンプのID
 	}
     // インクを引く
-//	else if(s.ink > 0)	{ s.ink --; }
+	else if(s.ink > 0)	
+	{ 
+		SetScaleAlphaFadeEffect
+		(
+		stampBar.ctx, 
+		ix, id,
+		stampBar.iSelectedX, 
+		0, 
+		STAMP_W, 
+		STAMP_H, 
+		1);
+		s.ink --; 
+	}
 }
 
 
