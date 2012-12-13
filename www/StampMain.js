@@ -101,7 +101,7 @@ function ExecEffect()
 			//sTimeHandle = false;
 			nEffectTime = 30;
 			nEffectCount = 0;
-			DelHasStamp(nEffectID);
+			DelHasStamp(nEffectNID);
 			saveHasStamp();
 			stampBar.selectedStampId = -1;	//選択された手持ちスタンプのID
 			nEffectSwitch ++;
@@ -436,14 +436,14 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
     stampDrawData.save(gStampSheetNo);	//オートセーブ
     
 	// インク切れの瞬間
-	//if(s.ink == 1 || s.ink < 0)      
+//	if(s.ink == 1 || s.ink < 0)      
 	{
 		// 拡大しつつアルファでフェード
-		var dd = getHasStampIndex(id + 1);
+		//var dd = getHasStampIndex(id + 1);
 		SetScaleAlphaFadeEffect
 		(
 		stampBar.ctx, 
-		ix, dd,
+		ix, id,
 		stampBar.iSelectedX, 
 		0, 
 		STAMP_W, 
@@ -456,7 +456,7 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 		stampBar.selectedStampId = -1;				//選択された手持ちスタンプのID
 	}
     // インクを引く
-	//else if(s.ink > 0)	{ s.ink --; }
+//	else if(s.ink > 0)	{ s.ink --; }
 }
 
 
