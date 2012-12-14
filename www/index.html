@@ -9,25 +9,6 @@
         <script type="text/javascript">
             common.viewport({width: 640});
             
-            function goGohan()  {document.location="KamiSelect.html"; event.preventDefault();};
-            function goStamp()  {document.location="StampSelect.html"; event.preventDefault();};
-            function goHelp()
-            {
-                document.location="#";
-                event.preventDefault();
-                alert("未実装です。");
-            };
-            function goPresent()
-            {
-                document.location="#";
-                event.preventDefault();
-                window.localStorage.removeItem("CntGochi");
-                window.localStorage.removeItem("CntCoin");
-                deleteHasStamp();
-				AllDeleteStampDrawData();	// スタンプしたデータを削除
-                alert("ごちそうさました回数、スタンプデータをリセットしました。");
-            };
-            
             function onLoadIndex() {
             	common.hideAddressbar();
             	titleAddSceen();
@@ -39,25 +20,6 @@
     </head>
     <body onload = "onLoadIndex()">
     	<div id="sceen"></div>
-<!--
-        <img id="bg" src="img/title/h_h00_bgd_a/h_h00_bgd_a_00000.png"></img>
--->
-        <img id="title" src="img/title/t_rgo_a000.png"></img>
-
-        <img id="megami" src="img/title/t_meg_a/t_meg_a_00000.png"></img>
-        <img id="nasu" src="img/title/t_nas_a/t_nas_a_00000.png"></img>
-        <img id="ninjin" src="img/title/t_nin_a/t_nin_a_00000.png"></img>
-        <img id="piman" src="img/title/t_pii_a/t_pii_a_00000.png"></img>
-        <img id="tomato" src="img/title/t_tom_a/t_tom_a_00000.png"></img>
-
-        <img id="icon_facebook" src="img/title/k_rogo_b000.png" onClick=writeFacebook()></img>
-        <img id="icon_twitter" src="img/title/k_rogo_c000.png" onClick=writeTwitter()></img>
-
-        <img id="gohan" src="img/title/t_btn_a000.png" onClick=goGohan()></img>
-        <img id="stamp" src="img/title/t_btn_b000.png" onClick=goStamp()></img>
-        <img id="help" src="img/title/t_btn_c000.png" onClick=goHelp()></img>
-        <img id="present" src="img/title/t_btn_d000.png" onClick=goPresent()></img>
-
 	<div id="version">
 		version 0.0.17
 	</div>

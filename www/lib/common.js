@@ -55,11 +55,64 @@
 */
 
 	
-	//DIVスプライト
-	function DivSprite(w,h) {
-		this.div = document.createElement("div");
-		this.img = document.createElement("img");
-		div.appendChild(img);
-	};
-	
+
 })();
+
+
+
+//DIVスプライト
+var DivSprite = function(w,h) {
+	this.div = document.createElement("div");
+	this.img = document.createElement("img");
+	this._frame = 0;
+	this._w = w;
+	this._h = h;
+	this._x = 0;
+	this._y = 0;
+	this._z = 0;
+	this.div.appendChild(this.img);
+	this.div.style.position = "fixed";
+	this.div.style.overflow = "hidden";
+	this.div.style.width = w + "px";
+	this.div.style.height = h + "px";
+	this.img.style.position = "absolute";
+	this.img.style.top = "0px";
+	this.img.style.left = "0px";
+	
+};
+DivSprite.prototype = {
+	//x X座標
+	get x() { return this._x; },
+	set x(a) {
+		this._x = a;
+		this.div.style.left = a + "px";
+	},
+	//y Y座標
+	get y() { return this._y; },
+	set y(a) {
+		this._y = a;
+		this.div.style.top = a + "px";
+	},
+	//z Z座標
+	get z() { return this._z; },
+	set z(a) {
+		this._z = a;
+		this.div.style.zIndex = a;
+	},
+	//src
+	set src(a) {
+		this.img.src = a;
+	},
+	//frame
+	get frame() { return this._frame; },
+	set frame(a) {
+		this._frame = a;
+		this.img.style.left = -a * this.w;
+	},
+	
+	//onclick
+	set onclick(a) {
+		this.img.onclick = a;
+	},
+};
+
