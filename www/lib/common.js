@@ -73,7 +73,11 @@ var DivSprite = function(w,h) {
 	this._x = 0;
 	this._y = 0;
 	this._z = 0;
-	this.div.appendChild(this.img);
+	this._scale = 1;
+	this._alpha = 1;
+	this._anim = null;
+	this._animScale = null;
+	this._animPos = null;
 	this.div.style.position = "fixed";
 	this.div.style.overflow = "hidden";
 	this.div.style.width = w + "px";
@@ -81,6 +85,8 @@ var DivSprite = function(w,h) {
 	this.img.style.position = "absolute";
 	this.img.style.top = "0px";
 	this.img.style.left = "0px";
+	this.img.style.overflow = "hidden";
+	this.div.appendChild(this.img);
 	
 };
 DivSprite.prototype = {
@@ -88,19 +94,33 @@ DivSprite.prototype = {
 	get x() { return this._x; },
 	set x(a) {
 		this._x = a;
-		this.div.style.left = a + "px";
+		this.div.style.left = (a/this._scale) + "px";
 	},
 	//y Y座標
 	get y() { return this._y; },
 	set y(a) {
 		this._y = a;
-		this.div.style.top = a + "px";
+		this.div.style.top = (a/this._scale) + "px";
 	},
 	//z Z座標
 	get z() { return this._z; },
 	set z(a) {
 		this._z = a;
 		this.div.style.zIndex = a;
+	},
+	//scale 拡大率
+	get scale() { return this._scale; },
+	set scale(a) {
+		this._scale = a;
+		this.div.style.zoom = a;
+		this.x = this._x;
+		this.y = this._y;
+	},
+	//alpha α値
+	get alpha() { return this._alpha; },
+	set alpha(a) {
+		this._alpha = a;
+		this.div.style.opacity = a;
 	},
 	//src
 	set src(a) {
@@ -112,12 +132,84 @@ DivSprite.prototype = {
 	get frame() { return this._frame; },
 	set frame(a) {
 		this._frame = a;
-		this.img.style.left = -a * this.w;
+		this.img.style.left = (-a * this._w) + "px";
 	},
 	
 	//onclick
 	set onclick(a) {
 		this.img.onclick = a;
+	},
+	
+	//anim アニメーションパターンセット
+	set anim(a) {
+		this._anim = a;
+		this._animIx = 0;
+		this._animFrm = 0;
+	},
+	//animScale スケールアニメーションセット
+	set animScale(a) {
+		this._animScale = a;
+		this._animScaleIx = 0;
+		if (a!=null)
+			this._animScaleFrm = a[1];
+	},
+	//animPos ポジションアニメーションセット
+	set animPos(a) {
+		this._animPos = a;
+		this._animPosIx = 0;
+		if (a!=null)
+			this._animPosFrm = a[2];
+	},
+	
+	//animExec() アニメーション処理（フレームごとに呼び出してやる必要あり）
+	animExec : function() {
+		if (this._anim) {
+			this.frame = this._anim[this._animIx+0];
+			if (this._anim[this._animIx+1] > 0) {
+				this._animFrm ++;
+				if (this._animFrm >= this._anim[this._animIx+1]) {
+					this._animFrm = 0;
+					this._animIx += 2;
+					if (this._animIx >= this._anim.length) {
+						this._animIx = 0;
+					}
+				}
+			}
+		}
+		if (this._animScale) {
+			if (this._animScaleFrm <= 0) {
+				this.scale = this._animScale[this._animScaleIx+0];
+				if (this._animScale[this._animScaleIx+1] > 0) {
+					this._animScaleIx += 2;
+					if (this._animScaleIx >= this._animScale.length) {
+						this._animScaleIx = 0;
+					}
+					this._animScaleFrm = this._animScale[this._animScaleIx+1];
+				}
+			} else {
+				var d = this._animScale[this._animScaleIx+0] - this._scale;
+				this.scale = this._scale + (d/this._animScaleFrm);
+				this._animScaleFrm --;
+			}
+		}
+		if (this._animPos) {
+			if (this._animPosFrm <= 0) {
+				this.x = this._animPos[this._animPosIx+0];
+				this.y = this._animPos[this._animPosIx+1];
+				if (this._animPos[this._animPosIx+2] > 0) {
+					this._animPosIx += 3;
+					if (this._animPosIx >= this._animPos.length) {
+						this._animPosIx = 0;
+					}
+					this._animPosFrm = this._animPos[this._animPosIx+2];
+				}
+			} else {
+				this.x = this._x + (this._animPos[this._animPosIx+0]-this._x) / this._animPosFrm;
+				this.y = this._y + (this._animPos[this._animPosIx+1]-this._y) / this._animPosFrm;
+				this._animPosFrm --;
+			}
+		}
+		
 	},
 };
 
