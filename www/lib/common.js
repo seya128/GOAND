@@ -59,6 +59,9 @@
 })();
 
 
+//動的読み込みしているファイルの数
+var LoadingCounter = 0;
+
 
 //DIVスプライト
 var DivSprite = function(w,h) {
@@ -101,6 +104,8 @@ DivSprite.prototype = {
 	},
 	//src
 	set src(a) {
+		this.img.onload = function() {LoadingCounter--;};
+		LoadingCounter ++;
 		this.img.src = a;
 	},
 	//frame

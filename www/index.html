@@ -9,11 +9,28 @@
         <script type="text/javascript">
             common.viewport({width: 640});
             
+            var currentSceen = null;
+            var nextSceen = null;
             function onLoadIndex() {
             	common.hideAddressbar();
-            	titleAddSceen();
+            	nextSceen = new SceenTitle();
             	//setTimerindex();
+            	setInterval('mainLoop()', 50);
             }
+            
+            function mainLoop() {
+            	if (currentSceen) {
+            		if (currentSceen.onframe) {
+            			currentSceen.onframe();
+            		}
+            	}
+            	
+            	if (nextSceen) {
+            		currentSceen = nextSceen;
+            		nextSceen = null;
+            	}
+            }
+            
             
         </script>
         <link rel="stylesheet" type="text/css" href="index.css"
@@ -28,6 +45,7 @@
         <script type="text/javascript" src="se.js"></script>
         <script type="text/javascript" src="anime.js"></script>
         <script type="text/javascript" src="StampData.js"></script>
-        <script type="text/javascript" src="title.js"></script>
+        <script type="text/javascript" src="Title.js"></script>
+        <script type="text/javascript" src="Gohan.js"></script>
     </body>
 </html>
