@@ -19,12 +19,6 @@ var SceenGohan = function() {
 	var st = STATUS.INIT;
 	var stFrm = 0;		//ステート処理用のフレームカウンタ
 	
-	var NEXT = {
-		NONEXT:		0,
-		TITLE:		1,
-	};
-	var next = NEXT.NONEXT;
-	
 	var alpha = 0;
 	
 	var selected=-1;		//選択したキャラ
@@ -51,6 +45,7 @@ var SceenGohan = function() {
 	};
 	sceen.appendChild(megami.div);
 	
+	//めがみさま：だれにおうえんしてもらいますか？
 	//吹きだし
 	var fuki = new DivSprite(515,227);
 	fuki.x=66; fuki.y=0, fuki.z=2;
@@ -61,7 +56,6 @@ var SceenGohan = function() {
 	words.x=166; words.y=61, words.z=3;
 	words.src = "img/02_charaselect/g_g01_txt_a.png";
 	sceen.appendChild(words.div);
-	
 	
 	//キャラクター
 	var charaData=[
@@ -101,7 +95,9 @@ var SceenGohan = function() {
 	chara[6].onclick = function() { selected = 6; };
 	chara[7].onclick = function() { selected = 7; };
 	
-
+	//後で動的生成するスプライト
+	var mega_fuki,mega_words;
+	var chara_fuki,chara_words;
 
 
 	
@@ -133,10 +129,6 @@ var SceenGohan = function() {
 
 			//メイン処理
 			case STATUS.MAIN:
-				//次の処理がセットされれば次へ
-				if (next != NEXT.NONEXT) {
-					st = STATUS.FADEOUT;
-				}
 				//キャラが選択されたら次へ
 				if (selected != -1) {
 					st = STATUS.SELECTED_INIT;
@@ -160,8 +152,18 @@ var SceenGohan = function() {
 				chara[6].animPos = [840,chara[6].y,10, 840,chara[6].y,-1];
 				chara[7].animPos = [840,chara[7].y,10, 840,chara[7].y,-1];
 				
-				chara[selected].animPos = [90,230,10, 90,230,-1];
+				chara[selected].animPos = [110,230,10, 110,230,-1];
 				chara[selected].animScale = [0.75,10, 0.75,-1];
+				
+				//セリフ読み込み
+				mega_fuki = new DivSprite(463,205);
+				mega_fuki.src = "img/00_common/g_g01_huk_b000.png";
+				mega_words = new DivSprite(304,80);
+				mega_words.src = "img/02_charaselect/g_g01_txt_b.png";
+				chara_fuki = new DivSprite(300,224);
+				chara_fuki.src = "img/00_common/g_g01_huk_c000.png";
+				chara_words = new DivSprite(210,87);
+				chara_words.src = "img/02_charaselect/g_g01_txt_c.png";
 				
 				st = STATUS.SELECTED_MOVE;
 				
@@ -178,8 +180,25 @@ var SceenGohan = function() {
 			
 			//選択された：選択完了
 			case STATUS.SELECTED_END:
+				switch (stFrm) {
+					case 0: //めがみセリフセット
+						mega_fuki.x=180; mega_fuki.y=-20; mega_fuki.z=2;
+						sceen.appendChild(mega_fuki.div);
+						mega_words.x=260; mega_words.y=40; mega_words.z=3;
+						sceen.appendChild(mega_words.div);
+						break;
+					case 2*10: //キャラクターセリフセット
+						chara_fuki.x=340; chara_fuki.y=200; chara_fuki.z=5;
+						sceen.appendChild(chara_fuki.div);
+						chara_words.x=390; chara_words.y=250; chara_words.z=6;
+						sceen.appendChild(chara_words.div);
+						break;
+						
+
+				}
+				
 				stFrm ++;
-				if (stFrm >= 10*5) {
+				if (stFrm >= 9*10) {
 					st = STATUS.FADEOUT;
 					stFrm = 0;
 				}
@@ -201,6 +220,8 @@ var SceenGohan = function() {
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
 				nextSceen = new SceenTitle();
+				//選択したキャラクターをグローバル変数にセット
+				gohanChara = selected;
 				break;
 		}
 		
