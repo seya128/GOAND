@@ -30,12 +30,14 @@ var SceenGohan = function() {
 	
 	//BG
 	var bg = new DivSprite(640,1138);
+	bg.basePos= {x:0,y:0};
 	bg.x=0; bg.y=0; bg.z=0;
 	bg.src = "img/02_charaselect/g_g01_bgd_a.png";
 	sceen.appendChild(bg.div);
 	
 	//女神
 	var megami = new DivSprite(400,520);
+	megami.basePos={x:0,y:0};
 	megami.x=117; megami.y=77; megami.z=1;
 	megami.src = "img/00_common/k_sin_c.png";
 	megami.anim = [0,36, 1,30, 0,40, 1,10];
@@ -48,11 +50,13 @@ var SceenGohan = function() {
 	//めがみさま：だれにおうえんしてもらいますか？
 	//吹きだし
 	var fuki = new DivSprite(515,227);
+	fuki.basePos={x:0,y:0};
 	fuki.x=66; fuki.y=0, fuki.z=2;
 	fuki.src = "img/00_common/g_g01_huk_a000.png";
 	sceen.appendChild(fuki.div);
 	//セリフ
 	var words = new DivSprite(310,87);
+	words.basePos={x:0,y:0};
 	words.x=166; words.y=61, words.z=3;
 	words.src = "img/02_charaselect/g_g01_txt_a.png";
 	sceen.appendChild(words.div);
@@ -73,12 +77,11 @@ var SceenGohan = function() {
 	var scale = 0.26;
 	var ofsx=-20;
 	
-	console.log("charaData.length " + charaData.length);
-	
 	for (var i=0; i<charaData.length; i++) {
 		chara[i] = new DivSprite(1126/2,605);
 		chara[i].src = "img/00_common/" + charaData[i].src;
 		chara[i].id = i;
+		chara[i].basePos={x:0,y:0};
 		chara[i].x = (charaData[i].x + ofsx);
 		chara[i].y = charaData[i].y;
 		chara[i].z = 4;
@@ -131,6 +134,8 @@ var SceenGohan = function() {
 			case STATUS.MAIN:
 				//キャラが選択されたら次へ
 				if (selected != -1) {
+					//選択したキャラクターをグローバル変数にセット
+					gohanChara = selected;
 					st = STATUS.SELECTED_INIT;
 				}
 				break;
@@ -157,12 +162,16 @@ var SceenGohan = function() {
 				
 				//セリフ読み込み
 				mega_fuki = new DivSprite(463,205);
+				mega_fuki.basePos={x:0,y:0};
 				mega_fuki.src = "img/00_common/g_g01_huk_b000.png";
 				mega_words = new DivSprite(304,80);
+				mega_words.basePos={x:0,y:0};
 				mega_words.src = "img/02_charaselect/g_g01_txt_b.png";
 				chara_fuki = new DivSprite(300,224);
+				chara_fuki.basePos={x:0,y:0};
 				chara_fuki.src = "img/00_common/g_g01_huk_c000.png";
 				chara_words = new DivSprite(210,87);
+				chara_words.basePos={x:0,y:0};
 				chara_words.src = "img/02_charaselect/g_g01_txt_c.png";
 				
 				st = STATUS.SELECTED_MOVE;
@@ -219,9 +228,7 @@ var SceenGohan = function() {
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
-				nextSceen = new SceenTitle();
-				//選択したキャラクターをグローバル変数にセット
-				gohanChara = selected;
+				nextSceen = new SceenGohanItadaki();
 				break;
 		}
 		

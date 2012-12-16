@@ -73,11 +73,13 @@ var DivSprite = function(w,h) {
 	this._x = 0;
 	this._y = 0;
 	this._z = 0;
+	this._basePos = {x:w/2,y:h/2};
 	this._scale = 1;
 	this._alpha = 1;
 	this._anim = null;
 	this._animScale = null;
 	this._animPos = null;
+	this._animAlpha = null;
 	this.div.style.position = "fixed";
 	this.div.style.overflow = "hidden";
 	this.div.style.width = w + "px";
@@ -94,13 +96,13 @@ DivSprite.prototype = {
 	get x() { return this._x; },
 	set x(a) {
 		this._x = a;
-		this.div.style.left = (a/this._scale) + "px";
+		this.div.style.left = ((a-(this._basePos.x*this._scale))/this._scale) + "px";
 	},
 	//y Y座標
 	get y() { return this._y; },
 	set y(a) {
 		this._y = a;
-		this.div.style.top = (a/this._scale) + "px";
+		this.div.style.top = ((a-(this._basePos.y*this._scale))/this._scale) + "px";
 	},
 	//z Z座標
 	get z() { return this._z; },
@@ -108,9 +110,19 @@ DivSprite.prototype = {
 		this._z = a;
 		this.div.style.zIndex = a;
 	},
+	//ofsPos 中心座標
+	set basePos(a) {
+		this._basePos = a;
+		//座標再セット
+		this.x = this._x;
+		this.y = this._y;
+	},
 	//scale 拡大率
 	get scale() { return this._scale; },
 	set scale(a) {
+		//0だと0除算してしまうので
+		if (a == 0)
+			a = 0.000001;
 		this._scale = a;
 		this.div.style.zoom = a;
 		this.x = this._x;
@@ -153,6 +165,13 @@ DivSprite.prototype = {
 		if (a!=null)
 			this._animScaleFrm = a[1];
 	},
+	//animAlpha αアニメーションセット
+	set animAlpha(a) {
+		this._animAlpha = a;
+		this._animAlphaIx = 0;
+		if (a!=null)
+			this._animAlphaFrm = a[1];
+	},
 	//animPos ポジションアニメーションセット
 	set animPos(a) {
 		this._animPos = a;
@@ -190,6 +209,22 @@ DivSprite.prototype = {
 				var d = this._animScale[this._animScaleIx+0] - this._scale;
 				this.scale = this._scale + (d/this._animScaleFrm);
 				this._animScaleFrm --;
+			}
+		}
+		if (this._animAlpha) {
+			if (this._animAlphaFrm <= 0) {
+				this.alpha = this._animAlpha[this._animAlphaIx+0];
+				if (this._animAlpha[this._animAlphaIx+1] > 0) {
+					this._animAlphaIx += 2;
+					if (this._animAlphaIx >= this._animAlpha.length) {
+						this._animAlphaIx = 0;
+					}
+					this._animAlphaFrm = this._animAlpha[this._animAlphaIx+1];
+				}
+			} else {
+				var d = this._animAlpha[this._animAlphaIx+0] - this._alpha;
+				this.alpha = this._alpha + (d/this._animAlphaFrm);
+				this._animAlphaFrm --;
 			}
 		}
 		if (this._animPos) {

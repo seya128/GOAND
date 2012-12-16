@@ -29,19 +29,20 @@ var SceenTitle = function() {
 	
 	//BG
 	var bg = new DivSprite(640,1138);
+	bg.basePos={x:0, y:0};
 	bg.x=0; bg.y=0; bg.z=0;
 	bg.src = "img/title/h_h00_bgd_a/h_h00_bgd_a_00000.png";
 	sceen.appendChild(bg.div);
 	
 	//ロゴ
 	var logo = new DivSprite(445,186);
-	logo.x=90; logo.y=180; logo.z=3;
+	logo.x=90+(445/2); logo.y=180+(186/2); logo.z=3;
 	logo.src = "img/title/t_rgo_a000.png";
 	sceen.appendChild(logo.div);
 	
 	//女神
 	var megami = new DivSprite(316,452);
-	megami.x=160; megami.y=-20; megami.z=2;
+	megami.x=160+(316/2); megami.y=-20+(452/2); megami.z=2;
 	megami.src = "img/title/t_meg_a/t_meg_a_00000.png";
 	sceen.appendChild(megami.div);
 	
@@ -54,7 +55,7 @@ var SceenTitle = function() {
 
 	//ごはん
 	var gohan = new DivSprite(266,228);
-	gohan.x=20; gohan.y=420; gohan.z=2;
+	gohan.x=20+(266/2); gohan.y=420+(228/2); gohan.z=2;
 	gohan.src = "img/title/t_btn_a000.png";
 	gohan.onclick = function(){
 		event.preventDefault();
@@ -64,7 +65,7 @@ var SceenTitle = function() {
 	
 	//スタンプ
 	var stamp = new DivSprite(258,224);
-	stamp.x=360; stamp.y=420; stamp.z=2;
+	stamp.x=360+(258/2); stamp.y=420+(224/2); stamp.z=2;
 	stamp.src = "img/title/t_btn_b000.png";
 	stamp.onclick = function() {
 		document.location="StampSelect.html";
@@ -75,7 +76,7 @@ var SceenTitle = function() {
 	
 	//あそびかた
 	var help = new DivSprite(220,194);
-	help.x=40; help.y=650; help.z=2;
+	help.x=40+(220/2); help.y=650+(194/2); help.z=2;
 	help.src = "img/title/t_btn_c000.png";
 	help.onclick = function(){
 		event.preventDefault();
@@ -85,7 +86,7 @@ var SceenTitle = function() {
 	
 	//ショップ
 	var shop = new DivSprite(220,196);
-	shop.x=360; shop.y=650; shop.z=2;
+	shop.x=360+(220/2); shop.y=650+(196/2); shop.z=2;
 	shop.src = "img/title/t_btn_d000.png";
 	shop.onclick = function() {
 		event.preventDefault();
@@ -150,6 +151,7 @@ var SceenTitle = function() {
 				switch(next) {
 					case NEXT.GOHAN:
 						nextSceen = new SceenGohan();
+						//nextSceen = new SceenGohanItadaki();
 						break;
 				}
 				break;
