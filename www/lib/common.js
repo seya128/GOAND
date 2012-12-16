@@ -247,4 +247,3 @@ DivSprite.prototype = {
 		
 	},
 };
-
