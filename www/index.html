@@ -21,8 +21,6 @@
             }
             
             function mainLoop() {
-            	setTimeout('mainLoop()', 50);
-            	
             	if (currentSceen) {
             		if (currentSceen.onframe) {
             			currentSceen.onframe();
@@ -33,6 +31,9 @@
             		currentSceen = nextSceen;
             		nextSceen = null;
             	}
+
+            	setTimeout('mainLoop()', 50);
+            	
             }
             
             
