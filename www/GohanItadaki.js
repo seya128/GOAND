@@ -60,9 +60,10 @@ var SceenGohanItadaki = function() {
 		{src:"k_nin_c.png"	},
 		{src:"k_sak_c.png"	},
 	];
-	var scale = 0.6;
-	var chara = new DivSprite(1280/2,830);
-	chara.src = "img/00_common/" + charaData[gohanChara].src;
+	var scale = 1;
+	var chara = new DivSprite(1512/4,490);
+//	chara.src = "img/00_common/" + charaData[gohanChara].src;
+	chara.src = "img/00_common/" + charaData[0].src;
 	chara.x=463; chara.y=489; chara.z=2;
 	chara.scale = scale;
 	chara.anim = [0,10, 1,10];
@@ -219,6 +220,7 @@ var SceenGohanItadaki = function() {
 					words3.alpha = 0;
 					words3.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words3.div);
+					chara.anim = [2,100];
 				} else if (stFrm == 6*10) {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words3.animAlpha = wordsOutAnimAlphaData;
@@ -232,6 +234,7 @@ var SceenGohanItadaki = function() {
 					words4.animAlpha = wordsInAnimAlphaData;
 					words4.scale = 2;
 					sceen.appendChild(words4.div);
+					chara.anim = [3,100];
 				} else if (stFrm == 12*10) {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words4.animAlpha = wordsOutAnimAlphaData;
@@ -246,6 +249,7 @@ var SceenGohanItadaki = function() {
 					words5.alpha = 0;
 					words5.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words5.div);
+					chara.anim = [0,10, 1,10];
 				} else if (stFrm == 17*10) {
 					//はい
 					buttonYes.x=168; buttonYes.y=712; buttonYes.z=5;
