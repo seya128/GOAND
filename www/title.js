@@ -156,7 +156,7 @@ var SceenTitle = function() {
 						break;
 					// ショップ
 					case NEXT.SHOP:
-						nextSceen = new SceenGohan();
+						nextSceen = new StampShop();
 						break;						
 				}
 				break;

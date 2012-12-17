@@ -843,7 +843,7 @@ var MainCanvas = function()
     this.draw();
 };
 
-var SceenGohan = function() {
+var StampShop = function() {
 
 	var STATUS = {
 		INIT:			0,
