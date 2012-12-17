@@ -162,12 +162,26 @@ StampSheet.prototype.drawWindow = function()
 		386, 
 		162);
 
-	this.ctx.drawImage(GetStampGraphicHandle_StampImage(sTouchNo%27), 
-		262/* - (STAMP_W * 0.7)/2*/, 
-		GPosY + 237/* - (STAMP_H * 0.7)/2*/, 
-		STAMP_W * 0.7, 
-		STAMP_H * 0.7);
-
+	var id       = gShopBuyListTable[sTouchNo]["id"];
+	var popImage = GetStampGraphicImage(id);
+	
+	if(id >= 100)
+	{
+		this.ctx.drawImage(popImage, 
+			262/* - (STAMP_W * 0.7)/2*/, 
+			GPosY + 237/* - (STAMP_H * 0.7)/2*/, 
+			popImage.width  * 0.7, 
+			popImage.height * 0.7);
+	}
+	else
+	{
+		this.ctx.drawImage(popImage, 
+			262+20/* - (STAMP_W * 0.7)/2*/, 
+			GPosY + 237-20/* - (STAMP_H * 0.7)/2*/, 
+			popImage.width  * 0.12, 
+			popImage.height * 0.12);
+	}
+	
 	var PosYesX = 33;
 	var PosYesY = GPosY + 565;
 	var PosYesW = 281;
@@ -190,7 +204,9 @@ StampSheet.prototype.drawWindow = function()
 		PosNoH);
 	this.ctx.fillStyle = 'rgb(255, 255, 255)';
 	this.ctx.font = "20pt Arial";
-	this.ctx.fillText("" + 10, 128 + 320 + 24, 335); 
+	
+	var gold = gShopBuyListTable[sTouchNo]["gold"];
+	this.ctx.fillText("" + gold, 128 + 320 + 24, 335); 
 	this.ctx.fillStyle = 'rgb(0, 0, 0)';
 	this.ctx.globalAlpha = 0.5;
 	
@@ -261,13 +277,25 @@ StampSheet.prototype.drawOK= function()
 			386, 
 			162);
 	}
-
-	this.ctx.drawImage(GetStampGraphicHandle_StampImage(sTouchNo%27), 
-		262/* - (STAMP_W * 0.7)/2*/, 
-		237/* - (STAMP_H * 0.7)/2*/, 
-		STAMP_W * 0.7, 
-		STAMP_H * 0.7);
-
+	var id       = gShopBuyListTable[sTouchNo]["id"];
+	var popImage = GetStampGraphicImage(id);
+	
+	if(id >= 100)
+	{
+		this.ctx.drawImage(popImage, 
+			262/* - (STAMP_W * 0.7)/2*/, 
+			237/* - (STAMP_H * 0.7)/2*/, 
+			popImage.width * 0.7, 
+			popImage.height * 0.7);
+	}
+	else
+	{
+		this.ctx.drawImage(popImage, 
+			262+20/* - (STAMP_W * 0.7)/2*/, 
+			237-20/* - (STAMP_H * 0.7)/2*/, 
+			popImage.width * 0.12, 
+			popImage.height * 0.12);
+	}
 	var PosYesX = 180;
 	var PosYesY = 565;
 	var PosYesW = 281;
@@ -316,15 +344,20 @@ StampSheet.prototype.draw = function(ofs)
 		// -------------------------------------
 		// 小物を表示[ここは領域に制限をかけてのちのち高速化]
 		// -------------------------------------  
-		var vS = (sActiveSheetNo * MAX_SHOP_DISP_HEIGHT) - MAX_SHOP_DISP_HEIGHT;
-		if(vS < 0) { vS = 0; }
+		var vS       = (sActiveSheetNo * MAX_SHOP_DISP_HEIGHT) - MAX_SHOP_DISP_HEIGHT;
+		if(vS < 0)  { vS = 0; }
+		var iCounter = (vS * 3);
 		for(var i = vS; i < vS + (MAX_SHOP_DISP_HEIGHT * 3); i ++)
 		{
 			var YVal = i / MAX_SHOP_DISP_HEIGHT;
 			YVal  = Math.floor(YVal);
 			YVal *= MAX_SHOP_PANEL_INTERVAL_Y;
 			for(var j = 0; j < MAX_SHOP_LIST_WIDTH; j ++)
-			{
+			{				
+				// 終端
+				iCounter ++;
+				if(iCounter > M_MAX_BUY_LIST) { break; }		
+				
 				var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 				var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 				this.ctx.drawImage(this.img, 
@@ -332,15 +365,30 @@ StampSheet.prototype.draw = function(ofs)
 					(yy)-237/2 + y, 
 					214, 
 					237);
+				var id       = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["id"];
+				var popImage = GetStampGraphicImage(id);
+	
+				if(id >= 100)
+				{
+					this.ctx.drawImage(popImage, 
+						(xx)-STAMP_W/2 + x, 
+						(yy)-STAMP_H/2 + y - 70, 
+						STAMP_W, 
+						STAMP_H);
+				}
+				else
+				{
+					this.ctx.drawImage(popImage, 
+						(xx)-popImage.width * 0.12/2 + x, 
+						(yy)-popImage.height * 0.12/2 + y - 70, 
+						popImage.width  * 0.12, 
+						popImage.height * 0.12);					
+				}
 
-				this.ctx.drawImage(GetStampGraphicHandle_StampImage(((i * MAX_SHOP_DISP_WIDTH) + j)%27), 
-					(xx)-STAMP_W/2 + x, 
-					(yy)-STAMP_H/2 + y - 70, 
-					STAMP_W, 
-					STAMP_H);
 
+				var gold       = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["gold"];
 				this.ctx.font = "20pt Arial";
-				this.ctx.fillText("10", xx - 25 + x, yy + 35 + y); 
+				this.ctx.fillText("" + gold, xx - 25 + x, yy + 35 + y); 								
 			}
 		}
 /*
@@ -511,7 +559,9 @@ var StampShop = function()
 						{
 							eSwitch = 2;
 							sScaleRate = 0;
-							CoinNum -= 10;
+							
+							var gold = gShopBuyListTable[sTouchNo]["gold"];
+							CoinNum -= gold;
 							bOldTouch = false; 
 							bTouch = false;
 						}
@@ -703,7 +753,8 @@ var StampShop = function()
 						bOldTouch = false; 
 						bTouch = false;
 						sScaleRate = 0;
-						if(CoinNum < 10)
+						var gold = gShopBuyListTable[sTouchNo]["gold"];
+						if(CoinNum < gold)
 						{
 							eSwitch = 3;
 						}
@@ -720,16 +771,6 @@ var StampShop = function()
 	        sheet.draw(sScrollY);
 			// タッチ
 			bOldTouch = bTouch;
-		}
-		this.draw_debug = function()
-		{
-			// メモリ内の表示デバッグ
-			//var Use    = performance.memory.usedJSHeapSize;
-			//var Total  = performance.memory.totalJSHeapSize;
-			//var UseM   = Use   / 1024 / 1024;
-			//var TotalM = Total / 1024 / 1024;
-			//document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]" + sActiveSheetNo;
-			//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 		}
 	    //描画
 	    this.draw = function() 
@@ -749,9 +790,6 @@ var StampShop = function()
 			{
 				this.draw_BuyWindow();
 			}
-			
-			// デバッグの表示
-			this.draw_debug();
 	    };
 		// --------------------------------------    
 	    // マウスイベント

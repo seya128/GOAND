@@ -45,9 +45,7 @@ var gStampEnum =
 	WATER_01:		6,
 	WATER_02:		7,
 	WATER_03:		8,
-	// 最大数
-	MAX_SHEET:		9,
-	
+
 	// スタンプ
 	// ごはん系
 	NIKU:		100,				// ハンバーグ
@@ -88,10 +86,7 @@ var gStampEnum =
 	KAMI_SIITAKE:	132,			// シイタケの神様
 	KAMI_TAMANEGI:	133,			// 玉ねぎの神様
 	KAMI_TOMATO:	134,			// トマトの神様
-	MAX_STAMP:		135,			// 最大数
 };
-var M_MAX_SHEET = gStampEnum.MAX_SHEET;
-var M_MAX_STAMP = gStampEnum.MAX_STAMP - gStampEnum.NIKU;
 
 // 背景画像
 var gStampBgFileName = 
@@ -155,6 +150,10 @@ var gStampImgFileName =
 
 ];
 
+var M_MAX_SHEET = gStampBgFileName.length;
+var M_MAX_STAMP = gStampImgFileName.length;
+
+
 // ------------------------------------------------------
 // ショップ販売リスト
 // 000-099	シート
@@ -215,6 +214,7 @@ var gShopBuyListTable =
     { "id":gStampEnum.KAMI_TOMATO,		"gold":45 },	// トマトの神様
     
 ];
+var M_MAX_BUY_LIST = gShopBuyListTable.length;
 
 // ------------------------------------------------------
 // グラフィックデータ
@@ -226,6 +226,10 @@ var g_StampLoadDataArray = null;
 // ------------------------------------------------------
 // データの取得
 // ------------------------------------------------------
+function GetStampGraphicHandleImage(no)
+{
+	return g_StampGraphicHandle[no].m_Image;
+}
 function GetStampGraphicHandle_Sheet(no)
 {
 	return g_StampGraphicHandle[no];
@@ -245,13 +249,18 @@ function GetStampGraphicHandle_StampImage(no)
 
 function GetStampGraphicHandle(no)
 {
-	if(no >= 100) { return g_StampGraphicHandle[100 - no]; }
+	if(no >= 100) { return g_StampGraphicHandle[(no - 100) + M_MAX_SHEET]; }
 	return g_StampGraphicHandle[no];
 }
 function GetStampGraphicIndex(no)
 {
-	if(no >= 100) { return 100 - no; }
+	if(no >= 100) { return (100 - no) + M_MAX_SHEET; }
 	return no;
+}
+function GetStampGraphicImage(no)
+{
+	if(no >= 100) { return g_StampGraphicHandle[(no - 100) + M_MAX_SHEET].m_Image; }
+	return g_StampGraphicHandle[no].m_Image;
 }
 
 // -------------------------------------
@@ -270,7 +279,7 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 {
 	// 自分のポインタ
     var _this  = this;
-	var iIndex = GetStampGraphicIndex(eStampEnum);
+	var iIndex = eStampEnum;//GetStampGraphicIndex(eStampEnum);
     // ロード
     this.m_bLoaded = false;
 	// ロードが終わっていたらフラグを立てる
@@ -439,6 +448,21 @@ function DummySheetDataSet()
 		AddHasSheet(i);
 	}
 }
+
+// ------------------------------------------------------
+// デバッグ
+// ------------------------------------------------------
+function DispMemory()
+{
+	// メモリ内の表示デバッグ
+	var Use    = performance.memory.usedJSHeapSize;
+	var Total  = performance.memory.totalJSHeapSize;
+	//var UseM   = Use   / 1024 / 1024;
+	//var TotalM = Total / 1024 / 1024;
+	document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]" + sActiveSheetNo;
+	//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
+}
+
 
 
 
