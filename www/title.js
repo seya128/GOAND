@@ -69,8 +69,9 @@ var SceenTitle = function() {
 	stamp.x=360+(258/2); stamp.y=420+(224/2); stamp.z=2;
 	stamp.src = "img/title/t_btn_b000.png";
 	stamp.onclick = function() {
-		document.location="StampSelect.html";
 		event.preventDefault();
+		document.location="StampSelect.html";	
+		//next = NEXT.STAMP;	
 	};
 	sceen.appendChild(stamp.div);
 	
@@ -157,7 +158,11 @@ var SceenTitle = function() {
 					// ショップ
 					case NEXT.SHOP:
 						nextSceen = new StampShop();
-						break;						
+						break;		
+					// ショップセレクト
+					//case NEXT.STAMP:
+					//	nextSceen = new StampSelect();
+					//	break;					
 				}
 				break;
 		}

@@ -79,7 +79,18 @@ var stamp = new Array();
 var timerID;
 var mainCanvas;
 
-
+var STATUS = {
+	INIT:			0,
+	FADEIN:			1,
+	MAIN:			2,
+	FADEOUT:		3,
+	END:			4,
+	
+	SELECTED_INIT:	5,
+	SELECTED_MOVE:	6,
+	SELECTED_END:	7,
+};
+var st = STATUS.INIT;
 
 //
 // スタンプシート
@@ -843,35 +854,11 @@ var MainCanvas = function()
     this.draw();
 };
 
-var StampShop = function() {
+var StampShop = function() 
+{
 
-	var STATUS = {
-		INIT:			0,
-		FADEIN:			1,
-		MAIN:			2,
-		FADEOUT:		3,
-		END:			4,
-		
-		SELECTED_INIT:	5,
-		SELECTED_MOVE:	6,
-		SELECTED_END:	7,
-	};
-	var st = STATUS.INIT;
-	var stFrm = 0;		//ステート処理用のフレームカウンタ
-	
 	var alpha = 0;
 	
-	var selected=-1;		//選択したキャラ
-	
-// -------------------------------------
-// すべてのスタンプデータをロード
-// -------------------------------------   
-/*
-for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
-{
-	StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
-	StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
-}*/
 	// -------------------------------------
 	// すべてのスタンプ画像をロード
 	// -------------------------------------   
@@ -940,21 +927,15 @@ for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
-				nextSceen = new SceenGohanItadaki();
+				nextSceen = new SceenTitle();
 				break;
 		}
-		
-		if (st != STATUS.END) {
-			//アニメーション処理
-		//	megami.animExec();
-		//	for (var i=0; i<charaData.length; i++) {
-		//		chara[i].animExec();
-		//	}
-		}
-
 	};
 	
 };
 
-function goTitle(e)  {document.location="index.html"; e.preventDefault();};
+function goTitle(e)  
+{
+	st = STATUS.FADEOUT;
+}
 
