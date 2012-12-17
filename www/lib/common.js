@@ -84,10 +84,12 @@ var DivSprite = function(w,h) {
 	this.div.style.overflow = "hidden";
 	this.div.style.width = w + "px";
 	this.div.style.height = h + "px";
+	this.div.style.zoom = 1;
 	this.img.style.position = "absolute";
 	this.img.style.top = "0px";
 	this.img.style.left = "0px";
 	this.img.style.overflow = "hidden";
+	this.img.style.zoom = 1;
 	this.div.appendChild(this.img);
 	
 };
