@@ -16,7 +16,8 @@ var SceenTitle = function() {
 	var NEXT = {
 		NONEXT:		0,
 		GOHAN:		1,
-		STAMP:		2
+		STAMP:		2,
+		SHOP:		3,
 	};
 	var next = NEXT.NONEXT;
 	
@@ -68,8 +69,9 @@ var SceenTitle = function() {
 	stamp.x=360+(258/2); stamp.y=420+(224/2); stamp.z=2;
 	stamp.src = "img/title/t_btn_b000.png";
 	stamp.onclick = function() {
-		document.location="StampSelect.html";
 		event.preventDefault();
+		//document.location="StampSelect.html";	
+		next = NEXT.STAMP;	
 	};
 	sceen.appendChild(stamp.div);
 	
@@ -80,7 +82,11 @@ var SceenTitle = function() {
 	help.src = "img/title/t_btn_c000.png";
 	help.onclick = function(){
 		event.preventDefault();
-		alert("未実装です。");
+		window.localStorage.removeItem("CntGochi");
+		window.localStorage.removeItem("CntCoin");
+		deleteHasStamp();
+		AllDeleteStampDrawData();	// スタンプしたデータを削除
+		alert("ごちそうさました回数、スタンプデータをリセットしました。");
 	};
 	sceen.appendChild(help.div);
 	
@@ -90,11 +96,7 @@ var SceenTitle = function() {
 	shop.src = "img/title/t_btn_d000.png";
 	shop.onclick = function() {
 		event.preventDefault();
-		window.localStorage.removeItem("CntGochi");
-		window.localStorage.removeItem("CntCoin");
-		deleteHasStamp();
-		AllDeleteStampDrawData();	// スタンプしたデータを削除
-		alert("ごちそうさました回数、スタンプデータをリセットしました。");
+		next = NEXT.SHOP;
 	};
 	sceen.appendChild(shop.div);
 	
@@ -153,6 +155,14 @@ var SceenTitle = function() {
 						nextSceen = new SceenGohan();
 						//nextSceen = new SceenGohanItadaki();
 						break;
+					// ショップ
+					case NEXT.SHOP:
+						nextSceen = new StampShop();
+						break;		
+					// ショップセレクト
+					case NEXT.STAMP:
+						nextSceen = new StampSelect();
+						break;					
 				}
 				break;
 		}
