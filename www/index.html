@@ -17,10 +17,12 @@
             	common.hideAddressbar();
             	nextSceen = new SceenTitle();
             	//setTimerindex();
-            	setInterval('mainLoop()', 50);
+            	setTimeout('mainLoop()', 50);
             }
             
             function mainLoop() {
+            	setTimeout('mainLoop()', 50);
+            	
             	if (currentSceen) {
             		if (currentSceen.onframe) {
             			currentSceen.onframe();
