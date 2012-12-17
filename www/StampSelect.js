@@ -370,6 +370,12 @@ window.onload = function() {
 //描画
 function draw() {
     mainCanvas.draw();
+	var Use    = performance.memory.usedJSHeapSize;
+	var Total  = performance.memory.totalJSHeapSize;
+	var UseM   = Use   / 1024 / 1024;
+	var TotalM = Total / 1024 / 1024;
+	document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";
+	//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
 
 //ロード

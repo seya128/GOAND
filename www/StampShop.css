@@ -1,0 +1,17 @@
+body { background-color: #DDDDDD; font: 14px sans-serif; color:#FFFFFF;}
+
+#canvas {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    
+    background-color: #FFFFFF;
+}
+
+#body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: #FFFFFF;
+}
+
