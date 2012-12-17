@@ -2,7 +2,7 @@
 // -------------------------------------
 // 定義
 // -------------------------------------
-var STAMP_W = 160;
+/*var STAMP_W = 160;
 var STAMP_H = 160;
 
 // -------------------------------------
@@ -13,7 +13,7 @@ var SCREEN_WIDTH   = 640;
 var SCREEN_HEIGHT  = 1200;
 var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
 var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
-
+*/
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
@@ -319,7 +319,7 @@ var StampSelect = function()
 	
 	//Yes
 	var nYesHandle = new DivSprite(281,184);
-	nYesHandle.x=180; nYesHandle.y=980; nYesHandle.z=2;
+	nYesHandle.x=180; nYesHandle.y=950; nYesHandle.z=2;
 	nYesHandle.src = "img/00_common/k_btn_a.png";
 	nYesHandle.onclick = function(){
 		event.preventDefault();
@@ -329,7 +329,7 @@ var StampSelect = function()
 	sceen.appendChild(nYesHandle.div);
 	//No
 	var nNoHandle = new DivSprite(281,184);
-	nNoHandle.x=450; nNoHandle.y=980; nNoHandle.z=2;
+	nNoHandle.x=440; nNoHandle.y=950; nNoHandle.z=2;
 	nNoHandle.src = "img/00_common/k_btn_b.png";
 	nNoHandle.onclick = function(){
 		event.preventDefault();

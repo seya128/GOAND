@@ -1,24 +1,9 @@
 
-// -------------------------------------
-// お店データ[3*3]
-// -------------------------------------
-var MAX_SHOP_DISP_WIDTH  = 3;
-var MAX_SHOP_DISP_HEIGHT = 3;
-var MAX_SHOP_LIST_WIDTH  = 3;
-var MAX_SHOP_LIST_HEIGHT = 34;
-var MAX_SHOP_PANEL_WIDTH  = 215;
-var MAX_SHOP_PANEL_HEIGHT = 250;
-var MAX_SHOP_PANEL_START_X = 105;
-var MAX_SHOP_PANEL_START_Y = 340;
-var MAX_SHOP_PANEL_INTERVAL_Y = 60;
-var sHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
 // -------------------------------------
 // 定義
 // -------------------------------------
 var CoinNum         = 100;
-var STAMP_W 		= 160;
-var STAMP_H 		= 160;
 var sTouchStartX 	= -200;
 var sTouchStartY 	= -200;
 var sTouchMoveX 	= -200;
@@ -36,14 +21,7 @@ var sTouchAccelerator = 0;
 var eSwitch = 0;
 var sResYesNo = 0;
 var sScaleRate = 0;
-// -------------------------------------
-// リダクションサイズを設定する「処理を軽くするためサムネイル」
-// -------------------------------------
-var REDUCTION_SIZE = 2.0;
-var SCREEN_WIDTH   = 640;
-var SCREEN_HEIGHT  = 1200;
-var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
-var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
+
 
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
@@ -586,7 +564,7 @@ var StampShop = function()
 				{
 					if(i == 0)
 					{
-						sChack -= (sHeightSize / 2);							// シート分の高さ
+						sChack -= (gHeightSize / 2);							// シート分の高さ
 						sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
 						if(sScrollY > sChack) 
 						{ 
@@ -597,11 +575,11 @@ var StampShop = function()
 					}
 					else
 					{
-						sChack -= (sHeightSize);								// シート分の高さ
+						sChack -= (gHeightSize);								// シート分の高さ
 						sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
 						if(sScrollY > sChack) 
 						{ 
-							sChack += (sHeightSize / 2);						// シート分の高さ
+							sChack += (gHeightSize / 2);						// シート分の高さ
 							sChack += (MAX_SHOP_PANEL_INTERVAL_Y / 2);			// インターバルの半分
 							sChackTargetX = sChack;
 							sActiveSheetNo = i; break;
