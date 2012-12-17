@@ -9,8 +9,6 @@ var stampBar;
 //
 var gStampSheetNo = 0;					//シート番号
 
-// スタンプ描画データ
-var stampDrawData = new StampDrawData();
 
 //スタンプ種類の数
 var NUM_STAMP_MAX = stampImgName.length;
@@ -505,154 +503,307 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
 //
 // キャンバス
 //
-var canvas_canvas = document.getElementById("canvas");
-var canvas_ctx = canvas_canvas.getContext("2d");
+/*
+var canvas_canvas;
+var canvas_ctx;
 var canvas_img = new Image();
 var canvas_load_ix = 0;
 var canvas_stamp_img = new Image();
-
-// キャンバス：初期化
-function canvas_Init() {
-
-    //マウスイベントリスナーの追加
-    if (navigator.userAgent.indexOf('iPhone')>0 ||
-        navigator.userAgent.indexOf('iPod')>0 ||
-        navigator.userAgent.indexOf('iPad')>0 ||
-        navigator.userAgent.indexOf('Android')>0) {
-        canvas_canvas.addEventListener("touchstart",canvas_onTouchEvent,false);
-    } else {
-        canvas_canvas.addEventListener("mousedown",canvas_onTouchEvent,false);
-    }
-    
-    //背景ロード
-    canvas_img.onload = canvas_Draw;
-    canvas_img.src = bgImgName[hasSheetData[gStampSheetNo]["id"]];
-}
-//背景描画
-function canvas_Draw() {
-    canvas_ctx.drawImage(canvas_img, 0,0);
-    
-    //スタンプ描画イメージ読み込み開始
-    canvas_load_ix = 0;
-    canvas_stamp_img.fname = null;
-    canvas_StampImageLoad();
-}
-//スタンプ描画イメージ読み込み開始
-function canvas_StampImageLoad() {
-	var d = stampDrawData.get(canvas_load_ix);
-	if (d == null)
-		return;
-	
-	if (canvas_stamp_img.fname == stampImgName[d.id]) {
-		canvas_StampDraw();
-	} else {
-		canvas_stamp_img.fname = stampImgName[d.id];
-		canvas_stamp_img.onload = canvas_StampDraw;
-		canvas_stamp_img.src = stampImgName[d.id];
-	}
-}
-function canvas_StampDraw() {
-	var d = stampDrawData.get(canvas_load_ix);
-	if (d == null)
-		return;
-
-    canvas_ctx.globalAlpha = d.alpha;
-	canvas_ctx.drawImage(canvas_stamp_img, d.x-STAMP_W/2,d.y-STAMP_H/2, STAMP_W,STAMP_H);
-    canvas_ctx.globalAlpha = 1.0;
-	
-	canvas_load_ix++;
-	canvas_StampImageLoad();	
-}
-
-// キャンバス：マウスタッチイベント
-function canvas_onTouchEvent(e) {
-    var pos = getTouchPos(e);
-    
-    drawStamp(pos.x, pos.y);
-	
-	save();
-	
-    e.preventDefault(); //デフォルトイベント処理をしない
-    
-}
-
-
-
-
-
-
-
-
-
-
-var timerID;
-
-function drawStamp(x,y){
-	if (stampBar.selectedStampId >= 0){
-		stampBar.drawSelectedStamp(canvas_ctx, x,y);
-        //playAudioSE_Stamp();
-	}
-}
-
-
-//ロード
-function load(){
-    var sheet = localStorage.getItem("SelectedStampSheet");
-    if (!sheet)    sheet = 0;
-	gStampSheetNo = sheet;
-	
-	// 持っているスタンプのロード
-	if(loadHasStamp() == true)
-	{
-		// 成功ならいじらないが、チートやエラーチェックをしたほうがいいかも
-	}
-	// 失敗したらとりあえず複数のスタンプを作る
-	else
-	{
-		// ダミー削除
-		//DelHasStamp(0);
-		DummyStampDataSet();
-	}
-	stampDrawData.load(sheet);
-}
-
-//セーブ
-function save() {
-	saveHasStamp();
-}
-
-
-window.onload = function() {
-
-	load();
-	
-    canvas_Init();
-    
-    stampBar = new StampBar(3);
-
-    clearInterval(timerID);
-    timerID = setInterval(
-        function(){
-        	stampBar.slide();
-            stampBar.updateDispInfo();
-            stampBar.imageLoad();
-            stampBar.draw();
-
-			// スタンプエフェクト
-			if(sTimeHandle) { ExecEffect(); }
-            
-            //dubugDisp();
-        },
-        50);
-
-};
+*/
 
 
 // MENUボタンクリック
 function menuButtonClick(e){
-	document.location="StampSelect.html";
-    e.preventDefault(); //デフォルトイベント処理をしない
+	st = STATUS.FADEOUT;
+  //  e.preventDefault(); //デフォルトイベント処理をしない
 }
+
+var StampMain = function() 
+{
+	
+	var canvas_canvas;
+	var canvas_ctx;
+	var canvas_img = new Image();
+	var canvas_load_ix = 0;
+	var canvas_stamp_img = new Image();	
+	
+	//背景描画
+	function canvas_Draw() {
+	    canvas_ctx.drawImage(canvas_img, 0,0);
+	    
+	    //スタンプ描画イメージ読み込み開始
+	    canvas_load_ix = 0;
+	    canvas_stamp_img.fname = null;
+	    canvas_StampImageLoad();
+	}
+
+	// キャンバス：初期化
+	function canvas_Init() {
+		
+		canvas_canvas = document.getElementById("canvas");
+		canvas_ctx = canvas_canvas.getContext("2d");	
+
+	    //マウスイベントリスナーの追加
+	    if (navigator.userAgent.indexOf('iPhone')>0 ||
+	        navigator.userAgent.indexOf('iPod')>0 ||
+	        navigator.userAgent.indexOf('iPad')>0 ||
+	        navigator.userAgent.indexOf('Android')>0) {
+	        canvas_canvas.addEventListener("touchstart",canvas_onTouchEvent,false);
+	    } else {
+	        canvas_canvas.addEventListener("mousedown",canvas_onTouchEvent,false);
+	    }
+	    
+	    //背景ロード
+	    canvas_img.onload = canvas_Draw;
+	    canvas_img.src = bgImgName[hasSheetData[gStampSheetNo]["id"]];
+	}
+
+	//スタンプ描画イメージ読み込み開始
+	function canvas_StampImageLoad() {
+		var d = stampDrawData.get(canvas_load_ix);
+		if (d == null)
+			return;
+		
+		if (canvas_stamp_img.fname == stampImgName[d.id]) {
+			canvas_StampDraw();
+		} else {
+			canvas_stamp_img.fname = stampImgName[d.id];
+			canvas_stamp_img.onload = canvas_StampDraw;
+			canvas_stamp_img.src = stampImgName[d.id];
+		}
+	}
+	function canvas_StampDraw() {
+		var d = stampDrawData.get(canvas_load_ix);
+		if (d == null)
+			return;
+
+	    canvas_ctx.globalAlpha = d.alpha;
+		canvas_ctx.drawImage(canvas_stamp_img, d.x-STAMP_W/2,d.y-STAMP_H/2, STAMP_W,STAMP_H);
+	    canvas_ctx.globalAlpha = 1.0;
+		
+		canvas_load_ix++;
+		canvas_StampImageLoad();	
+	}
+
+	// キャンバス：マウスタッチイベント
+	function canvas_onTouchEvent(e) {
+	    var pos = getTouchPos(e);
+	    
+	    drawStamp(pos.x, pos.y);
+		
+		save();
+		
+	    e.preventDefault(); //デフォルトイベント処理をしない
+	    
+	}
+
+
+	var timerID;
+
+	function drawStamp(x,y){
+		if (stampBar.selectedStampId >= 0){
+			stampBar.drawSelectedStamp(canvas_ctx, x,y);
+	        //playAudioSE_Stamp();
+		}
+	}
+
+	
+	//ロード
+	function load(){
+	    var sheet = localStorage.getItem("SelectedStampSheet");
+	    if (!sheet)    sheet = 0;
+		gStampSheetNo = sheet;
+		
+		// 持っているスタンプのロード
+		if(loadHasStamp() == true)
+		{
+			// 成功ならいじらないが、チートやエラーチェックをしたほうがいいかも
+		}
+		// 失敗したらとりあえず複数のスタンプを作る
+		else
+		{
+			// ダミー削除
+			//DelHasStamp(0);
+			DummyStampDataSet();
+		}
+		stampDrawData.load(sheet);
+	}
+
+	//セーブ
+	function save() {
+		saveHasStamp();
+	}
+	
+	stampDrawData = new StampDrawData();
+	load();	
+	
+	var rootSceen = document.getElementById("sceen");
+	var sceen = document.createElement("div");
+	rootSceen.appendChild(sceen);
+	sceen.style.opacity = alpha;
+	
+	var im =document.createElement('canvas');
+	im.setAttribute('id', 'canvas');
+ 	im.width = 640;   
+	im.height = 1200;  
+	sceen.appendChild(im);		
+	
+	//stamp_bar
+   ///this.canvas = document.getElementById("stamp_bar");
+  ///  this.ctx = this.canvas.getContext("2d");
+/*	position: fixed;
+    overflow:hidden;	// はみ出した部分表示しない
+	position:fixed;
+    bottom:0px;
+    left:0px;
+    background-color: #555;	
+*/
+	var imstamp_bar =document.createElement('canvas');
+	imstamp_bar.setAttribute('id', 'stamp_bar');
+ 	imstamp_bar.width = 640;   
+	imstamp_bar.height = 160;  
+	imstamp_bar.style.position = "fixed";
+    imstamp_bar.style.bottom = "0px";
+    imstamp_bar.style.left = "0px";
+	imstamp_bar.overflow = "hidden";  
+	sceen.appendChild(imstamp_bar);		
+
+	
+//	<button id="menu_button" onclick="menuButtonClick()">MENU</button>
+/*
+  var element = document.getElementById('hoge');	
+  var e = document.createElement('button');
+  e.innerHTML = 'ボタン';
+  var f = new Function("alert('ok');");
+  e.onclick = f;
+  element.appendChild(e);
+*/
+/*
+#menu_button {
+	position: absolute;
+	bottom:0px;
+	right:0px;
+	width: 120px;
+	height: 160px;
+}
+	this.div.style.position = "fixed";
+	this.div.style.overflow = "hidden";
+	this.div.style.width = w + "px";
+	this.div.style.height = h + "px";
+	this.img.style.position = "absolute";
+	this.img.style.top = "0px";
+	this.img.style.left = "0px";
+	this.img.style.overflow = "hidden";
+	this.div.appendChild(this.img);
+*/
+	var iMenu =document.createElement('button');
+	iMenu.setAttribute('id', 'menu_button');
+	iMenu.style.position = "absolute";  
+	iMenu.innerHTML = 'MENU'
+ 	iMenu.style.bottom = "0px";
+ 	iMenu.style.right = "0px";
+ 	iMenu.style.width = "120px";   
+	iMenu.style.height = "160px";  
+	var f = new Function("menuButtonClick();");
+ 	iMenu.onclick = f; 
+	sceen.appendChild(iMenu);		
+	
+/*
+#menu_button {
+	position: absolute;
+	bottom:0px;
+	right:0px;
+	width: 120px;
+	height: 160px;
+}
+*/
+    canvas_Init();
+    stampBar = new StampBar(3);
+	
+	st = STATUS.INIT;
+	var next;
+	var alpha = 0;
+	
+/*
+        <div id="ok"><img src="img/stamp/s_btn_d000.png" onMouseDown=goStamp() onTouchStart=goStamp()></img></div>
+        <div id="cancel"><img src="img/stamp/s_btn_e000.png" onMouseDown=goTitle() onTouchStart=goTitle()></img></div>
+#ok {
+    position: fixed;
+    bottom:5px;
+    left:20px;
+}
+
+#cancel {
+    position: fixed;
+    bottom:5px;
+    left:340px;
+	
+}
+
+*/
+
+	//
+	// フレーム処理
+	//
+	this.onframe = function() {
+
+		switch(st) {
+
+			//初期化
+			case STATUS.INIT:
+				//各データが読み込まれるまで待つ
+				if (LoadingCounter <= 0) {
+					st = STATUS.FADEIN;
+				}
+				break;
+
+			//フェードイン
+			case STATUS.FADEIN:
+				alpha += (1.0 / 4);
+				if (alpha >= 1.0) {
+					alpha = 1.0;
+					st = STATUS.MAIN;
+				}
+				sceen.style.opacity = alpha;
+				break;
+
+			//メイン処理
+			case STATUS.MAIN:
+				// メインキャンバスの描画
+			//	canvas_Draw();
+    		//	mainCanvas.draw();
+	        	stampBar.slide();
+	            stampBar.updateDispInfo();
+	            stampBar.imageLoad();
+	            stampBar.draw();
+
+				// スタンプエフェクト
+				if(sTimeHandle) { ExecEffect(); }
+				break;
+			
+			//フェードアウト
+			case STATUS.FADEOUT:
+				alpha -= (1.0 / 4);
+				if (alpha <= 0) {
+					alpha = 0;
+					st = STATUS.END;
+				}
+				sceen.style.opacity = alpha;
+				break;
+
+			//終了
+			case STATUS.END:
+				//DOMエレメントの削除
+				rootSceen.removeChild(sceen);
+				canvas_img = null;
+				//次のシーンをセット
+				nextSceen = new StampSelect();
+				break;
+		}
+	};
+	
+};
+
 
 
 //debug

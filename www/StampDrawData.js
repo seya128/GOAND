@@ -111,3 +111,81 @@ StampDrawData.prototype.clear = function() {
 	this.drawData = new Array();
 };
 
+// ------------------------------------------------------
+// 画像操作
+// ------------------------------------------------------
+// -------------------------------------
+// スタンプのロード
+// -------------------------------------
+function StampGraphic()
+{
+    this.stampImageNo = -1;       	// スタンプの画像番号[一応持っておく]
+    this.isLoaded = false;			// ロードフラグ
+    this.img = new Image();			// イメージクラス
+}
+// -------------------------------------
+// スタンプのローダー
+// -------------------------------------
+StampGraphic.prototype.loadImage = function(no)
+{
+	// 自分のポインタ
+    var _this = this;
+    
+    // ロード
+    this.isLoaded = false;																	// フラグの初期化				
+    this.img.onload = function(){ _this.isLoaded = true; /*alert("seikou" + no);*/ }		// ロードが終わっていたらフラグを立てる
+    this.img.src = stampImgName[no];														// イメージの名前を代入[StampData.js]
+    this.stampImageNo = no;																	// イメージ番号
+};
+
+// -------------------------------------
+// データのロード
+// -------------------------------------
+function StampLoadData(no)
+{
+    this.stampImageNo 			= no;       	// スタンプの画像番号[一応持っておく]
+	this.stampDrawData  		= new StampDrawData();
+	this.stampLoadGetDataArray	= new Array();
+}
+// -------------------------------------
+// データのローダー
+// -------------------------------------
+StampLoadData.prototype.load = function(no)
+{
+	this.stampDrawData.load(no);
+	if (this.stampDrawData != null)
+	{
+		for(var i = 0;; i ++)
+		{
+			this.stampLoadGetDataArray[i] = this.stampDrawData.get(i);
+			if (this.stampLoadGetDataArray[i] == null) { break; }
+		}
+	}
+};
+
+var StampLoadDataArray = new Array();
+var gStampGraphicHandle = new Array();
+
+function LoadStampGraphicHandle()
+{
+	// -------------------------------------
+	// すべてのスタンプ画像をロード
+	// -------------------------------------   
+	for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
+	{
+		gStampGraphicHandle[i] = new StampGraphic(); 
+	    gStampGraphicHandle[i].loadImage(i);
+	}
+}
+function ReleaseStampGraphicHandle()
+{
+	for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
+	{
+		gStampGraphicHandle[i] = null;
+	}
+}
+
+// スタンプ描画データ
+var stampDrawData;
+
+
