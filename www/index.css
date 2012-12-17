@@ -4,6 +4,7 @@ body {
     padding: 0px;
     background-color: #FFFFFF; 
     font: 20px sans-serif;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
 }
 
 #version {

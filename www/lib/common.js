@@ -88,8 +88,7 @@ var DivSprite = function(w,h) {
 	this.img.style.position = "absolute";
 	this.img.style.top = "0px";
 	this.img.style.left = "0px";
-	this.img.style.overflow = "hidden";
-	this.img.style.zoom = 1;
+//	this.img.style.overflow = "hidden";
 	this.div.appendChild(this.img);
 	
 };
@@ -138,15 +137,31 @@ DivSprite.prototype = {
 	},
 	//src
 	set src(a) {
-		this.img.onload = function() {LoadingCounter--;};
+		var _this = this;
+		this.img.onload = function() {
+			LoadingCounter--;
+		};
 		LoadingCounter ++;
 		this.img.src = a;
 	},
 	//frame
 	get frame() { return this._frame; },
 	set frame(a) {
+/*		var dw = Math.floor(this.img.naturalWidth / this._w);
+		var top = 0;
+		if (a > dw)	top = Math.floor(a / dw) * this._h;
+		var left = Math.floor(a % dw) * this._w;
+*/
+		var top = 0;
+		var left = a * this._w;
+		var bottom = top+this._h;
+		var right = left+this._w;
+		
 		this._frame = a;
-		this.img.style.left = (-a * this._w) + "px";
+		this.img.style.clip = "rect("+top+"px "+right+"px "+bottom+"px "+left+"px)";
+		this.img.style.left = -left + "px";
+		this.img.style.top = -top + "px";
+		this.img.style.zoom = 1;
 	},
 	
 	//onclick
