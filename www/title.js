@@ -70,8 +70,8 @@ var SceenTitle = function() {
 	stamp.src = "img/title/t_btn_b000.png";
 	stamp.onclick = function() {
 		event.preventDefault();
-		document.location="StampSelect.html";	
-		//next = NEXT.STAMP;	
+		//document.location="StampSelect.html";	
+		next = NEXT.STAMP;	
 	};
 	sceen.appendChild(stamp.div);
 	
@@ -160,9 +160,9 @@ var SceenTitle = function() {
 						nextSceen = new StampShop();
 						break;		
 					// ショップセレクト
-					//case NEXT.STAMP:
-					//	nextSceen = new StampSelect();
-					//	break;					
+					case NEXT.STAMP:
+						nextSceen = new StampSelect();
+						break;					
 				}
 				break;
 		}

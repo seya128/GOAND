@@ -1,5 +1,4 @@
 
-
 // -------------------------------------
 // お店データ[3*3]
 // -------------------------------------
@@ -50,34 +49,8 @@ var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
 var MAX_STAMP_IMAGE = stampImgName.length;
-
-// -------------------------------------
-// スタンプのロード
-// -------------------------------------
-function StampGraphic()
-{
-    this.stampImageNo = -1;       	// スタンプの画像番号[一応持っておく]
-    this.isLoaded = false;			// ロードフラグ
-    this.img = new Image();			// イメージクラス
-}
-// -------------------------------------
-// スタンプのローダー
-// -------------------------------------
-StampGraphic.prototype.loadImage = function(no)
-{
-	// 自分のポインタ
-    var _this = this;
-    
-    // ロード
-    this.isLoaded = false;																	// フラグの初期化				
-    this.img.onload = function(){ _this.isLoaded = true; /*alert("seikou" + no);*/ }		// ロードが終わっていたらフラグを立てる
-    this.img.src = stampImgName[no];														// イメージの名前を代入[StampData.js]
-    this.stampImageNo = no;																	// イメージ番号
-};
-var StampLoadDataArray = new Array();
-var stamp = new Array();	
 var timerID;
-var mainCanvas;
+
 
 var STATUS = {
 	INIT:			0,
@@ -212,7 +185,7 @@ StampSheet.prototype.drawWindow = function()
 		386, 
 		162);
 
-	this.ctx.drawImage(stamp[sTouchNo%27].img, 
+	this.ctx.drawImage(gStampGraphicHandle[sTouchNo%27].img, 
 		262/* - (STAMP_W * 0.7)/2*/, 
 		GPosY + 237/* - (STAMP_H * 0.7)/2*/, 
 		STAMP_W * 0.7, 
@@ -312,7 +285,7 @@ StampSheet.prototype.drawOK= function()
 			162);
 	}
 
-	this.ctx.drawImage(stamp[sTouchNo%27].img, 
+	this.ctx.drawImage(gStampGraphicHandle[sTouchNo%27].img, 
 		262/* - (STAMP_W * 0.7)/2*/, 
 		237/* - (STAMP_H * 0.7)/2*/, 
 		STAMP_W * 0.7, 
@@ -383,7 +356,7 @@ StampSheet.prototype.draw = function(ofs)
 					214, 
 					237);
 
-				this.ctx.drawImage(stamp[((i * MAX_SHOP_DISP_WIDTH) + j)%27].img, 
+				this.ctx.drawImage(gStampGraphicHandle[((i * MAX_SHOP_DISP_WIDTH) + j)%27].img, 
 					(xx)-STAMP_W/2 + x, 
 					(yy)-STAMP_H/2 + y - 70, 
 					STAMP_W, 
@@ -403,7 +376,7 @@ StampSheet.prototype.draw = function(ofs)
 			{
 				var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 				var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
-				this.ctx.drawImage(stamp[((i * MAX_SHOP_DISP_WIDTH) + j)%27].img, 
+				this.ctx.drawImage(gStampGraphicHandle[((i * MAX_SHOP_DISP_WIDTH) + j)%27].img, 
 					(xx)-STAMP_W/2 + x, 
 					(yy)-STAMP_H/2 + y - 70, 
 					STAMP_W, 
@@ -492,382 +465,375 @@ StampSheet.prototype.draw = function(ofs)
 };
    
 
-//
-// メインキャンバス
-//
-var MainCanvas = function()
+var StampShop = function() 
 {
-    var _this = this;
-    this.selectIx = 0;
-	var sScrollY    = 0;
-	var sMoveRate   = (0.4);
-    var ofsX=0;
-    var addX=0, ofsXold=0;
-    var ofsRate=1.2;
-
-	// デフォルトキャンバス
-    var canvas = document.getElementById("canvas");
-	var ctx    = canvas.getContext("2d");
-    var sheet = new StampSheet(ctx, 0);
-	
-    //キャンバスクリア
-    this.clear = function()
+	var mainCanvas;
+	//
+	// メインキャンバス
+	//
+	var MainCanvas = function()
 	{
-        ctx.beginPath();
-        //グラデーション領域をセット
-        var grad  = ctx.createLinearGradient(0,0, 0,1200);
-        //グラデーション終点のオフセットと色をセット
-        grad.addColorStop(0,'rgb(10, 10, 50)');
-        grad.addColorStop(0.7,'rgb(150, 150, 240)');
-        //グラデーションをfillStyleプロパティにセット
-        ctx.fillStyle = grad;
-        /* 矩形を描画 */
-        ctx.rect(0,0, 640, 1200);
-        ctx.fill();
-    };
-    
-	this.draw_BuyWindow = function() 
-	{
-		// 画面クリア
-        this.clear();
-		// シートの描画
-        sheet.draw(sScrollY);
+	    var _this = this;
+	    this.selectIx = 0;
+		var sScrollY    = 0;
+		var sMoveRate   = (0.4);
+	    var ofsX=0;
+	    var addX=0, ofsXold=0;
+	    var ofsRate=1.2;
 
-		if(bTouch == bOldTouch)
+		// デフォルトキャンバス
+	    var canvas = document.getElementById("canvas");
+		var ctx    = canvas.getContext("2d");
+	    var sheet = new StampSheet(ctx, 0);
+		
+	    //キャンバスクリア
+	    this.clear = function()
 		{
-			sResYesNo = -1;
-		}
-		// ウィンドウの描画
-		if(eSwitch == 1)
+	        ctx.beginPath();
+	        //グラデーション領域をセット
+	        var grad  = ctx.createLinearGradient(0,0, 0,1200);
+	        //グラデーション終点のオフセットと色をセット
+	        grad.addColorStop(0,'rgb(10, 10, 50)');
+	        grad.addColorStop(0.7,'rgb(150, 150, 240)');
+	        //グラデーションをfillStyleプロパティにセット
+	        ctx.fillStyle = grad;
+	        /* 矩形を描画 */
+	        ctx.rect(0,0, 640, 1200);
+	        ctx.fill();
+	    };
+	    
+		this.draw_BuyWindow = function() 
 		{
-			sheet.drawWindow(sScrollY);
- 		}
-		else
-		{
-			sheet.drawOK(sScrollY);
-		}
-		// 決定
-		if(bTouch == true && bOldTouch == false)
-		{
-			if(sScaleRate >= 1.0)
+			// 画面クリア
+	        this.clear();
+			// シートの描画
+	        sheet.draw(sScrollY);
+
+			if(bTouch == bOldTouch)
 			{
-				if(eSwitch == 1)
-				{
-					// Yes
-					if(sResYesNo == 0)
-					{
-						eSwitch = 2;
-						sScaleRate = 0;
-						CoinNum -= 10;
-						bOldTouch = false; 
-						bTouch = false;
-					}
-					// No
-					else if(sResYesNo == 1)
-					{	
-						eSwitch = 0;
-						bOldTouch = false; 
-						bTouch = false;
-					}
-				}
-				else
-				{
-					if(sResYesNo == 0)
-					{	
-						eSwitch = 0;
-						bOldTouch = false; 
-						bTouch = false;
-					}
-				}
+				sResYesNo = -1;
 			}
-			else { bOldTouch = false; bTouch = false; }
-		}
-		// タッチ
-		bOldTouch = bTouch;
-	}
-    this.draw_Main = function()
-	{
-        // タッチされていない場合の位置調整
-		sPrevSheetNo = sActiveSheetNo;
-		bMoveList = false;
-
-		if(bTouch == bOldTouch)
-		{
-			sTouchNo  = -1;
-		}
-		if(sTouchAccelerator == 0 && bTouch)
-		{	
-			sheet.Proc(sScrollY);
-		}
-        if(bBuyTouch == false)
-		{
-			// -----------------------------------------
-			// 現在のシート番号を探す
-			// -----------------------------------------
-			var sChack         = 0;
-			var sChackTargetX  = 0;
-			for(var i = 0;; i ++)
+			// ウィンドウの描画
+			if(eSwitch == 1)
 			{
-				if(i == 0)
-				{
-					sChack -= (sHeightSize / 2);							// シート分の高さ
-					sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
-					if(sScrollY > sChack) 
-					{ 
-						sChackTargetX  = 0;
-						sActiveSheetNo = i; break; 
-					}
-					sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
-				}
-				else
-				{
-					sChack -= (sHeightSize);								// シート分の高さ
-					sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
-					if(sScrollY > sChack) 
-					{ 
-						sChack += (sHeightSize / 2);						// シート分の高さ
-						sChack += (MAX_SHOP_PANEL_INTERVAL_Y / 2);			// インターバルの半分
-						sChackTargetX = sChack;
-						sActiveSheetNo = i; break;
-					}
-					sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
-				}
+				sheet.drawWindow(sScrollY);
+	 		}
+			else
+			{
+				sheet.drawOK(sScrollY);
 			}
-			// -----------------------------------------
-			// タッチ終了
-			// -----------------------------------------
-	        if (!bTouch)
+			// 決定
+			if(bTouch == true && bOldTouch == false)
 			{
-				// -----------------------------------------
-				// 範囲外の場合保管移動
-				// -----------------------------------------
-				if(sScrollY > 0)
+				if(sScaleRate >= 1.0)
 				{
-					// 線形保管
-					if(Math.abs(sScrollY) > 2)
+					if(eSwitch == 1)
 					{
-						sTouchAccelerator = (0 - sScrollY) * sMoveRate;
-						sScrollY = sScrollY + sTouchAccelerator;
-						bMoveList = true;
-					}	
-					else { sScrollY = 0; sTouchAccelerator = 0; }
-				}
-				// -----------------------------------------
-				// タッチ終了時なので保管移動
-				// -----------------------------------------
-				else
-				{
-					// 移動保管
-					var sMoveSpeed = 64;
-					if(Math.abs(sTouchAccelerator) <= 0)
-					{
-						if(sChackTargetX > sScrollY)
+						// Yes
+						if(sResYesNo == 0)
 						{
-							if(Math.abs(sChackTargetX - sScrollY) < sMoveSpeed)
-							{
-								sScrollY = sChackTargetX;
-							}
-							else
-							{
-								sScrollY += sMoveSpeed;
-							}
-							bMoveList = true;
+							eSwitch = 2;
+							sScaleRate = 0;
+							CoinNum -= 10;
+							bOldTouch = false; 
+							bTouch = false;
 						}
-						else if(sChackTargetX < sScrollY)
-						{
-							if(Math.abs(sChackTargetX - sScrollY) < sMoveSpeed)
-							{
-								sScrollY = sChackTargetX;
-							}
-							else
-							{
-								sScrollY -= sMoveSpeed;
-							}
-							bMoveList = true;
+						// No
+						else if(sResYesNo == 1)
+						{	
+							eSwitch = 0;
+							bOldTouch = false; 
+							bTouch = false;
 						}
-						else {}
 					}
 					else
 					{
-						// 急ブレーキ
-						if((sPrevSheetNo != sActiveSheetNo) && (Math.abs(sTouchAccelerator) < 60))
+						if(sResYesNo == 0)
+						{	
+							eSwitch = 0;
+							bOldTouch = false; 
+							bTouch = false;
+						}
+					}
+				}
+				else { bOldTouch = false; bTouch = false; }
+			}
+			// タッチ
+			bOldTouch = bTouch;
+		}
+	    this.draw_Main = function()
+		{
+	        // タッチされていない場合の位置調整
+			sPrevSheetNo = sActiveSheetNo;
+			bMoveList = false;
+
+			if(bTouch == bOldTouch)
+			{
+				sTouchNo  = -1;
+			}
+			if(sTouchAccelerator == 0 && bTouch)
+			{	
+				sheet.Proc(sScrollY);
+			}
+	        if(bBuyTouch == false)
+			{
+				// -----------------------------------------
+				// 現在のシート番号を探す
+				// -----------------------------------------
+				var sChack         = 0;
+				var sChackTargetX  = 0;
+				for(var i = 0;; i ++)
+				{
+					if(i == 0)
+					{
+						sChack -= (sHeightSize / 2);							// シート分の高さ
+						sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
+						if(sScrollY > sChack) 
+						{ 
+							sChackTargetX  = 0;
+							sActiveSheetNo = i; break; 
+						}
+						sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
+					}
+					else
+					{
+						sChack -= (sHeightSize);								// シート分の高さ
+						sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
+						if(sScrollY > sChack) 
+						{ 
+							sChack += (sHeightSize / 2);						// シート分の高さ
+							sChack += (MAX_SHOP_PANEL_INTERVAL_Y / 2);			// インターバルの半分
+							sChackTargetX = sChack;
+							sActiveSheetNo = i; break;
+						}
+						sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
+					}
+				}
+				// -----------------------------------------
+				// タッチ終了
+				// -----------------------------------------
+		        if (!bTouch)
+				{
+					// -----------------------------------------
+					// 範囲外の場合保管移動
+					// -----------------------------------------
+					if(sScrollY > 0)
+					{
+						// 線形保管
+						if(Math.abs(sScrollY) > 2)
 						{
-							sTouchAccelerator = 0;
+							sTouchAccelerator = (0 - sScrollY) * sMoveRate;
+							sScrollY = sScrollY + sTouchAccelerator;
 							bMoveList = true;
+						}	
+						else { sScrollY = 0; sTouchAccelerator = 0; }
+					}
+					// -----------------------------------------
+					// タッチ終了時なので保管移動
+					// -----------------------------------------
+					else
+					{
+						// 移動保管
+						var sMoveSpeed = 64;
+						if(Math.abs(sTouchAccelerator) <= 0)
+						{
+							if(sChackTargetX > sScrollY)
+							{
+								if(Math.abs(sChackTargetX - sScrollY) < sMoveSpeed)
+								{
+									sScrollY = sChackTargetX;
+								}
+								else
+								{
+									sScrollY += sMoveSpeed;
+								}
+								bMoveList = true;
+							}
+							else if(sChackTargetX < sScrollY)
+							{
+								if(Math.abs(sChackTargetX - sScrollY) < sMoveSpeed)
+								{
+									sScrollY = sChackTargetX;
+								}
+								else
+								{
+									sScrollY -= sMoveSpeed;
+								}
+								bMoveList = true;
+							}
+							else {}
 						}
 						else
 						{
-							sScrollY += sTouchAccelerator;
-							// マイナス
-							if(sTouchAccelerator < 0)           
-							{ 
-								sTouchAccelerator += 8; 
-								if(sTouchAccelerator > -58) { sTouchAccelerator = -58; } 
+							// 急ブレーキ
+							if((sPrevSheetNo != sActiveSheetNo) && (Math.abs(sTouchAccelerator) < 60))
+							{
+								sTouchAccelerator = 0;
+								bMoveList = true;
 							}
-							// プラス
 							else
-							{ 
-								sTouchAccelerator -= 8; 
-								if(sTouchAccelerator < 58) { sTouchAccelerator = 58; } 
+							{
+								sScrollY += sTouchAccelerator;
+								// マイナス
+								if(sTouchAccelerator < 0)           
+								{ 
+									sTouchAccelerator += 8; 
+									if(sTouchAccelerator > -58) { sTouchAccelerator = -58; } 
+								}
+								// プラス
+								else
+								{ 
+									sTouchAccelerator -= 8; 
+									if(sTouchAccelerator < 58) { sTouchAccelerator = 58; } 
+								}
+								bMoveList = true;
 							}
-							bMoveList = true;
 						}
 					}
-				}
-	        }
-			// -----------------------------------------
-			// タッチスライド中
-			// -----------------------------------------
-			else 
-			{
-				// 移動量
-				sTouchAccelerator = (sTouchMoveY - sTouchLastY) 	// 移動量
-				sScrollY += sTouchAccelerator; 						// 移動量を算出し移動させる
-				sTouchLastY = sTouchMoveY; 							// 最近の最新座標
-				bMoveList = true;
-	        }
-			// 範囲外
-			var sMax = -(MAX_SHOP_PANEL_START_Y + (MAX_SHOP_PANEL_HEIGHT * (MAX_SHOP_LIST_HEIGHT-4)))
-			if(sScrollY > (MAX_SHOP_PANEL_HEIGHT / 2))
-			{
-				sTouchAccelerator = 0;
-				sScrollY          = (MAX_SHOP_PANEL_HEIGHT / 2);
-			}
-			if(sScrollY < sMax)
-			{
-				sTouchAccelerator = 0;
-				sScrollY          = sMax;
-			}
-		}
-		else
-		{
-			if(bTouch/*!bTouch*/) 
-			{	
-				if(bBuyTouch && sTouchNo != -1)
+		        }
+				// -----------------------------------------
+				// タッチスライド中
+				// -----------------------------------------
+				else 
 				{
- 					eSwitch = 1;
-					sResYesNo = -1;
-					bOldTouch = false; 
-					bTouch = false;
-					sScaleRate = 0;
-					if(CoinNum < 10)
+					// 移動量
+					sTouchAccelerator = (sTouchMoveY - sTouchLastY) 	// 移動量
+					sScrollY += sTouchAccelerator; 						// 移動量を算出し移動させる
+					sTouchLastY = sTouchMoveY; 							// 最近の最新座標
+					bMoveList = true;
+		        }
+				// 範囲外
+				var sMax = -(MAX_SHOP_PANEL_START_Y + (MAX_SHOP_PANEL_HEIGHT * (MAX_SHOP_LIST_HEIGHT-4)))
+				if(sScrollY > (MAX_SHOP_PANEL_HEIGHT / 2))
+				{
+					sTouchAccelerator = 0;
+					sScrollY          = (MAX_SHOP_PANEL_HEIGHT / 2);
+				}
+				if(sScrollY < sMax)
+				{
+					sTouchAccelerator = 0;
+					sScrollY          = sMax;
+				}
+			}
+			else
+			{
+				if(bTouch/*!bTouch*/) 
+				{	
+					if(bBuyTouch && sTouchNo != -1)
 					{
-						eSwitch = 3;
+	 					eSwitch = 1;
+						sResYesNo = -1;
+						bOldTouch = false; 
+						bTouch = false;
+						sScaleRate = 0;
+						if(CoinNum < 10)
+						{
+							eSwitch = 3;
+						}
 					}
+					else
+					{
+					}
+					bBuyTouch = false; 
 				}
-				else
-				{
-				}
-				bBuyTouch = false; 
 			}
+			// 画面クリア
+	        this.clear();
+			// シートの描画
+	        sheet.draw(sScrollY);
+			// タッチ
+			bOldTouch = bTouch;
 		}
-		// 画面クリア
-        this.clear();
-		// シートの描画
-        sheet.draw(sScrollY);
-		// タッチ
-		bOldTouch = bTouch;
-	}
-	this.draw_debug = function()
-	{
-		// メモリ内の表示デバッグ
-		//var Use    = performance.memory.usedJSHeapSize;
-		//var Total  = performance.memory.totalJSHeapSize;
-		//var UseM   = Use   / 1024 / 1024;
-		//var TotalM = Total / 1024 / 1024;
-		//document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]" + sActiveSheetNo;
-		//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
-	}
-    //描画
-    this.draw = function() 
-	{
-		// メイン
-		if(eSwitch == 0)
+		this.draw_debug = function()
 		{
-			this.draw_Main();
+			// メモリ内の表示デバッグ
+			//var Use    = performance.memory.usedJSHeapSize;
+			//var Total  = performance.memory.totalJSHeapSize;
+			//var UseM   = Use   / 1024 / 1024;
+			//var TotalM = Total / 1024 / 1024;
+			//document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]" + sActiveSheetNo;
+			//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 		}
-		// ウィンドウ
-		else if(eSwitch == 1 || eSwitch == 2)
+	    //描画
+	    this.draw = function() 
 		{
-			this.draw_BuyWindow();
-		}
-		// 満タンまたはお金がない
-		else if(eSwitch == 3 || eSwitch == 4)
+			// メイン
+			if(eSwitch == 0)
+			{
+				this.draw_Main();
+			}
+			// ウィンドウ
+			else if(eSwitch == 1 || eSwitch == 2)
+			{
+				this.draw_BuyWindow();
+			}
+			// 満タンまたはお金がない
+			else if(eSwitch == 3 || eSwitch == 4)
+			{
+				this.draw_BuyWindow();
+			}
+			
+			// デバッグの表示
+			this.draw_debug();
+	    };
+		// --------------------------------------    
+	    // マウスイベント
+		// --------------------------------------
+	    this.onTouchStart = function(e)
 		{
-			this.draw_BuyWindow();
-		}
-		
-		// デバッグの表示
-		this.draw_debug();
-    };
-	// --------------------------------------    
-    // マウスイベント
-	// --------------------------------------
-    this.onTouchStart = function(e)
-	{
-        var pos = getTouchPos(e);
-        sTouchStartX = pos.x;
-        sTouchStartY = pos.y;
-        sTouchMoveX  = pos.x;
-        sTouchMoveY  = pos.y;
-		sTouchLastX  = pos.x;
-		sTouchLastY  = pos.y;
-        bTouch = true;
-        e.preventDefault(); // デフォルトイベント処理をしない
-    };
-    this.onTouchMove = function(e) 
-	{
-        if (bTouch) 
+	        var pos = getTouchPos(e);
+	        sTouchStartX = pos.x;
+	        sTouchStartY = pos.y;
+	        sTouchMoveX  = pos.x;
+	        sTouchMoveY  = pos.y;
+			sTouchLastX  = pos.x;
+			sTouchLastY  = pos.y;
+	        bTouch = true;
+	        e.preventDefault(); // デフォルトイベント処理をしない
+	    };
+	    this.onTouchMove = function(e) 
 		{
-            var pos = getTouchPos(e);
-        	sTouchMoveX  = pos.x;
-			sTouchMoveY  = pos.y;
-        }
-        e.preventDefault(); // デフォルトイベント処理をしない
-    };
-    this.onTouchEnd = function(e)
-	{
-        bTouch = false;
-        e.preventDefault(); // デフォルトイベント処理をしない
-    };
-	// --------------------------------------    
-    // マウスイベントリスナーの追加
-	// --------------------------------------
-    if (navigator.userAgent.indexOf('iPhone')  > 0 ||
-        navigator.userAgent.indexOf('iPod')    > 0 ||
-        navigator.userAgent.indexOf('iPad')    > 0 ||
-        navigator.userAgent.indexOf('Android') > 0) 
-	{
-        canvas.addEventListener("touchstart",this.onTouchStart,false);
-        canvas.addEventListener("touchmove", this.onTouchMove, false);
-        canvas.addEventListener("touchend",  this.onTouchEnd,  false);
-    } 
-	else 
-	{
-        canvas.addEventListener("mousedown", this.onTouchStart,false);
-        canvas.addEventListener("mousemove", this.onTouchMove, false);
-        canvas.addEventListener("mouseup",   this.onTouchEnd,  false);
-    }
-	// --------------------------------------
-    // 初期描画
-	// --------------------------------------
-    this.draw();
-};
-
-var StampShop = function() 
-{
+	        if (bTouch) 
+			{
+	            var pos = getTouchPos(e);
+	        	sTouchMoveX  = pos.x;
+				sTouchMoveY  = pos.y;
+	        }
+	        e.preventDefault(); // デフォルトイベント処理をしない
+	    };
+	    this.onTouchEnd = function(e)
+		{
+	        bTouch = false;
+	        e.preventDefault(); // デフォルトイベント処理をしない
+	    };
+		// --------------------------------------    
+	    // マウスイベントリスナーの追加
+		// --------------------------------------
+	    if (navigator.userAgent.indexOf('iPhone')  > 0 ||
+	        navigator.userAgent.indexOf('iPod')    > 0 ||
+	        navigator.userAgent.indexOf('iPad')    > 0 ||
+	        navigator.userAgent.indexOf('Android') > 0) 
+		{
+	        canvas.addEventListener("touchstart",this.onTouchStart,false);
+	        canvas.addEventListener("touchmove", this.onTouchMove, false);
+	        canvas.addEventListener("touchend",  this.onTouchEnd,  false);
+	    } 
+		else 
+		{
+	        canvas.addEventListener("mousedown", this.onTouchStart,false);
+	        canvas.addEventListener("mousemove", this.onTouchMove, false);
+	        canvas.addEventListener("mouseup",   this.onTouchEnd,  false);
+	    }
+		// --------------------------------------
+	    // 初期描画
+		// --------------------------------------
+	    this.draw();
+	};
 
 	var alpha = 0;
-	
-	// -------------------------------------
-	// すべてのスタンプ画像をロード
-	// -------------------------------------   
-	for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
-	{
-		stamp[i] = new StampGraphic(); 
-	    stamp[i].loadImage(i);
-	}
-	
+	st = STATUS.INIT;	
+	// スタンプ画像のロード
+	LoadStampGraphicHandle();
 	
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
@@ -879,7 +845,7 @@ var StampShop = function()
  	im.width = 640;   
 	im.height = 1200;  
 	sceen.appendChild(im);	
-	mainCanvas = new MainCanvas();
+	mainCanvas = new MainCanvas(0);
 	
 	//
 	// フレーム処理
