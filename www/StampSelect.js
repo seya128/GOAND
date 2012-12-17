@@ -17,7 +17,6 @@ var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
-var MAX_STAMP_IMAGE = stampImgName.length;
 var timerID;
  
 
@@ -60,18 +59,18 @@ var StampSelect = function()
 			// シートに張り付けて描画
 			// -------------------------------------  
 			var iSheetNo = this.sheetNo;
-			if(StampLoadDataArray[iSheetNo] != null && iSheetNo >= 0)
+			if(g_StampLoadDataArray[iSheetNo] != null && iSheetNo >= 0)
 			{
 				for(var i = 0;; i ++)
 				{
 					// -------------------------------------
 					// 座標取得
 					// ------------------------------------- 
-					if (StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] == null) { break; }
-					var xx  = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["x"];
-					var yy  = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["y"];
-					var id  = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["id"];
-					var a   = StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["alpha"];
+					if (g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] == null) { break; }
+					var xx  = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["x"];
+					var yy  = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["y"];
+					var id  = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["id"];
+					var a   = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["alpha"];
 					// -------------------------------------
 					// 座標変換
 					// -------------------------------------
@@ -87,12 +86,12 @@ var StampSelect = function()
 					// -------------------------------------
 					// 描画
 					// ------------------------------------- 
-					if(gStampGraphicHandle[id] == null) { continue; }
-					if(gStampGraphicHandle[id].isLoaded)
+					if(GetStampGraphicHandle_Stamp(id) == null) { continue; }
+					if(GetStampGraphicHandle_Stamp(id).m_bLoaded)
 					{
-						if(gStampGraphicHandle[id].img == null) { continue; }
+						if(GetStampGraphicHandle_StampImage(id) == null) { continue; }
 						this.CanvasSheet_2d.globalAlpha = a;
-						this.CanvasSheet_2d.drawImage(gStampGraphicHandle[id].img, 
+						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_StampImage(id), 
 							(xx/REDUCTION_SIZE)-STAMP_W/2/REDUCTION_SIZE, 
 							(yy/REDUCTION_SIZE)-STAMP_H/2/REDUCTION_SIZE, 
 							STAMP_W / REDUCTION_SIZE, 
@@ -111,12 +110,14 @@ var StampSelect = function()
 	    var _this = this;
 	    if (no < 0)    no +=hasSheetData.length;
 	    this.sheetNo = no % hasSheetData.length;
-	    this.isLoaded = false;
+	    this.isLoaded = true;
+/*
 	    this.img.onload = function() {
 	        _this.isLoaded = true;
 	    };
-	    this.sheetSrc = bgImgName[hasSheetData[this.sheetNo]["id"]];
-	    this.img.src = this.sheetSrc;
+*/
+//	    this.sheetSrc = bgImgName[hasSheetData[this.sheetNo]["id"]];
+		this.img = GetStampGraphicHandle_SheetImage(hasSheetData[this.sheetNo]["id"]);
 	};
 	   	
 	
@@ -278,17 +279,25 @@ var StampSelect = function()
 	st = STATUS.INIT;
 	var next;
 	var alpha = 0;
+
+    // 画像ロード[初回一回のみ]
+	AllLoadStampLoadDataArray();
+    AllLoadStampGraphic();
+	// データロード[毎回強制]
+	
+/*
 	// -------------------------------------
 	// すべてのスタンプデータをロード
 	// -------------------------------------   
 	for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
 	{
-		StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
-		StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
+		g_StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
+		g_StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
 	}
+*/	
 	// スタンプ画像のロード
-	LoadStampGraphicHandle();
-	
+//	LoadStampGraphicHandle();
+
 /*
         <div id="ok"><img src="img/stamp/s_btn_d000.png" onMouseDown=goStamp() onTouchStart=goStamp()></img></div>
         <div id="cancel"><img src="img/stamp/s_btn_e000.png" onMouseDown=goTitle() onTouchStart=goTitle()></img></div>

@@ -26,7 +26,6 @@ var sScaleRate = 0;
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
-var MAX_STAMP_IMAGE = stampImgName.length;
 var timerID;
 
 
@@ -163,7 +162,7 @@ StampSheet.prototype.drawWindow = function()
 		386, 
 		162);
 
-	this.ctx.drawImage(gStampGraphicHandle[sTouchNo%27].img, 
+	this.ctx.drawImage(GetStampGraphicHandle_StampImage(sTouchNo%27), 
 		262/* - (STAMP_W * 0.7)/2*/, 
 		GPosY + 237/* - (STAMP_H * 0.7)/2*/, 
 		STAMP_W * 0.7, 
@@ -263,7 +262,7 @@ StampSheet.prototype.drawOK= function()
 			162);
 	}
 
-	this.ctx.drawImage(gStampGraphicHandle[sTouchNo%27].img, 
+	this.ctx.drawImage(GetStampGraphicHandle_StampImage(sTouchNo%27), 
 		262/* - (STAMP_W * 0.7)/2*/, 
 		237/* - (STAMP_H * 0.7)/2*/, 
 		STAMP_W * 0.7, 
@@ -334,7 +333,7 @@ StampSheet.prototype.draw = function(ofs)
 					214, 
 					237);
 
-				this.ctx.drawImage(gStampGraphicHandle[((i * MAX_SHOP_DISP_WIDTH) + j)%27].img, 
+				this.ctx.drawImage(GetStampGraphicHandle_StampImage(((i * MAX_SHOP_DISP_WIDTH) + j)%27), 
 					(xx)-STAMP_W/2 + x, 
 					(yy)-STAMP_H/2 + y - 70, 
 					STAMP_W, 
@@ -354,7 +353,7 @@ StampSheet.prototype.draw = function(ofs)
 			{
 				var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 				var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
-				this.ctx.drawImage(gStampGraphicHandle[((i * MAX_SHOP_DISP_WIDTH) + j)%27].img, 
+				this.ctx.drawImage(GetStampGraphicHandle_StampImage(((i * MAX_SHOP_DISP_WIDTH) + j)%27), 
 					(xx)-STAMP_W/2 + x, 
 					(yy)-STAMP_H/2 + y - 70, 
 					STAMP_W, 
@@ -810,8 +809,11 @@ var StampShop = function()
 
 	var alpha = 0;
 	st = STATUS.INIT;	
+
+    // すべてロード
+    AllLoadStampGraphic();
 	// スタンプ画像のロード
-	LoadStampGraphicHandle();
+//	LoadStampGraphicHandle();
 	
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
