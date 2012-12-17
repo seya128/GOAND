@@ -1,3 +1,5 @@
+
+
 // -------------------------------------
 // お店データ[3*3]
 // -------------------------------------
@@ -48,37 +50,6 @@ var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
 var MAX_STAMP_IMAGE = stampImgName.length;
-//alert(MAX_STAMP_IMAGE);
-
-// -------------------------------------
-// ※勉強を兼ねて無駄にコメントを書きます
-// 　文法もC++風で書いてあるので、そのうちJava風に書き直します。
-// 　高速性はまったく考慮してません・・・。
-// -------------------------------------
-// -------------------------------------
-// データのロード
-// -------------------------------------
-function StampLoadData(no)
-{
-    this.stampImageNo 			= no;       	// スタンプの画像番号[一応持っておく]
-	this.stampDrawData  		= new StampDrawData();
-	this.stampLoadGetDataArray	= new Array();
-}
-// -------------------------------------
-// データのローダー
-// -------------------------------------
-StampLoadData.prototype.load = function()
-{
-	this.stampDrawData.load(iLoadDataIndex);
-	if (this.stampDrawData != null)
-	{
-		for(var i = 0;; i ++)
-		{
-			this.stampLoadGetDataArray[i] = this.stampDrawData.get(i);
-			if (this.stampLoadGetDataArray[i] == null) { break; }
-		}
-	}
-};
 
 // -------------------------------------
 // スタンプのロード
@@ -103,25 +74,12 @@ StampGraphic.prototype.loadImage = function(no)
     this.img.src = stampImgName[no];														// イメージの名前を代入[StampData.js]
     this.stampImageNo = no;																	// イメージ番号
 };
-
-// -------------------------------------
-// すべてのスタンプデータをロード
-// -------------------------------------   
 var StampLoadDataArray = new Array();
-for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
-{
-	StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
-	StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
-}
-// -------------------------------------
-// すべてのスタンプ画像をロード
-// -------------------------------------   
-var stamp = new Array();
-for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
-{
-	stamp[i] = new StampGraphic(); 
-    stamp[i].loadImage(i);
-}
+var stamp = new Array();	
+var timerID;
+var mainCanvas;
+
+
 
 //
 // スタンプシート
@@ -137,49 +95,49 @@ function StampSheet(canvas_ctx, no)
 	// イメージ
 	this.img = new Image();											// イメージクラス
     this.img.onload = function(){ _this.isLoaded = true; }			// ロードが終わっていたらフラグを立てる
-    this.img.src = "img/shop/004.png";								// イメージの名前を代入[StampData.js]
+    this.img.src = "img/07_shop/004.png";								// イメージの名前を代入[StampData.js]
     this.stampImageNo = no;											// イメージ番号  
 	// ウィンドウ
 	this.window = new Image();										// イメージクラス
     this.window.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.window.src = "img/shop/o_wak_a.png";						// イメージの名前を代入[StampData.js]
+    this.window.src = "img/07_shop/o_wak_a.png";						// イメージの名前を代入[StampData.js]
 	// ウィンドウ
 	this.YesNoImage = new Image();										// イメージクラス
     this.YesNoImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.YesNoImage.src = "img/shop/o_txt_a.png";						// イメージの名前を代入[StampData.js]
+    this.YesNoImage.src = "img/07_shop/o_txt_a.png";						// イメージの名前を代入[StampData.js]
 	// はい
 	this.YesImage = new Image();										// イメージクラス
     this.YesImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.YesImage.src = "img/shop/k_btn_a.png";						// イメージの名前を代入[StampData.js]
+    this.YesImage.src = "img/07_shop/k_btn_a.png";						// イメージの名前を代入[StampData.js]
 	// いいえ
 	this.NoImage = new Image();										// イメージクラス
     this.NoImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.NoImage.src = "img/shop/k_btn_b.png";						// イメージの名前を代入[StampData.js]
+    this.NoImage.src = "img/07_shop/k_btn_b.png";						// イメージの名前を代入[StampData.js]
 	// ウィンドウ
 	this.BuyOkImage = new Image();										// イメージクラス
     this.BuyOkImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BuyOkImage.src = "img/shop/o_txt_d.png";						// イメージの名前を代入[StampData.js]
+    this.BuyOkImage.src = "img/07_shop/o_txt_d.png";						// イメージの名前を代入[StampData.js]
 	// ウィンドウ
 	this.BuyNoImage = new Image();										// イメージクラス
     this.BuyNoImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BuyNoImage.src = "img/shop/o_txt_b.png";						// イメージの名前を代入[StampData.js]
+    this.BuyNoImage.src = "img/07_shop/o_txt_b.png";						// イメージの名前を代入[StampData.js]
 	// ウィンドウ
 	this.BuyIppaiImage = new Image();										// イメージクラス
     this.BuyIppaiImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BuyIppaiImage.src = "img/shop/o_txt_c.png";						// イメージの名前を代入[StampData.js]
+    this.BuyIppaiImage.src = "img/07_shop/o_txt_c.png";						// イメージの名前を代入[StampData.js]
 
 	// コイン
 	this.CoinImage = new Image();										// イメージクラス
     this.CoinImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.CoinImage.src = "img/shop/002.png";							// イメージの名前を代入[StampData.js]
+    this.CoinImage.src = "img/07_shop/002.png";							// イメージの名前を代入[StampData.js]
 	// ショップ
 	this.ShopImage = new Image();										// イメージクラス
     this.ShopImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.ShopImage.src = "img/shop/001.png";							// イメージの名前を代入[StampData.js]
+    this.ShopImage.src = "img/07_shop/001.png";							// イメージの名前を代入[StampData.js]
 	// 戻る
 	this.BackImage = new Image();										// イメージクラス
     this.BackImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BackImage.src = "img/shop/003.png";							// イメージの名前を代入[StampData.js]
+    this.BackImage.src = "img/07_shop/003.png";							// イメージの名前を代入[StampData.js]
 }
 
 // プロック
@@ -470,14 +428,14 @@ StampSheet.prototype.draw = function(ofs)
 						(PosX < sTouchMoveX) && (PosX + PosW > sTouchMoveX) &&
 						(PosY < sTouchMoveY) && (PosY + PosH > sTouchMoveY))
 					{
-			       // 	this.ctx.fillStyle = 'rgb(255, 0, 0)';	
+			        	this.ctx.fillStyle = 'rgb(255, 0, 0)';	
 					//	bBuyTouch = true;		
 					}	
 					else
 					{
-			        //	this.ctx.fillStyle = 'rgb(0, 0, 255)';
+			        	this.ctx.fillStyle = 'rgb(0, 0, 255)';
 					}	
-			       // this.ctx.fillRect(PosX, PosY, PosW, PosH);
+			        this.ctx.fillRect(PosX, PosY, PosW, PosH);
 					this.ctx.globalAlpha = 1.0;
 
 				}
@@ -885,23 +843,118 @@ var MainCanvas = function()
     this.draw();
 };
 
+var SceenGohan = function() {
 
-var timerID;
-var mainCanvas;
-window.onload = function() 
+	var STATUS = {
+		INIT:			0,
+		FADEIN:			1,
+		MAIN:			2,
+		FADEOUT:		3,
+		END:			4,
+		
+		SELECTED_INIT:	5,
+		SELECTED_MOVE:	6,
+		SELECTED_END:	7,
+	};
+	var st = STATUS.INIT;
+	var stFrm = 0;		//ステート処理用のフレームカウンタ
+	
+	var alpha = 0;
+	
+	var selected=-1;		//選択したキャラ
+	
+// -------------------------------------
+// すべてのスタンプデータをロード
+// -------------------------------------   
+/*
+for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
 {
-    mainCanvas = new MainCanvas();    
-    clearInterval(timerID);
-    timerID = setInterval('draw()', 50);
+	StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
+	StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
+}*/
+	// -------------------------------------
+	// すべてのスタンプ画像をロード
+	// -------------------------------------   
+	for(var i = 0; i < MAX_STAMP_IMAGE; i ++)
+	{
+		stamp[i] = new StampGraphic(); 
+	    stamp[i].loadImage(i);
+	}
+	
+	
+	var rootSceen = document.getElementById("sceen");
+	var sceen = document.createElement("div");
+	rootSceen.appendChild(sceen);
+	sceen.style.opacity = alpha;
+	
+	var im =document.createElement('canvas');
+	im.setAttribute('id', 'canvas');
+ 	im.width = 640;   
+	im.height = 1200;  
+	sceen.appendChild(im);	
+	mainCanvas = new MainCanvas();
+	
+	//
+	// フレーム処理
+	//
+	this.onframe = function() {
+
+		switch(st) {
+
+			//初期化
+			case STATUS.INIT:
+				//各データが読み込まれるまで待つ
+				if (LoadingCounter <= 0) {
+					st = STATUS.FADEIN;
+				}
+				break;
+
+			//フェードイン
+			case STATUS.FADEIN:
+				alpha += (1.0 / 4);
+				if (alpha >= 1.0) {
+					alpha = 1.0;
+					st = STATUS.MAIN;
+				}
+				sceen.style.opacity = alpha;
+				break;
+
+			//メイン処理
+			case STATUS.MAIN:
+				// メインキャンバスの描画
+    			mainCanvas.draw();
+				break;
+			
+			//フェードアウト
+			case STATUS.FADEOUT:
+				alpha -= (1.0 / 4);
+				if (alpha <= 0) {
+					alpha = 0;
+					st = STATUS.END;
+				}
+				sceen.style.opacity = alpha;
+				break;
+
+			//終了
+			case STATUS.END:
+				//DOMエレメントの削除
+				rootSceen.removeChild(sceen);
+				//次のシーンをセット
+				nextSceen = new SceenGohanItadaki();
+				break;
+		}
+		
+		if (st != STATUS.END) {
+			//アニメーション処理
+		//	megami.animExec();
+		//	for (var i=0; i<charaData.length; i++) {
+		//		chara[i].animExec();
+		//	}
+		}
+
+	};
+	
 };
 
-// --------------------------------------
-// 描画
-// --------------------------------------
-function draw() 
-{
-	// メインキャンバスの描画
-    mainCanvas.draw();
-}
 function goTitle(e)  {document.location="index.html"; e.preventDefault();};
 
