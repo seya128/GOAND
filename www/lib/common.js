@@ -269,3 +269,34 @@ DivSprite.prototype = {
 		
 	},
 };
+
+//
+// タッチ座標処理
+//
+// in : e  イベントオブジェクト
+// out : タッチ座標(r.x r.y)
+//　　イベントの発生したオブジェクトの左上からの座標
+//    座標はビューポートにあわせた座標に変換される
+//  注意
+//　　　タッチスタート、タッチムーブ以外のイベントでは(0,0)が返る。
+
+function getTouchPos(e) {
+    var r = { x:0, y:0};
+    var x,y;
+    if (e.type=="touchstart" || e.type=="touchmove") {
+        x = e.touches[0].pageX;
+        y = e.touches[0].pageY;
+    } else if (e.type=="mousedown" || e.type=="mousemove") {
+        x = e.pageX;
+        y = e.pageY;
+    } else
+        return r;
+    
+    rect = e.target.getBoundingClientRect();
+
+    r.x = Math.round(x / common.viewport.zoomRatio - rect.left);
+    r.y = Math.round(y / common.viewport.zoomRatio - rect.top);
+    
+    return r;
+}
+
