@@ -89,6 +89,8 @@ var SceenTitle = function() {
 		DeleteHaveSheetData();		// シート削除
 		AllDeleteStampDrawData();	// スタンプしたデータを削除
 		SaveActiveSheetIndex(0);	// アクティブシートの初期化
+		DummySheetDataSet();
+		DummyStampDataSet();
 		alert("ごちそうさました回数、スタンプデータをリセットしました。");
 	};
 	sceen.appendChild(help.div);

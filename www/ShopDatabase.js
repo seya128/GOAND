@@ -671,6 +671,7 @@ function DelSaveSheetData(index)
 {
 	// 配列から消す
 	g_HaveStampSheetData.splice(index, 1);
+	g_StampDrawData.splice(index, 1);
 	// ずべての配列とりあえず削除
 	for(var i = 0; i < M_MAX_BUY_SHEET; i ++)
 	{
@@ -681,14 +682,14 @@ function DelSaveSheetData(index)
 	}
 	// セーブして上書き
 	SaveHaveSheetData();
+	
 	// セーブ
-	//var iSheetNum = GetHaveSheetDataNum();
-	//g_StampDrawData = new Array(); 
-	//for(var iLoadDataIndex = 0; iLoadDataIndex < iSheetNum; iLoadDataIndex ++)
-	//{
-	//	g_StampDrawData[iLoadDataIndex] = new StampDrawData(iLoadDataIndex);
-	//	g_StampDrawData[iLoadDataIndex].Save();
-	//}
+	var iSheetNum = GetHaveSheetDataNum();
+	for(var iLoadDataIndex = 0; iLoadDataIndex < iSheetNum; iLoadDataIndex ++)
+	{
+		g_StampDrawData[iLoadDataIndex].nSheetIndex = iLoadDataIndex;
+		g_StampDrawData[iLoadDataIndex].Save();
+	}
 }
 
 // スタンプシート
