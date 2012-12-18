@@ -215,6 +215,8 @@ DivSprite.prototype = {
 						this._animIx = 0;
 					}
 				}
+			} else {
+				this._anim = null;
 			}
 		}
 		if (this._animScale) {
@@ -226,6 +228,8 @@ DivSprite.prototype = {
 						this._animScaleIx = 0;
 					}
 					this._animScaleFrm = this._animScale[this._animScaleIx+1];
+				} else {
+					this._animScale = null;
 				}
 			} else {
 				var d = this._animScale[this._animScaleIx+0] - this._scale;
@@ -242,6 +246,8 @@ DivSprite.prototype = {
 						this._animAlphaIx = 0;
 					}
 					this._animAlphaFrm = this._animAlpha[this._animAlphaIx+1];
+				} else {
+					this._animAlpha = null;
 				}
 			} else {
 				var d = this._animAlpha[this._animAlphaIx+0] - this._alpha;
@@ -259,6 +265,8 @@ DivSprite.prototype = {
 						this._animPosIx = 0;
 					}
 					this._animPosFrm = this._animPos[this._animPosIx+2];
+				} else {
+					this._animPos = null;
 				}
 			} else {
 				this.x = this._x + (this._animPos[this._animPosIx+0]-this._x) / this._animPosFrm;
@@ -300,3 +308,12 @@ function getTouchPos(e) {
     return r;
 }
 
+
+//
+// サウンド
+//
+var _audio;
+function playSound(a) {
+	_audio = new Audio(a);
+	_audio.play();
+}
