@@ -3,7 +3,6 @@
 // -------------------------------------
 // 定義
 // -------------------------------------
-var CoinNum         = 100;
 var sTouchStartX 	= -200;
 var sTouchStartY 	= -200;
 var sTouchMoveX 	= -200;
@@ -21,7 +20,6 @@ var sTouchAccelerator = 0;
 var eSwitch = 0;
 var sResYesNo = 0;
 var sScaleRate = 0;
-
 
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
@@ -479,7 +477,7 @@ StampSheet.prototype.draw = function(ofs)
 			190, 
 			101);
 		this.ctx.font = "20pt Arial";
-		this.ctx.fillText("" + CoinNum, 500, 70); 
+		this.ctx.fillText("" + GetCoin(), 500, 70); 
 		if(bTouch && 
 			(PosYesX < sTouchMoveX) && (PosYesX + PosYesW > sTouchMoveX) &&
 			(PosYesY < sTouchMoveY) && (PosYesY + PosYesH > sTouchMoveY))
@@ -559,9 +557,17 @@ var StampShop = function()
 						{
 							eSwitch = 2;
 							sScaleRate = 0;
-							
+							var id   = gShopBuyListTable[sTouchNo]["id"];						
 							var gold = gShopBuyListTable[sTouchNo]["gold"];
-							CoinNum -= gold;
+							
+							if(id >= M_OFFSET_STAMP)
+							{
+								BuySaveStampData(id - M_OFFSET_STAMP, -gold);
+							}
+							else
+							{
+								BuySaveSheetData(id, -gold)
+							}
 							bOldTouch = false; 
 							bTouch = false;
 						}
@@ -753,11 +759,14 @@ var StampShop = function()
 						bOldTouch = false; 
 						bTouch = false;
 						sScaleRate = 0;
+						
+						// 持っているものが満タンかをチェック
+						
+						// 購入するお金があるかチェック
+						var id   = gShopBuyListTable[sTouchNo]["id"];
 						var gold = gShopBuyListTable[sTouchNo]["gold"];
-						if(CoinNum < gold)
-						{
-							eSwitch = 3;
-						}
+						if(GetIsBuyMax(id) == false)    { eSwitch = 4; }
+						if(GetIsBuyCoin(gold) == false) { eSwitch = 3; }
 					}
 					else
 					{
