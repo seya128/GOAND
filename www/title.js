@@ -132,6 +132,7 @@ var SceenTitle = function() {
 				//次の処理がセットされれば次へ
 				if (next != NEXT.NONEXT) {
 					st = STATUS.FADEOUT;
+					playSound("sound/se/ok.mp3");
 				}
 				break;
 

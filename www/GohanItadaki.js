@@ -16,6 +16,12 @@ var SceenGohanItadaki = function() {
 		JYUNBI_OUT:		11,
 		ITADAKI:		12,
 		ITADAKI_OUT:	13,
+		OUEN_IN:		14,
+		OUEN_IN2:		15,
+		OUEN_OUT:		16,
+		
+		GOCHI_JYUNBI:	20,
+		
 		
 	};
 	var st = STATUS.INIT;
@@ -52,20 +58,20 @@ var SceenGohanItadaki = function() {
 	
 	//キャラクター
 	var charaData=[
-		{src:"k_pii_c.png"	},
-		{src:"k_nas_c.png"	},
-		{src:"k_tom_c.png"	},
-		{src:"k_nik_c.png"	},
-		{src:"k_sii_c.png"	},
-		{src:"k_tam_c.png"	},
-		{src:"k_nin_c.png"	},
-		{src:"k_sak_c.png"	},
+		{src:"k_pii_c.png",	msg1:"g_ita_txt_01_a.png",	msg2:"g_sup_txt_01.png",	msg3:"g_sup_txt_04.png",	msg4:"g_sup_txt_06.png"	},
+		{src:"k_nas_c.png",	msg1:"g_ita_txt_01_a.png",	msg2:"g_sup_txt_01.png",	msg3:"g_sup_txt_04.png",	msg4:"g_sup_txt_06.png"	},
+		{src:"k_tom_c.png",	msg1:"g_ita_txt_01_b.png",	msg2:"g_sup_txt_02.png",	msg3:"g_sup_txt_05.png",	msg4:"g_sup_txt_07.png"	},
+		{src:"k_nik_c.png",	msg1:"g_ita_txt_01_b.png",	msg2:"g_sup_txt_02.png",	msg3:"g_sup_txt_05.png",	msg4:"g_sup_txt_07.png"	},
+		{src:"k_sii_c.png",	msg1:"g_ita_txt_01_a.png",	msg2:"g_sup_txt_01.png",	msg3:"g_sup_txt_04.png",	msg4:"g_sup_txt_06.png"	},
+		{src:"k_tam_c.png",	msg1:"g_ita_txt_01_a.png",	msg2:"g_sup_txt_01.png",	msg3:"g_sup_txt_04.png",	msg4:"g_sup_txt_06.png"	},
+		{src:"k_nin_c.png",	msg1:"g_ita_txt_01_b.png",	msg2:"g_sup_txt_02.png",	msg3:"g_sup_txt_05.png",	msg4:"g_sup_txt_07.png"	},
+		{src:"k_sak_c.png",	msg1:"g_ita_txt_01_b.png",	msg2:"g_sup_txt_02.png",	msg3:"g_sup_txt_05.png",	msg4:"g_sup_txt_07.png"	},
 	];
 	var scale = 1;
 	var chara = new DivSprite(1512/4,490);
-//	chara.src = "img/00_common/" + charaData[gohanChara].src;
-	chara.src = "img/00_common/" + charaData[0].src;
-	chara.x=463; chara.y=489; chara.z=2;
+	chara.src = "img/00_common/" + charaData[gohanChara].src;
+	chara_x=463; chara_y=489;
+	chara.x=chara_x; chara.y=chara_y; chara.z=2;
 	chara.scale = scale;
 	chara.anim = [0,10, 1,10];
 	sceen.appendChild(chara.div);
@@ -76,7 +82,7 @@ var SceenGohanItadaki = function() {
 	fuki1.src = "img/00_common/g_g01_huk_d000.png";
 	animSprites.push(fuki1);
 	var words1 = new DivSprite(359,138);
-	words1.src = "img/03_itadakimasu/g_ita_txt_01_a.png";
+	words1.src = "img/03_itadakimasu/" + charaData[gohanChara].msg1;
 	animSprites.push(words1);
 	var words2 = new DivSprite(359,131);
 	words2.src = "img/03_itadakimasu/g_ita_txt_02.png";
@@ -90,6 +96,25 @@ var SceenGohanItadaki = function() {
 	var words5 = new DivSprite(359,131);
 	words5.src = "img/03_itadakimasu/g_ita_txt_05.png";
 	animSprites.push(words5);
+	//応援セリフ
+	var words10 = new DivSprite(359,131);
+	words10.src = "img/04_support/" + charaData[gohanChara].msg2;
+	animSprites.push(words10);
+	var words11 = new DivSprite(359,131);
+	words11.src = "img/04_support/" + charaData[gohanChara].msg3;
+	animSprites.push(words11);
+	var words12 = new DivSprite(359,131);
+	words12.src = "img/04_support/" + charaData[gohanChara].msg4;
+	animSprites.push(words12);
+	var words13 = new DivSprite(359,131);
+	words13.src = "img/04_support/g_sup_txt_03.png";
+	animSprites.push(words13);
+	var fuki10 = new DivSprite(440,299);
+	fuki10.src = "img/00_common/g_g01_huk_f000.png";
+	animSprites.push(fuki10);
+	var fuki11 = new DivSprite(256,258);
+	fuki11.src = "img/00_common/g_g01_huk_e000.png";
+	animSprites.push(fuki11);
 	
 	
 	//ボタン
@@ -104,6 +129,12 @@ var SceenGohanItadaki = function() {
 	var hands = new DivSprite(256,258);
 	hands.src = "img/00_common/g_hand_01.png";
 	animSprites.push(hands);
+	
+	//女神
+	var megami = new DivSprite(400,520);
+	megami.basePos={x:0,y:0};
+	megami.src = "img/00_common/k_sin_c.png";
+	animSprites.push(megami);
 	
 	// アニメーションデータ
 	var fukiInAnimScaleData = [1.15,3, 1,2, 1,-1];
@@ -131,8 +162,10 @@ var SceenGohanItadaki = function() {
 				alpha += (1.0 / 6);
 				if (alpha >= 1.0) {
 					alpha = 1.0;
-					//st = STATUS.JYUNBI;
-					st = STATUS.ITADAKI;
+					st = STATUS.JYUNBI;
+					//st = STATUS.ITADAKI;
+					//st = STATUS.OUEN_IN;
+					//st = STATUS.OUEN_IN2;
 					stFrm = 0;
 				}
 				sceen.style.opacity = alpha;
@@ -312,17 +345,215 @@ var SceenGohanItadaki = function() {
 				} else if (stFrm == 10) {
 					sceen.removeChild(fuki1.div);
 					sceen.removeChild(words5.div);
+					sceen.removeChild(buttonYes.div);
+					sceen.removeChild(buttonNo.div);
 					
 					if (selected == SELECTED.NO) {
 						st = STATUS.JYUNBI;
-						stFrm = 0;
-						break;
+					} else {
+						st = STATUS.OUEN_IN;
 					}
+					stFrm = 0;
+					break;
 				}
 				
 				stFrm ++;
 				break;
 			
+			//応援
+			case STATUS.OUEN_IN:
+				if (stFrm == 0) {
+					chara.anim = [0,10, 1,10];
+					chara.animScale = [1.3,3, 1.3,2, 1.0,7, 1.0,-1];
+					chara.animPos = [320+30,chara_y-200,3, 320+20,chara_y-210,2, 320,chara_y-60,7, 320,chara_y-60,-1];
+				} else if (stFrm == 2*10) {
+					fuki1.x=320; fuki1.y=144; fuki1.z=2;
+					fuki1.scale = 0;
+					fuki1.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki1.div);
+					words10.x=329; words10.y=131; words10.z=3;
+					words10.alpha = 0;
+					words10.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words10.div);
+				} else if (stFrm == 7*10) {
+					fuki1.animScale = fukiOutAnimScaleData;
+					words10.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 8*10) {
+					sceen.removeChild(words10.div);
+					fuki1.animScale = fukiInAnimScaleData;
+					words11.x=329; words11.y=131; words11.z=3;
+					words11.alpha = 0;
+					words11.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words11.div);
+				} else if (stFrm == 13*10) {
+					fuki1.animScale = fukiOutAnimScaleData;
+					words11.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 14*10) {
+					sceen.removeChild(words11.div);
+					fuki1.animScale = fukiInAnimScaleData;
+					words12.x=329; words12.y=131; words12.z=3;
+					words12.alpha = 0;
+					words12.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words12.div);
+				} else if (stFrm == 19*10) {
+					fuki1.animScale = fukiOutAnimScaleData;
+					words12.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 21*10) {
+					sceen.removeChild(fuki1.div);
+					sceen.removeChild(words12.div);
+					st = STATUS.OUEN_IN2;
+					stFrm = 0;
+					break;
+				}
+				
+				stFrm ++;
+				break;
+			
+			//応援女神登場
+			case STATUS.OUEN_IN2:
+				if (stFrm == 0) {
+					selected = SELECTED.NO_SELECT;
+					chara.anim = null;
+					chara.animScale = [1,5];
+					chara.animPos = [chara_x,chara_y,5];
+					megami.x=-10; megami.y=-10; megami.z=1;
+					megami.scale = 0.7;
+					megami.alpha = 0;
+					megami.animAlpha = [1,15];
+					megami.anim = [0,40, 1,40];
+					sceen.appendChild(megami.div);
+				} else if (stFrm == 2*10) {
+					chara.anim = [0,10, 1,10];
+					fuki10.x=429; fuki10.y=127; fuki10.z=2;
+					fuki10.alpha = 1;
+					fuki10.animAlpha = null;
+					fuki10.scale = 0;
+					fuki10.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki10.div);
+					words13.x=438; words13.y=120; words13.z=3;
+					words13.alpha = 0;
+					words13.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words13.div);
+				} else if (stFrm == 5*10) {
+					//はい
+					buttonYes.x=168; buttonYes.y=712; buttonYes.z=5;
+					buttonYes.scale = 0;
+					buttonYes.alpha = 1;
+					buttonYes.animScale = fukiInAnimScaleData;
+					buttonYes.animAlpha = null;
+					sceen.appendChild(buttonYes.div);
+					buttonYes.onclick = function(){
+						selected = SELECTED.YES;
+					};
+					//いいえ
+					buttonNo.x=466; buttonNo.y=712; buttonNo.z=5;
+					buttonNo.scale = 0;
+					buttonNo.alpha = 1;
+					buttonNo.animScale = fukiInAnimScaleData;
+					buttonNo.animAlpha = null;
+					sceen.appendChild(buttonNo.div);
+					buttonNo.onclick = function(){
+						selected = SELECTED.NO;
+					};
+				} else if (stFrm==7*10) {
+					buttonYes.animScale = [1.1,2, 1,2, 1,10, 1,10];
+					buttonNo.animScale  = [1,10, 1.1,2, 1,2, 1,10];
+					fuki11.alpha = 0;
+					sceen.appendChild(fuki11.div);
+					words11.alpha = 0;
+					sceen.appendChild(words11.div);
+					words12.alpha = 0;
+					sceen.appendChild(words12.div);
+				} else if (stFrm==8*10) {
+					fuki11.x=180; fuki11.y=458; fuki11.z=2;
+					fuki11.alpha = 0;
+					fuki11.animAlpha = [1,5];
+					words11.x=180; words11.y=458; words11.z=3;
+					words11.alpha = 0;
+					words11.animAlpha = [1,5];
+				} else if (stFrm==12*10) {
+					fuki11.animAlpha = [0,5];
+					words11.animAlpha = [0,5];
+				} else if (stFrm==13*10) {
+					fuki11.x=200; fuki11.y=420; fuki11.z=2;
+					fuki11.animAlpha = [1,5];
+					words12.x=200; words12.y=420; words12.z=3;
+					words12.alpha = 0;
+					words12.animAlpha = [1,5];
+				} else if (stFrm==17*10) {
+					fuki11.animAlpha = [0,5];
+					words12.animAlpha = [0,5];
+				} else if (stFrm==18*10) {
+					stFrm = 8*10;
+					break;
+				}
+				
+				if (selected != SELECTED.NO_SELECT) {
+					st = STATUS.OUEN_OUT;
+					stFrm = 0;
+					break;
+				}
+				
+				stFrm ++;
+				break;
+			
+			//応援終了
+			case STATUS.OUEN_OUT:
+				if (stFrm == 0) {
+					fuki10.animAlpha = [0,5];
+					fuki11.animAlpha = [0,5];
+					words11.animAlpha = [0,5];
+					words12.animAlpha = [0,5];
+					words13.animAlpha = [0,5];
+					if (selected == SELECTED.YES) {
+						buttonYes.animScale = [2.5,7];
+						buttonYes.animAlpha = [1,3, 0,4, 0,-1];
+						buttonNo.animScale = [0,7];
+						buttonNo.animAlpha = [0,7];
+					} else {
+						buttonNo.animScale = [2.5,7];
+						buttonNo.animAlpha = [1,3, 0,4, 0,-1];
+						buttonYes.animScale = [0,7];
+						buttonYes.animAlpha = [0,7];
+					}
+				} else if (stFrm == 10) {
+					sceen.removeChild(fuki10.div);
+					sceen.removeChild(fuki11.div);
+					sceen.removeChild(words11.div);
+					sceen.removeChild(words12.div);
+					sceen.removeChild(words13.div);
+					sceen.removeChild(buttonYes.div);
+					sceen.removeChild(buttonNo.div);
+					
+					if (selected == SELECTED.YES) {
+						st = STATUS.GOCHI_JYUNBI;
+						stFrm = 0;
+						break;
+					}
+				} else if (stFrm == 2*10) {
+					megami.animAlpha = [0,10];
+				} else if (stFrm == 4*10) {
+					sceen.removeChild(megami.div);
+					st = STATUS.OUEN_IN;
+					stFrm = 0;
+					break;
+				}
+				
+				stFrm ++;
+				break;
+			
+			//ごちそうさま準備
+			case STATUS.GOCHI_JYUNBI:
+				if (stFrm == 0) {
+
+					st = STATUS.FADEOUT;
+					stFrm = 0;
+					break;
+				}
+				
+				stFrm ++;
+				break;
+				
 			//フェードアウト
 			case STATUS.FADEOUT:
 				alpha -= (1.0 / 4);
