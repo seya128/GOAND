@@ -98,14 +98,14 @@ var SceenGohan = function() {
 		sceen.appendChild(chara[i].div);
 		animSprites.push(chara[i]);
 	}
-	chara[0].onclick = function() { selected = 0; };
-	chara[1].onclick = function() { selected = 1; };
-	chara[2].onclick = function() { selected = 2; };
-	chara[3].onclick = function() { selected = 3; };
-	chara[4].onclick = function() { selected = 4; };
-	chara[5].onclick = function() { selected = 5; };
-	chara[6].onclick = function() { selected = 6; };
-	chara[7].onclick = function() { selected = 7; };
+	chara[0].onclick = function() { selected = 0; playSound("sound/se/kirakira.mp3");};
+	chara[1].onclick = function() { selected = 1; playSound("sound/se/kirakira.mp3"); };
+	chara[2].onclick = function() { selected = 2; playSound("sound/se/kirakira.mp3"); };
+	chara[3].onclick = function() { selected = 3; playSound("sound/se/kirakira.mp3"); };
+	chara[4].onclick = function() { selected = 4; playSound("sound/se/kirakira.mp3"); };
+	chara[5].onclick = function() { selected = 5; playSound("sound/se/kirakira.mp3"); };
+	chara[6].onclick = function() { selected = 6; playSound("sound/se/kirakira.mp3"); };
+	chara[7].onclick = function() { selected = 7; playSound("sound/se/kirakira.mp3"); };
 	
 	//後で動的生成するスプライト
 	var chara2;

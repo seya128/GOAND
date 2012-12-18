@@ -15,6 +15,7 @@ var SceenGohanItadaki = function() {
 		JYUNBI:			10,
 		JYUNBI_OUT:		11,
 		ITADAKI:		12,
+		ITADAKI_OUT:	13,
 		
 	};
 	var st = STATUS.INIT;
@@ -130,8 +131,8 @@ var SceenGohanItadaki = function() {
 				alpha += (1.0 / 6);
 				if (alpha >= 1.0) {
 					alpha = 1.0;
-					st = STATUS.JYUNBI;
-					//st = STATUS.ITADAKI;
+					//st = STATUS.JYUNBI;
+					st = STATUS.ITADAKI;
 					stFrm = 0;
 				}
 				sceen.style.opacity = alpha;
@@ -142,6 +143,7 @@ var SceenGohanItadaki = function() {
 				if (stFrm==0) {
 					selected = SELECTED.NO_SELECT;
 				} else if (stFrm==10) {
+					playSound("sound/se/ok.mp3");
 					//ぼくといっしょに
 					fuki1.x=320; fuki1.y=144; fuki1.z=2;
 					fuki1.scale = 0;
@@ -155,6 +157,7 @@ var SceenGohanItadaki = function() {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words1.animAlpha = wordsOutAnimAlphaData;
 				} else if (stFrm==8*10) {
+					playSound("sound/se/ok.mp3");
 					//準備はいい？
 					sceen.removeChild(words1.div);
 					fuki1.scale = 0;
@@ -166,8 +169,10 @@ var SceenGohanItadaki = function() {
 				} else if (stFrm==8*10+3*10) {
 					//はい
 					buttonYes.x=320; buttonYes.y=712; buttonYes.z=5;
+					buttonYes.alpha = 1;
 					buttonYes.scale = 0;
 					buttonYes.animScale = fukiInAnimScaleData;
+					buttonYes.animAlpha = null;
 					sceen.appendChild(buttonYes.div);
 					buttonYes.onclick = function(){
 						selected = SELECTED.YES;
@@ -178,6 +183,7 @@ var SceenGohanItadaki = function() {
 				stFrm ++;
 
 				if (selected == SELECTED.YES) {
+					playSound("sound/se/ok.mp3");
 					st = STATUS.JYUNBI_OUT;
 					stFrm = 0;
 				}
@@ -211,6 +217,7 @@ var SceenGohanItadaki = function() {
 					hands.animScale = fukiInAnimScaleData;
 					sceen.appendChild(hands.div);
 				} else if (stFrm == 1*10) {
+					playSound("sound/se/ok.mp3");
 					//かんしゃして
 					fuki1.x=320; fuki1.y=144; fuki1.z=2;
 					fuki1.scale = 0;
@@ -226,6 +233,7 @@ var SceenGohanItadaki = function() {
 					words3.animAlpha = wordsOutAnimAlphaData;
 				} else if (stFrm == 7*10) {
 					sceen.removeChild(words3.div);
+					playSound("sound/se/ok.mp3");
 					//いただきます
 					fuki1.scale = 0;
 					fuki1.animScale = fukiInAnimScaleData;
@@ -243,6 +251,7 @@ var SceenGohanItadaki = function() {
 					sceen.removeChild(words4.div);
 					sceen.removeChild(hands.div);
 					//ちゃんとできた？
+					playSound("sound/se/ok.mp3");
 					fuki1.scale = 0;
 					fuki1.animScale = fukiInAnimScaleData;
 					words5.x=329; words5.y=131; words5.z=3;
@@ -274,10 +283,46 @@ var SceenGohanItadaki = function() {
 					buttonYes.animScale = [1.1,2, 1,2, 1,10, 1,10];
 					buttonNo.animScale  = [1,10, 1.1,2, 1,2, 1,10];
 				}
-					
+				
+				if (selected != SELECTED.NO_SELECT) {
+					st = STATUS.ITADAKI_OUT;
+					stFrm = 0;
+					break;
+				}
 				
 				stFrm ++;
 				break;
+
+			//いただきます out
+			case STATUS.ITADAKI_OUT:
+				if (stFrm == 0) {
+					if (selected == SELECTED.YES) {
+						buttonYes.animScale = [2.5,7];
+						buttonYes.animAlpha = [1,3, 0,4, 0,-1];
+						buttonNo.animScale = [0,7];
+						buttonNo.animAlpha = [0,7];
+					} else {
+						buttonNo.animScale = [2.5,7];
+						buttonNo.animAlpha = [1,3, 0,4, 0,-1];
+						buttonYes.animScale = [0,7];
+						buttonYes.animAlpha = [0,7];
+					}
+					fuki1.animScale = fukiOutAnimScaleData;
+					words5.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 10) {
+					sceen.removeChild(fuki1.div);
+					sceen.removeChild(words5.div);
+					
+					if (selected == SELECTED.NO) {
+						st = STATUS.JYUNBI;
+						stFrm = 0;
+						break;
+					}
+				}
+				
+				stFrm ++;
+				break;
+			
 			//フェードアウト
 			case STATUS.FADEOUT:
 				alpha -= (1.0 / 4);
