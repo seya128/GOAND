@@ -84,8 +84,13 @@ var SceenTitle = function() {
 		event.preventDefault();
 		window.localStorage.removeItem("CntGochi");
 		window.localStorage.removeItem("CntCoin");
-		deleteHasStamp();
+		DeleteCoin();				// コイン初期化
+		DeleteHaveStampData();		// スタンプ削除
+		DeleteHaveSheetData();		// シート削除
 		AllDeleteStampDrawData();	// スタンプしたデータを削除
+		SaveActiveSheetIndex(0);	// アクティブシートの初期化
+		DummySheetDataSet();
+		DummyStampDataSet();
 		alert("ごちそうさました回数、スタンプデータをリセットしました。");
 	};
 	sceen.appendChild(help.div);
@@ -100,6 +105,31 @@ var SceenTitle = function() {
 	};
 	sceen.appendChild(shop.div);
 	
+	// コインのロード処理
+	LoadCoin();
+	// シートのロード処理
+	if(LoadHaveSheetData() == true)
+	{
+	}
+	// 失敗なので新規ロード
+	else
+	{
+		// ダミー削除
+	//	DelHasSheet(0);
+		DummySheetDataSet();
+		SaveActiveSheetIndex(0);
+	}	
+	// スタンプのロード処理
+	if(LoadHaveStampData() == true)
+	{
+	}
+	// 失敗なので新規ロード
+	else
+	{
+		// ダミー削除
+	//	DelHasStamp(0);
+		DummyStampDataSet();
+	}	
 	
 	
 	//

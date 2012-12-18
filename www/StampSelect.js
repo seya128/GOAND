@@ -19,7 +19,17 @@ var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 // -------------------------------------
 var timerID;
  
-
+// クリア
+function DeleteSheetClick(e)
+{
+//	g_sActiveDrawData.Clear();	//削除
+//	g_sActiveDrawData.Save();	//オートセーブ
+	//event.preventDefault();
+	st = STATUS.FADEOUT;
+	next = -1;
+}
+	
+	
 var StampSelect = function() 
 {
 	//
@@ -59,18 +69,18 @@ var StampSelect = function()
 			// シートに張り付けて描画
 			// -------------------------------------  
 			var iSheetNo = this.sheetNo;
-			if(g_StampLoadDataArray[iSheetNo] != null && iSheetNo >= 0)
+			var iNum     = GetStampDrawNum(iSheetNo);
+			if(GetStampDrawData(iSheetNo) != null && iSheetNo >= 0)
 			{
-				for(var i = 0;; i ++)
+				for(var i = 0; i < iNum; i ++)
 				{
 					// -------------------------------------
 					// 座標取得
 					// ------------------------------------- 
-					if (g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] == null) { break; }
-					var xx  = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["x"];
-					var yy  = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["y"];
-					var id  = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["id"];
-					var a   = g_StampLoadDataArray[iSheetNo].stampLoadGetDataArray[i] ["alpha"];
+					var xx  = GetStampDrawDataX(iSheetNo, i);
+					var yy  = GetStampDrawDataY(iSheetNo, i);
+					var id  = GetStampDrawDataID(iSheetNo, i);
+					var a   = GetStampDrawDataA(iSheetNo, i);
 					// -------------------------------------
 					// 座標変換
 					// -------------------------------------
@@ -108,16 +118,16 @@ var StampSelect = function()
 	//イメージセット
 	StampSheet.prototype.setImage = function(no) {
 	    var _this = this;
-	    if (no < 0)    no +=hasSheetData.length;
-	    this.sheetNo = no % hasSheetData.length;
+	    if (no < 0)    no += g_HaveStampSheetData.length;
+	    this.sheetNo = no %  g_HaveStampSheetData.length;
 	    this.isLoaded = true;
 /*
 	    this.img.onload = function() {
 	        _this.isLoaded = true;
 	    };
 */
-//	    this.sheetSrc = bgImgName[hasSheetData[this.sheetNo]["id"]];
-		this.img = GetStampGraphicHandle_SheetImage(hasSheetData[this.sheetNo]["id"]);
+//	    this.sheetSrc = bgImgName[g_HaveStampSheetData[this.sheetNo]["id"]];
+		this.img = GetStampGraphicHandle_SheetImage(g_HaveStampSheetData[this.sheetNo]["id"]);
 	};
 	   	
 	
@@ -139,11 +149,11 @@ var StampSelect = function()
 		var ctx    = canvas.getContext("2d");
 	    //スタンプシート準備
 	    var sheet = new Array();
-	    sheet[0] = new StampSheet(ctx,no);
-	    sheet[1] = new StampSheet(ctx,no+1);
-	    sheet[2] = new StampSheet(ctx,no+2);
-	    sheet[4] = new StampSheet(ctx,no+hasSheetData.length-1);
-	    sheet[3] = new StampSheet(ctx,no+hasSheetData.length-2);
+	    sheet[0] = new StampSheet(ctx, no);
+	    sheet[1] = new StampSheet(ctx, no + 1);
+	    sheet[2] = new StampSheet(ctx, no + 2);
+	    sheet[4] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 1);
+	    sheet[3] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 2);
 
 	    //debug
 	    this.dubugDisp = function() {
@@ -280,41 +290,12 @@ var StampSelect = function()
 	var next;
 	var alpha = 0;
 
+	// 描画データ[初回一回のみ]
+	AllLoadStampDrawData();
     // 画像ロード[初回一回のみ]
-	AllLoadStampLoadDataArray();
     AllLoadStampGraphic();
-	// データロード[毎回強制]
-	
-/*
-	// -------------------------------------
-	// すべてのスタンプデータをロード
-	// -------------------------------------   
-	for(var iLoadDataIndex = 0; iLoadDataIndex < hasSheetData.length; iLoadDataIndex ++)
-	{
-		g_StampLoadDataArray[iLoadDataIndex] = new StampLoadData();
-		g_StampLoadDataArray[iLoadDataIndex].load(iLoadDataIndex);
-	}
-*/	
-	// スタンプ画像のロード
-//	LoadStampGraphicHandle();
 
-/*
-        <div id="ok"><img src="img/stamp/s_btn_d000.png" onMouseDown=goStamp() onTouchStart=goStamp()></img></div>
-        <div id="cancel"><img src="img/stamp/s_btn_e000.png" onMouseDown=goTitle() onTouchStart=goTitle()></img></div>
-#ok {
-    position: fixed;
-    bottom:5px;
-    left:20px;
-}
 
-#cancel {
-    position: fixed;
-    bottom:5px;
-    left:340px;
-	
-}
-
-*/
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
 	rootSceen.appendChild(sceen);
@@ -326,10 +307,27 @@ var StampSelect = function()
 	im.height = 1200;  
 	sceen.appendChild(im);	
 	
+	var iMenuDel =document.createElement('button');
+	iMenuDel.setAttribute('id', 'menu_del');
+	iMenuDel.style.position = "absolute";  
+	iMenuDel.innerHTML = '削除'
+ 	iMenuDel.style.top = "50px";
+ 	iMenuDel.style.left = "50px";
+ 	iMenuDel.style.width = "60px";   
+	iMenuDel.style.height = "60px";  
+	var fd = new Function("DeleteSheetClick();");
+ 	iMenuDel.onclick = fd; 
+	sceen.appendChild(iMenuDel);
+	
+	//Back
+//	var nBack = new DivSprite(601,222);
+//	nBack.x=290; nBack.y=120; nBack.z=2;
+//	nBack.src = "img/08_stamp/s_btn_b000.png";
+//	sceen.appendChild(nBack.div);
 	//Yes
-	var nYesHandle = new DivSprite(281,184);
-	nYesHandle.x=180; nYesHandle.y=950; nYesHandle.z=2;
-	nYesHandle.src = "img/00_common/k_btn_a.png";
+	var nYesHandle = new DivSprite(289,146);
+	nYesHandle.x=170; nYesHandle.y=950; nYesHandle.z=2;
+	nYesHandle.src = "img/08_stamp/s_btn_d000.png";
 	nYesHandle.onclick = function(){
 		event.preventDefault();
 		st = STATUS.FADEOUT;
@@ -337,9 +335,9 @@ var StampSelect = function()
 	};
 	sceen.appendChild(nYesHandle.div);
 	//No
-	var nNoHandle = new DivSprite(281,184);
-	nNoHandle.x=440; nNoHandle.y=950; nNoHandle.z=2;
-	nNoHandle.src = "img/00_common/k_btn_b.png";
+	var nNoHandle = new DivSprite(289,146);
+	nNoHandle.x=450; nNoHandle.y=950; nNoHandle.z=2;
+	nNoHandle.src = "img/08_stamp/s_btn_e000.png";
 	nNoHandle.onclick = function(){
 		event.preventDefault();
 		st = STATUS.FADEOUT;
@@ -403,40 +401,31 @@ var StampSelect = function()
 					save();
 					nextSceen = new StampMain();
 				}
-				else
+				else if(next == 1)
 				{
 					//次のシーンをセット
 					nextSceen = new SceenTitle();
+				}
+				else
+				{
+					//次のシーンをセット
+					DelSaveSheetData(mainCanvas.getSelectSheet().sheetNo);
+					nextSceen = new StampSelect();		
 				}
 				break;
 		}
 	};
 	//ロード
-	function load() {
-	    var select = localStorage.getItem("SelectedStampSheet");
-	    if (!select)    select = 0;
-	    
-	    return select*1;
+	function load() 
+	{
+		return LoadActiveSheetIndex()*1;
 	} 
 	//セーブ
-	function save() {
-	    localStorage.setItem("SelectedStampSheet",mainCanvas.getSelectSheet().sheetNo);
+	function save() 
+	{
+		SaveActiveSheetIndex(mainCanvas.getSelectSheet().sheetNo);
 	}	
 };
-
-
-
-//描画
-/*
-function draw() {
-    mainCanvas.draw();
-	var Use    = performance.memory.usedJSHeapSize;
-	var Total  = performance.memory.totalJSHeapSize;
-	var UseM   = Use   / 1024 / 1024;
-	var TotalM = Total / 1024 / 1024;
-	document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";
-	//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
-}*/
 
 
 

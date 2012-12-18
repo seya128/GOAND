@@ -3,22 +3,26 @@
 var STAMP_W = 160;
 var STAMP_H = 160;
 
+
+// スタンプ描画データ
+var g_sActiveDrawData;
+
 // スタンプバー
 var stampBar;
 
 //
-var gStampSheetNo = 0;					//シート番号
+var g_iEditSheetIndex = 0;					//シート番号
 
 //持ってるスタンプ
 function getHasStampData(no){
-    if (no<0)   no+=hasStampData.length;
-    no %= hasStampData.length;
-    return hasStampData[no];
+    if (no<0)   no+=g_HaveStampImageData.length;
+    no %= g_HaveStampImageData.length;
+    return g_HaveStampImageData[no];
 }
 //持ってるスタンプ
 function getHasStampIndex(no){
-    if (no<0)   no+=hasStampData.length;
-    no %= hasStampData.length;
+    if (no<0)   no+=g_HaveStampImageData.length;
+    no %= g_HaveStampImageData.length;
     return no;
 }
 
@@ -125,7 +129,7 @@ function ExecEffect()
 				nEffectTime = 30;
 				nEffectCount = 0;
 				DelHasStamp(nEffectNID);
-				saveHasStamp();
+				SaveHaveStampData();
 				stampBar.selectedStampId = -1;	//選択された手持ちスタンプのID
 				nEffectSwitch ++;
 			}
@@ -212,13 +216,13 @@ function StampBar(ofs) {
 StampBar.prototype.updateDispInfo = function(){
     
 	// 3つ以下なら固定する
-	if(hasStampData.length <= 0) 
+	if(g_HaveStampImageData.length <= 0) 
 	{ 
 		this.leftDispOfs = 0;
 		this.selectedStampId = 0;
 		return;
 	}
-	if(hasStampData.length <= 3) 
+	if(g_HaveStampImageData.length <= 3) 
 	{ 
 		this.leftDispOfs = 0;
 		this.offset = 0;
@@ -233,8 +237,8 @@ StampBar.prototype.updateDispInfo = function(){
 
     //計算用オフセット
     var offset = this.offset;
-    offset %= hasStampData.length*STAMP_W;
-    if (offset < 0)    offset += hasStampData.length*STAMP_W;
+    offset %= g_HaveStampImageData.length*STAMP_W;
+    if (offset < 0)    offset += g_HaveStampImageData.length*STAMP_W;
     
     //左端に表示されている所持スタンプＩＤ
     var idOld = this.leftHasStampId;
@@ -262,7 +266,7 @@ StampBar.prototype.imageLoad = function()
     var ix = this.leftStampIx;
 
 	var iDrawNum = NUM_STAMPBAR_W-1;
-	if(iDrawNum > hasStampData.length) { iDrawNum = hasStampData.length; }
+	if(iDrawNum > g_HaveStampImageData.length) { iDrawNum = g_HaveStampImageData.length; }
     if(iDrawNum <= 0) { return; }
 	for (i=0; i<iDrawNum; i++)
 	{
@@ -291,7 +295,7 @@ StampBar.prototype.draw = function(){
         var s = getHasStampData(id);
         
 		// 空データ
-		if(i > hasStampData.length - 1)
+		if(i > g_HaveStampImageData.length - 1)
 		{
 	        this.ctx.fillStyle = 'rgb(0, 0, 0)';
 	        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMP_H-4);	
@@ -325,7 +329,7 @@ StampBar.prototype.draw = function(){
         ix ++;
         ix %= NUM_STAMPBAR_W;
         id ++;
-        id %= hasStampData.length;
+        id %= g_HaveStampImageData.length;
     }
     
 };
@@ -390,7 +394,7 @@ StampBar.prototype.setTouchEvent = function() {
 StampBar.prototype.slide = function()
 {
     
-	if(hasStampData.length <= 3) 
+	if(g_HaveStampImageData.length <= 3) 
 	{ 
 		this.offsetAdd = 0;
 		return;
@@ -432,15 +436,16 @@ StampBar.prototype.slide = function()
 //スタンプ選択
 StampBar.prototype.selectStamp = function(x){
 	var offset = x + this.offset;
-    offset %= hasStampData.length*STAMP_W;
-    if (offset < 0)    offset += hasStampData.length*STAMP_W;
+    offset %= g_HaveStampImageData.length*STAMP_W;
+    if (offset < 0)    offset += g_HaveStampImageData.length*STAMP_W;
 	
 	var id = Math.floor(offset/STAMP_W);
 	this.selectedStampId = id;
 }
 
 //選択スタンプ描画
-StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
+StampBar.prototype.drawSelectedStamp = function(ctx,x,y)
+{
 	var ix = this.selectedStampIx;		//選択された手持ちスタンプのID
 	var id = this.selectedStampId;		//選択されたスタンプオブジェクトのインデックス
 
@@ -457,8 +462,8 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y){
     ctx.globalAlpha = 1.0;
     
     //描画データ保存
-    stampDrawData.set(x,y, s.id, a);
-    stampDrawData.save(gStampSheetNo);	//オートセーブ
+    g_sActiveDrawData.Add(x,y, s.id, a);
+    g_sActiveDrawData.Save();	//オートセーブ
     
 	// インク切れの瞬間
 	if(s.ink == 1 || s.ink < 0)      
@@ -507,13 +512,24 @@ var canvas_img = new Image();
 var canvas_load_ix = 0;
 var canvas_stamp_img = new Image();
 */
-
+	
+var nNextEvent = 0;
 
 // MENUボタンクリック
 function menuButtonClick(e){
 	st = STATUS.FADEOUT;
+	nNextEvent = 0;
+   // e.preventDefault(); //デフォルトイベント処理をしない
+}
+// クリア
+function clearButtonClick(e){
+	g_sActiveDrawData.Clear();	//削除
+	g_sActiveDrawData.Save();	//オートセーブ
+	st = STATUS.FADEOUT;
+	nNextEvent = 1;
   //  e.preventDefault(); //デフォルトイベント処理をしない
 }
+
 
 var StampMain = function() 
 {
@@ -552,16 +568,18 @@ var StampMain = function()
 	    
 	    //背景ロード
 	    canvas_img.onload = canvas_Draw;
-	    canvas_img.src = gStampBgFileName[hasSheetData[gStampSheetNo]["id"]];
+	    canvas_img.src = gStampBgFileName[g_HaveStampSheetData[g_iEditSheetIndex]["id"]];
 	}
 
 	//スタンプ描画イメージ読み込み開始
-	function canvas_StampImageLoad() {
-		var d = stampDrawData.get(canvas_load_ix);
+	function canvas_StampImageLoad() 
+	{
+		var d = g_sActiveDrawData.Get(canvas_load_ix);
 		if (d == null)
 			return;
 		
-		if (canvas_stamp_img.fname == gStampImgFileName[d.id]) {
+		if (canvas_stamp_img.fname == gStampImgFileName[d.id]) 
+		{
 			canvas_StampDraw();
 		} else {
 			canvas_stamp_img.fname = gStampImgFileName[d.id];
@@ -569,8 +587,9 @@ var StampMain = function()
 			canvas_stamp_img.src = gStampImgFileName[d.id];
 		}
 	}
-	function canvas_StampDraw() {
-		var d = stampDrawData.get(canvas_load_ix);
+	function canvas_StampDraw() 
+	{
+		var d = g_sActiveDrawData.Get(canvas_load_ix);
 		if (d == null)
 			return;
 
@@ -604,36 +623,19 @@ var StampMain = function()
 		}
 	}
 
-	
-	//ロード
-	function load(){
-	    var sheet = localStorage.getItem("SelectedStampSheet");
-	    if (!sheet)    sheet = 0;
-		gStampSheetNo = sheet;
-		
-		// 持っているスタンプのロード
-		if(loadHasStamp() == true)
-		{
-			// 成功ならいじらないが、チートやエラーチェックをしたほうがいいかも
-		}
-		// 失敗したらとりあえず複数のスタンプを作る
-		else
-		{
-			// ダミー削除
-			//DelHasStamp(0);
-			DummyStampDataSet();
-		}
-		stampDrawData.load(sheet);
-	}
 
 	//セーブ
-	function save() {
-		saveHasStamp();
+	function save() 
+	{
+		SaveHaveStampData();
 	}
+
+
 	
-	stampDrawData = new StampDrawData();
-	load();	
-	
+	// 描画データの設定
+	g_iEditSheetIndex = LoadActiveSheetIndex();
+	g_sActiveDrawData = GetStampDrawData(g_iEditSheetIndex);//new StampDrawData(g_iEditSheetIndex);
+
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
 	rootSceen.appendChild(sceen);
@@ -655,6 +657,20 @@ var StampMain = function()
     left:0px;
     background-color: #555;	
 */
+	
+	var iMenuDel =document.createElement('button');
+	iMenuDel.setAttribute('id', 'menu_del');
+	iMenuDel.style.position = "absolute";  
+	iMenuDel.innerHTML = 'クリア'
+ 	iMenuDel.style.top = "50px";
+ 	iMenuDel.style.left = "50px";
+ 	iMenuDel.style.width = "60px";   
+	iMenuDel.style.height = "60px";  
+	var fd = new Function("clearButtonClick();");
+ 	iMenuDel.onclick = fd; 
+	sceen.appendChild(iMenuDel);		
+		
+	
 	var imstamp_bar =document.createElement('canvas');
 	imstamp_bar.setAttribute('id', 'stamp_bar');
  	imstamp_bar.width = 640;   
@@ -704,7 +720,7 @@ var StampMain = function()
 	var f = new Function("menuButtonClick();");
  	iMenu.onclick = f; 
 	sceen.appendChild(iMenu);		
-	
+
 /*
 #menu_button {
 	position: absolute;
@@ -794,7 +810,14 @@ var StampMain = function()
 				rootSceen.removeChild(sceen);
 				canvas_img = null;
 				//次のシーンをセット
-				nextSceen = new StampSelect();
+				if(nNextEvent == 0)
+				{
+					nextSceen = new StampSelect();
+				}
+				else
+				{
+					nextSceen = new StampMain();
+				}
 				break;
 		}
 	};
