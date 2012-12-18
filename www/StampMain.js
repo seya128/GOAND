@@ -9,10 +9,6 @@ var stampBar;
 //
 var gStampSheetNo = 0;					//シート番号
 
-
-//スタンプ種類の数
-var NUM_STAMP_MAX = stampImgName.length;
-
 //持ってるスタンプ
 function getHasStampData(no){
     if (no<0)   no+=hasStampData.length;
@@ -44,13 +40,14 @@ Stamp.prototype.loadImage = function(no){
         return;
     
     //範囲チェック
-    if (no < 0)  no += NUM_STAMP_MAX;
-    no %= NUM_STAMP_MAX;
+    if (no < 0)  no += M_MAX_STAMP;
+    no %= M_MAX_STAMP;
     
     //イメージロード
-    this.isLoaded = false;
-    this.img.onload = function(){ _this.isLoaded = true; };
-    this.img.src = stampImgName[no];
+    this.isLoaded = true;
+	this.img      = GetStampGraphicHandle_StampImage(no);
+ //   this.img.onload = function(){ _this.isLoaded = true; };
+ //   this.img.src = stampImgName[no];
     this.stampImageNo = no;
     
     imageLoadCounter ++;    //デバッグ用
@@ -555,7 +552,7 @@ var StampMain = function()
 	    
 	    //背景ロード
 	    canvas_img.onload = canvas_Draw;
-	    canvas_img.src = bgImgName[hasSheetData[gStampSheetNo]["id"]];
+	    canvas_img.src = gStampBgFileName[hasSheetData[gStampSheetNo]["id"]];
 	}
 
 	//スタンプ描画イメージ読み込み開始
@@ -564,12 +561,12 @@ var StampMain = function()
 		if (d == null)
 			return;
 		
-		if (canvas_stamp_img.fname == stampImgName[d.id]) {
+		if (canvas_stamp_img.fname == gStampImgFileName[d.id]) {
 			canvas_StampDraw();
 		} else {
-			canvas_stamp_img.fname = stampImgName[d.id];
+			canvas_stamp_img.fname = gStampImgFileName[d.id];
 			canvas_stamp_img.onload = canvas_StampDraw;
-			canvas_stamp_img.src = stampImgName[d.id];
+			canvas_stamp_img.src = gStampImgFileName[d.id];
 		}
 	}
 	function canvas_StampDraw() {
