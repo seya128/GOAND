@@ -18,7 +18,8 @@ var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
 var timerID;
- 
+var g_YOffset = 90;
+
 // クリア
 function DeleteSheetClick(e)
 {
@@ -32,6 +33,13 @@ function DeleteSheetClick(e)
 	
 var StampSelect = function() 
 {
+	var BackImage 		= new Image();	// イメージクラス
+	var bTouch 			= false;
+	var bOldTouch		= false;
+	var sTouchStartX 	= -200;
+	var sTouchStartY 	= -200;
+	var sTouchMoveX 	= -200;
+	var sTouchMoveY 	= -200;	
 	//
 	// スタンプシート
 	//
@@ -61,7 +69,7 @@ var StampSelect = function()
 	        var w = this.img.naturalWidth  * (0.65 - rate);
 	        var h = this.img.naturalHeight * (0.65 - rate);
 	        var x = (640 - w) / 2 + ofs - rate*ofs ;
-	        var y = (800 - h) / 2 + 20;
+	        var y = (800 - h) / 2 + g_YOffset;
 			// そのまま描画
 			this.CanvasSheet_2d.drawImage(this.img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -83,16 +91,16 @@ var StampSelect = function()
 					var a   = GetStampDrawDataA(iSheetNo, i);
 					// -------------------------------------
 					// 座標変換
-					// -------------------------------------
-	/* 
-					var r   = (0.65 - rate);
-					var ww  = (STAMP_W * r);
-					var hh  = (STAMP_H * r);
-					var ox  = x   + (xx * r);
-					var oy  = 400 + (yy * r) - (h / 2);
-					xx = (ox) -  (ww / 2);
-	      		  	yy = ((oy) - (hh / 2) + 20);
-	*/
+					// ------------------------------------- 
+					//var r   = (0.65 - rate);
+					//var ww  = (STAMP_W * r);
+					//var hh  = (STAMP_H * r);
+					//var ox  = x   + (xx * r);
+					//var oy  = 400 + (yy * r) - (h / 2);
+					//xx = (ox) -  (ww / 2);
+	      		  	//yy = ((oy) - (hh / 2) + 20);
+					
+	
 					// -------------------------------------
 					// 描画
 					// ------------------------------------- 
@@ -135,7 +143,8 @@ var StampSelect = function()
 	//
 	// メインキャンバス
 	//
-	var MainCanvas = function(no){
+	var MainCanvas = function(no)
+	{
 	    var _this = this;
 	    this.selectIx = 0;
 	    var startX=0;
@@ -241,30 +250,83 @@ var StampSelect = function()
 	        sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
 	        sheet[this.selectIx].draw(ofsX);
 
-
 			// 合成して描画
-	      	//ctx.drawImage(obj, 0, 0, 640, 1200);
+	      	ctx.drawImage(BackImage, 			
+		      	0, 
+				0, 
+				190, 
+				101);
+/*	    	
+			var PosX = 0;
+			var PosY = 215 + g_YOffset - 20;
+			var PosW = 112;
+			var PosH = 410;
 
-	//      this.dubugDisp();
+			ctx.globalAlpha = 0.5;
+			ctx.fillStyle = 'rgb(255, 0, 0)';
+	        ctx.fillRect(PosX, PosY, PosW, PosH);
+			ctx.globalAlpha = 1.0;	
+	    	
+			PosX = 527;
+			PosY = 215 + g_YOffset - 20;
+			PosW = 118;
+			PosH = 410;
+
+			ctx.globalAlpha = 0.5;
+			ctx.fillStyle = 'rgb(255, 0, 0)';
+	        ctx.fillRect(PosX, PosY, PosW, PosH);
+			ctx.globalAlpha = 1.0;	
+	    	
+	    	
+			PosX = 112;
+			PosY = 50 + g_YOffset - 20;
+			PosW = 416;
+			PosH = 740;
+
+			ctx.globalAlpha = 0.5;
+			ctx.fillStyle = 'rgb(0, 255, 0)';
+	        ctx.fillRect(PosX, PosY, PosW, PosH);
+			ctx.globalAlpha = 1.0;	
+	    			    			
+			if(
+				(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+				(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+				(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+				(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+			{	
+				st = STATUS.FADEOUT;
+				next = 1;
+			}	
+*/	    	
 	    };
-	    
+  
 	    //マウスイベント
-	    this.onTouchStart = function(e){
+	    this.onTouchStart = function(e)
+		{
 	        var pos = getTouchPos(e);
-	        startX = pos.x - ofsX * ofsRate;
+	        sTouchStartX = pos.x;
+	        sTouchStartY = pos.y;
+	        sTouchMoveX  = pos.x;
+	        sTouchMoveY  = pos.y;
+	        startX  = pos.x - ofsX * ofsRate;
 	        isTouch = true;
-	        
+	     	bTouch  = true;   
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
-	    this.onTouchMove = function(e) {
-	        if (isTouch) {
-	            var pos = getTouchPos(e);
-	            ofsX = (pos.x - startX) * ofsRate;
+	    this.onTouchMove = function(e) 
+		{
+	        if (isTouch) 
+	    	{
+	            var pos	= getTouchPos(e);
+				sTouchMoveX = pos.x;
+				sTouchMoveY = pos.y;
+	            ofsX 	= (pos.x - startX) * ofsRate;
+	    		bTouch 	= true;
 	        }
-
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
-	    this.onTouchEnd = function(e){
+	    this.onTouchEnd = function(e)
+		{
 	        isTouch = false;
 
 	        e.preventDefault(); //デフォルトイベント処理をしない
@@ -295,7 +357,10 @@ var StampSelect = function()
     // 画像ロード[初回一回のみ]
     AllLoadStampGraphic();
 
-
+	// 戻る
+    BackImage.onload = function() {}		// ロードが終わっていたらフラグを立てる
+    BackImage.src = "img/07_shop/003.png";							// イメージの名前を代入[StampData.js]
+	
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
 	rootSceen.appendChild(sceen);
@@ -312,7 +377,7 @@ var StampSelect = function()
 	iMenuDel.style.position = "absolute";  
 	iMenuDel.innerHTML = '削除'
  	iMenuDel.style.top = "50px";
- 	iMenuDel.style.left = "50px";
+ 	iMenuDel.style.left = "450px";
  	iMenuDel.style.width = "60px";   
 	iMenuDel.style.height = "60px";  
 	var fd = new Function("DeleteSheetClick();");
@@ -334,7 +399,7 @@ var StampSelect = function()
 		next = 0;
 	};
 	sceen.appendChild(nYesHandle.div);
-	//No
+	/*//No
 	var nNoHandle = new DivSprite(289,146);
 	nNoHandle.x=450; nNoHandle.y=950; nNoHandle.z=2;
 	nNoHandle.src = "img/08_stamp/s_btn_e000.png";
@@ -343,7 +408,7 @@ var StampSelect = function()
 		st = STATUS.FADEOUT;
 		next = 1;
 	};	
-	sceen.appendChild(nNoHandle.div);	
+	sceen.appendChild(nNoHandle.div);	*/
 	var select = load();
 	mainCanvas = new MainCanvas(select);
 	
@@ -376,7 +441,28 @@ var StampSelect = function()
 
 			//メイン処理
 			case STATUS.MAIN:
-				// メインキャンバスの描画
+
+				// ----------------------------------------------
+				// タイトルへ戻る
+				// ----------------------------------------------
+				if((!bTouch) && bOldTouch)
+				{
+					var TitleBackYesX = 0;
+					var TitleBackYesY = 0;
+					var TitleBackYesW = 260;
+					var TitleBackYesH = 101;		
+					if(
+						(TitleBackYesX < sTouchMoveX)  && (TitleBackYesX + TitleBackYesW > sTouchMoveX)  &&
+						(TitleBackYesY < sTouchMoveY)  && (TitleBackYesY + TitleBackYesH > sTouchMoveY)  &&
+						(TitleBackYesX < sTouchStartX) && (TitleBackYesX + TitleBackYesW > sTouchStartX) &&
+						(TitleBackYesY < sTouchStartY) && (TitleBackYesY + TitleBackYesH > sTouchStartY))
+					{	
+						st = STATUS.FADEOUT;
+						next = 1;
+					}	
+				}
+				bOldTouch = bTouch;
+				bTouch	  = false;
     			mainCanvas.draw();
 				break;
 			
