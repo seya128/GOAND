@@ -476,9 +476,12 @@ function AllDeleteStampDrawData()
 		var data = window.localStorage.getItem(key);
 		if (!data) { continue; }
 		window.localStorage.removeItem(key);
-		if(g_StampDrawData[i] != null)
+		if(g_StampDrawData != null)
 		{
-			g_StampDrawData[i].Clear();
+			if(g_StampDrawData[i] != null)
+			{
+				g_StampDrawData[i].Clear();
+			}
 		}
 	}
 }
