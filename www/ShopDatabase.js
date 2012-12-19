@@ -11,7 +11,7 @@ var MAX_SHOP_PANEL_WIDTH  		= 215;
 var MAX_SHOP_PANEL_HEIGHT 		= 250;
 var MAX_SHOP_PANEL_START_X 		= 105;
 var MAX_SHOP_PANEL_START_Y 		= 340;
-var MAX_SHOP_PANEL_INTERVAL_Y 	= 60;
+var MAX_SHOP_PANEL_INTERVAL_Y 	= 0;
 var gHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
 // -------------------------------------
@@ -166,11 +166,11 @@ var M_MAX_BUY_STAMP = 64;		// スタンプ
 var gShopBuyListTable = 
 [
 	// ごはん系
-    { "id":gStampEnum.GOHAN_01, "gold":30 },	// ごはん1
-    { "id":gStampEnum.GOHAN_02, "gold":60 },	// ごはん2
-    { "id":gStampEnum.GOHAN_03, "gold":90 },	// ごはん3
+    { "id":gStampEnum.GOHAN_01, "gold":1  },	// ごはん1
+    { "id":gStampEnum.GOHAN_02, "gold":10 },	// ごはん2
+    { "id":gStampEnum.GOHAN_03, "gold":100},	// ごはん3
     // 小物
-    { "id":gStampEnum.NIKU,    "gold":10 },		// ハンバーグ
+    { "id":gStampEnum.NIKU,    "gold":999},		// ハンバーグ
     { "id":gStampEnum.PURIN,   "gold":15 },		// プリン
     { "id":gStampEnum.SUPA,    "gold":20 },		// スパゲティ
     { "id":gStampEnum.HATA,    "gold":25 },		// お子様の旗
@@ -747,9 +747,100 @@ function DispMemory()
 	//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
 
+var g_WindowImageHandle 		= null;
+var g_YesImageHandle 			= null;
+var g_NoImageHandle  			= null;
+var g_YesNoMessageImageHandle	= null;
+var g_WindowsScaleRate			= 1.0;
 
+function LoadWindowYesNo()
+{
+	// ウィンドウ
+	g_WindowImageHandle     	= new Image();
+    g_WindowImageHandle.src = "img/00_common/g_g01_huk_e000.png";
+	// メッセージ
+	g_YesNoMessageImageHandle 	= new Image();
+    g_YesNoMessageImageHandle.src = "img/00_common/g_hand_01.png";
+	// はい
+	g_YesImageHandle 			= new Image();
+    g_YesImageHandle.src = "img/07_shop/k_btn_a.png";
+	// いいえ
+	g_NoImageHandle				= new Image();
+    g_NoImageHandle.src = "img/07_shop/k_btn_b.png";
+}
+function DeleteWindowYesNo()
+{
+	g_WindowImageHandle 		= null;
+	g_YesImageHandle 			= null;
+	g_NoImageHandle  			= null;
+	g_YesNoMessageImageHandle	= null;	
+}
 
+function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
+									sTouchStartX, sTouchStartY,
+									sTouchMoveX, sTouchMoveY)
+{
+	var GPosY = (1.0 - sScaleRate) * -64;
 
-
+	ctx.globalAlpha = sScaleRate;
+	ctx.drawImage(g_WindowImageHandle, 
+		89, 
+		GPosY + 214, 
+		460, 
+		440);
+	ctx.drawImage(g_YesNoMessageImageHandle, 
+		128, 
+		GPosY + 380, 
+		386, 
+		162);
+	
+	// ---------------------------------------------------
+	// YesNo
+	// ---------------------------------------------------
+	var PosYesX = 33;
+	var PosYesY = GPosY + 565;
+	var PosYesW = 281;
+	var PosYesH = 184;
+	var PosNoX  = 317;
+	var PosNoY  = GPosY + 565;
+	var PosNoW  = 281;
+	var PosNoH  = 184;
+	ctx.globalAlpha = sScaleRate;
+	ctx.drawImage(g_YesImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
+	ctx.drawImage(g_NoImageHandle,   PosNoX, PosNoY,  PosNoW,  PosNoH);
+/*	
+	this.ctx.fillStyle = 'rgb(255, 255, 255)';
+	this.ctx.font = "20pt Arial";
+	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
+	this.ctx.fillText("" + gold, 128 + 320 + 24, GPosY + 335); 
+	this.ctx.fillStyle = 'rgb(0, 0, 0)';
+*/
+	
+	// ---------------------------------------------------
+	// アルファブレンド計算
+	// ---------------------------------------------------
+	ctx.globalAlpha = 1.0;
+	sScaleRate += 0.15;
+	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
+	
+	// ---------------------------------------------------
+	// クリックイベント
+	// ---------------------------------------------------
+	if(sScaleRate >= 1.0 && bTrigger)
+	{
+		if(
+			(PosYesX < sTouchStartX) && (PosYesX + PosYesW > sTouchStartX) &&
+			(PosYesY < sTouchStartY) && (PosYesY + PosYesH > sTouchStartY) &&
+			(PosYesX < sTouchMoveX) && (PosYesX + PosYesW > sTouchMoveX)   &&
+			(PosYesY < sTouchMoveY) && (PosYesY + PosYesH > sTouchMoveY)) { return 0; }
+			
+		if(
+			(PosNoX < sTouchStartX) && (PosNoX + PosNoW > sTouchStartX) &&
+			(PosNoY < sTouchStartY) && (PosNoY + PosNoH > sTouchStartY) &&
+			(PosNoX < sTouchMoveX) && (PosNoX + PosNoW > sTouchMoveX)   &&
+ 			(PosNoY < sTouchMoveY) && (PosNoY + PosNoH > sTouchMoveY)) { return 1; }
+	}
+	return -1;
+}
 
 

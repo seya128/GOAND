@@ -1,33 +1,30 @@
 
 // -------------------------------------
-// 定義
-// -------------------------------------
-/*var STAMP_W = 160;
-var STAMP_H = 160;
-
-// -------------------------------------
 // リダクションサイズを設定する「処理を軽くするためサムネイル」
 // -------------------------------------
-var REDUCTION_SIZE = 2.0;
+// 1   640 1200
+// 2   320 600
+// 2.5 256 480
+// 3   213 400
+// 4   160 300
+var REDUCTION_SIZE = 2.5;
 var SCREEN_WIDTH   = 640;
 var SCREEN_HEIGHT  = 1200;
 var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
 var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
-*/
+
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
 var timerID;
 var g_YOffset = 90;
+var g_iSwitch = 0;
 
 // クリア
 function DeleteSheetClick(e)
 {
-//	g_sActiveDrawData.Clear();	//削除
-//	g_sActiveDrawData.Save();	//オートセーブ
-	//event.preventDefault();
-	st = STATUS.FADEOUT;
-	next = -1;
+	g_iSwitch = 1;
+	g_WindowsScaleRate = 0;
 }
 	
 	
@@ -44,6 +41,7 @@ var StampSelect = function()
 	var iButtonMoveClickIndex 	= -1;
 	var iForceTouch     = false;
 	var isTouch = false;
+	g_iSwitch = 0;
 
 	//
 	// スタンプシート
@@ -156,6 +154,7 @@ var StampSelect = function()
 	    var ofsX=0;
 	    var addX=0, ofsXold=0;
 	    var ofsRate=1.2;
+		var iOldSelecterID = no;
 
 		// デフォルトキャンバス
 	    var canvas = document.getElementById("canvas");
@@ -205,72 +204,89 @@ var StampSelect = function()
 	        var ofsMax = 376;
 
 	        //タッチされていない場合の位置調整
-	        if (!isTouch)
-	    	{
-	            if (addX>=-25 && addX<=25)
-	        	{
-	                if (ofsX >= -ofsMax/2 && ofsX<0)
-	        		{
-	                    addX = 25;
-	                }
-	                if (ofsX <= ofsMax/2 && ofsX>0)
-	        		{
-	                    addX = -25;
-	                }
-	            }
-
-	    		// 速度の下限
-	    		if (addX < -60) { addX = -60; }
-	    		if (addX > 60)  { addX = 60;  }
-	            
-	    		// 速度を足す
-	    		ofsX += addX;
-	    		
-	    		// 移動補正
-	            if (addX<0)
-	    		{
-	                if (ofsX < 0  && addX>=-25)
-	    			{
-	                    ofsX = 0;
-	                }
-	                addX += 10;
-	    		//	if(addX <= 30)
-	            } 
-	    		else 
-	    		{
-	                ofsX += addX;
-	                if (ofsX > 0 && addX<=25)
-	            	{
-	                    ofsX = 0;
-	                }
-	                addX -= 10;
-	            }
-	        } 
-			else 
+			if(g_iSwitch == 0)
 			{
-	            addX = ofsX - ofsXold;
-	        }
-			console.log("" + ofsX);
-			
-	        if (ofsX < -ofsMax/2){
-	            startX -= ofsMax/ofsRate;
-	            ofsX += ofsMax;
-	            this.selectIx += 1;
-	            this.selectIx %= 5;
-	            sheet[(this.selectIx + 2)%5].setImage( sheet[this.selectIx].sheetNo + 2);
-	        }
-	        if (ofsX > ofsMax/2){
-	            startX += ofsMax/ofsRate;
-	            ofsX -= ofsMax;
-	            this.selectIx += 5-1;
-	            this.selectIx %= 5;
-	            sheet[(this.selectIx + 3)%5].setImage( sheet[this.selectIx].sheetNo - 2);
-	        }
-	        ofsXold = ofsX;
-	        
+		        if (!isTouch)
+		    	{
+		    		// 切り替わった瞬間
+		    		if(Math.abs(ofsX) < 25)
+		    		{
+		    			if(Math.abs(addX) < 30)
+		    			{
+		    				ofsX = 0;
+		    				addX = 0;
+		    			}
+		    		}
+		    		/*	
+		            if (addX>=-25 && addX<=25)
+		        	{
+		                if (ofsX >= -ofsMax/2 && ofsX<0)
+		        		{
+		                    addX = 25;
+		                }
+		                if (ofsX <= ofsMax/2 && ofsX>0)
+		        		{
+		                    addX = -25;
+		                }
+		            }
+*/
+		    		// 速度の下限
+		    		if (addX < -60) { addX = -60; }
+		    		if (addX > 60)  { addX = 60;  }
+		            
+		    		// 速度を足す
+		    		ofsX += addX;
+		    		
+		    		// 移動補正
+		            if (addX<0)
+		    		{
+		           ///     if (ofsX < 0  && addX>=-25)
+		    		//	{
+		            //        ofsX = 0;
+		            //    }
+		                addX += 8;
+		    			if (addX > -28) { addX = -28; }
+		    		//	if(addX <= 30)
+		            } 
+		    		else 
+		    		{
+		            //    ofsX += addX;
+		            //    if (ofsX > 0 && addX<=25)
+		            //	{
+		            //        ofsX = 0;
+		            //    }
+		                addX -= 8;
+		    			if (addX < 28) { addX = 28; }
+		            }
+		        } 
+				else 
+				{
+		            addX = ofsX - ofsXold;
+		        }
+				
+				// 代入
+				iOldSelecterID = this.selectIx;
+				
+		        if (ofsX < -ofsMax / 2){
+		            startX -= ofsMax / ofsRate;
+		            ofsX += ofsMax;
+		            this.selectIx += 1;
+		            this.selectIx %= 5;
+		            sheet[(this.selectIx + 2) % 5].setImage( sheet[this.selectIx].sheetNo + 2);
+		        }
+		        if (ofsX > ofsMax / 2){
+		            startX += ofsMax/ofsRate;
+		            ofsX -= ofsMax;
+		            this.selectIx += 5 - 1;
+		            this.selectIx %= 5;
+		            sheet[(this.selectIx + 3) % 5].setImage( sheet[this.selectIx].sheetNo - 2);
+		        }
+		        ofsXold = ofsX;
+			}
+			// クリアと背景の表示
 	        this.clear();
-	        sheet[(this.selectIx + 4)%5].draw(ofsX-ofsMax);
-	        sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
+	        sheet[(this.selectIx + 4) % 5].draw(ofsX - ofsMax);
+	        sheet[(this.selectIx + 1) % 5].draw(ofsX + ofsMax);
 	        sheet[this.selectIx].draw(ofsX);
 	    	
 	    	if(ofsX == 0 && iForceTouch)
@@ -293,8 +309,22 @@ var StampSelect = function()
 				0, 
 				190, 
 				101);
-	    	
-	    	if((!isTouch) && bOldTouch && iForceTouch == false)
+				
+			if(g_iSwitch == 1)
+			{
+				// ウィンドウの描画
+				g_WindowsScaleRate += 0.15;
+				if(g_WindowsScaleRate > 1.0) { g_WindowsScaleRate = 1.0; }
+				var id = DrawWindowYesNo(ctx, g_WindowsScaleRate, ((!isTouch) && bOldTouch), sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);	    
+				if(id == 1) { g_iSwitch = 0; }
+				else if(id == 0)
+				{
+					g_iSwitch = 0;
+					st        = STATUS.FADEOUT;
+					next      = -1;	
+				}
+			}
+	    	else if((!isTouch) && bOldTouch && iForceTouch == false)
 	    	{
 				var PosX = 0;
 				var PosY = 215 + g_YOffset - 20;
@@ -325,7 +355,7 @@ var StampSelect = function()
 		        		isTouch = true;
 		     			bTouch  = true; 
 						iForceTouch = true;
-						ofsX	= 50;
+						ofsX	= 100;
 					}		    	
 					PosX = 527;
 					PosY = 215 + g_YOffset - 20;
@@ -348,7 +378,7 @@ var StampSelect = function()
 		        		isTouch = true;
 		     			bTouch  = true;  
 						iForceTouch = true;
-						ofsX	= -150;
+						ofsX	= -100;
 					}	
 			    	
 					PosX = 112;
@@ -435,6 +465,7 @@ var StampSelect = function()
 	var alpha = 0;
 
 	// 描画データ[初回一回のみ]
+	LoadWindowYesNo();
 	AllLoadStampDrawData();
     // 画像ロード[初回一回のみ]
     AllLoadStampGraphic();
