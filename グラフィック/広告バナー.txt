@@ -1,0 +1,25 @@
+ごちそうさまの広告表示につきまして、インタースペースの
+「ATAD」にてメディア審査が通りました。
+
+管理画面
+http://www.accesstrade.ne.jp/
+
+■ID：
+dorasu_at
+■Pass：
+下記に記載しました。
+https://docs.google.com/a/dorasu.com/spreadsheet/ccc?key=0Ao_Pxygwqry4dEZtNzlJTTQ1b0F6d2hmWmF3NFpucEE#gid=0
+
+
+上記でレポート閲覧、バナー表示管理等ができます。
+
+上記管理画面より、埋め込みタグを取得しました。
+
+＝＝＝＝＝＝＝＝＝
+1.広告を掲載するページのheadタグ内の最後（</head>の直前）に下記のコードを貼り付けてください。
+
+<script type='text/javascript'
+src='http://h.accesstrade.net/js/at_adnw.js?pt=430A300E948538F864C6A5A0161A2C4D505378&overlay=1'></script>
+＝＝＝＝＝＝＝＝＝
+
+自分は、広告選定・カウカウフードシステム様への承認依頼などを進めてまいります。
