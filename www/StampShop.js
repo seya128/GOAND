@@ -843,7 +843,7 @@ var StampShop = function()
 					// 持っているものが満タンかをチェック
 					if(GetIsBuyMax(id) == false)    { eSwitch = 4; }
 					// お金はあるかチェック
-					if(GetIsBuyCoin(gold) == false) { eSwitch = 3; }
+					else if(GetIsBuyCoin(gold) == false) { eSwitch = 3; }
 				}
 			}
 			// 画面クリア
@@ -946,6 +946,58 @@ var StampShop = function()
  	im.width = 640;   
 	im.height = 1200;  
 	sceen.appendChild(im);	
+	
+	// デバッグボタン[コイン-100]
+	var iMenuDel =document.createElement('button');
+	iMenuDel.setAttribute('id', 'Coin100M');
+	iMenuDel.style.position = "absolute";  
+	iMenuDel.innerHTML = '-100'
+ 	iMenuDel.style.top = "50px";
+ 	iMenuDel.style.left = "180px";
+ 	iMenuDel.style.width = "40px";   
+	iMenuDel.style.height = "25px";  
+	var fd = new Function("Coin100M();");
+ 	iMenuDel.onclick = fd; 
+	sceen.appendChild(iMenuDel);
+	// デバッグボタン[コイン+100]
+	iMenuDel =document.createElement('button');
+	iMenuDel.setAttribute('id', 'Coin100P');
+	iMenuDel.style.position = "absolute";  
+	iMenuDel.innerHTML = '+100'
+ 	iMenuDel.style.top = "50px";
+ 	iMenuDel.style.left = "220px";
+ 	iMenuDel.style.width = "40px";   
+	iMenuDel.style.height = "25px";  
+	fd = new Function("Coin100P();");
+ 	iMenuDel.onclick = fd; 
+	sceen.appendChild(iMenuDel);	
+	sceen.appendChild(iMenuDel);
+	// デバッグボタン[コイン-100]
+	iMenuDel =document.createElement('button');
+	iMenuDel.setAttribute('id', 'ItemMax');
+	iMenuDel.style.position = "absolute";  
+	iMenuDel.innerHTML = 'ITEM_MAX'
+ 	iMenuDel.style.top = "75px";
+ 	iMenuDel.style.left = "180px";
+ 	iMenuDel.style.width = "70px";   
+	iMenuDel.style.height = "25px";  
+	fd = new Function("ItemMax();");
+ 	iMenuDel.onclick = fd; 
+	sceen.appendChild(iMenuDel);	
+	// デバッグボタン[コイン-100]
+	iMenuDel =document.createElement('button');
+	iMenuDel.setAttribute('id', 'ItemDel');
+	iMenuDel.style.position = "absolute";  
+	iMenuDel.innerHTML = 'ITEM_DEL'
+ 	iMenuDel.style.top = "75px";
+ 	iMenuDel.style.left = "250px";
+ 	iMenuDel.style.width = "70px";   
+	iMenuDel.style.height = "25px";  
+	fd = new Function("ItemDel();");
+ 	iMenuDel.onclick = fd; 
+	sceen.appendChild(iMenuDel);			
+	
+	// キャンバスの作成
 	mainCanvas = new MainCanvas(0);
 	
 	//
@@ -1005,5 +1057,32 @@ var StampShop = function()
 function goTitle(e)  
 {
 	st = STATUS.FADEOUT;
+}
+function Coin100P()
+{
+	AddCoin(100);
+}
+function Coin100M()
+{
+	AddCoin(-100)
+}
+function ItemMax()
+{
+	// スタンプ購入
+	for(var i = 0;;)
+	{
+		if(BuySaveStampData(i % M_MAX_STAMP, 0) == false) { break; }
+	}
+	// シート購入
+	for(var i = 0;;)
+	{
+		if(BuySaveSheetData(i % M_MAX_SHEET, 0) == false) { break; }
+	}	
+}
+function ItemDel()
+{
+	DeleteHaveStampData();
+	DeleteHaveSheetData();
+	AllDeleteStampDrawData();
 }
 

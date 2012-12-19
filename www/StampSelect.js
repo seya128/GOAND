@@ -40,6 +40,11 @@ var StampSelect = function()
 	var sTouchStartY 	= -200;
 	var sTouchMoveX 	= -200;
 	var sTouchMoveY 	= -200;	
+	var iButtonStartClickIndex	= -1;
+	var iButtonMoveClickIndex 	= -1;
+	var iForceTouch     = false;
+	var isTouch = false;
+
 	//
 	// スタンプシート
 	//
@@ -151,7 +156,6 @@ var StampSelect = function()
 	    var ofsX=0;
 	    var addX=0, ofsXold=0;
 	    var ofsRate=1.2;
-	    var isTouch = false;
 
 		// デフォルトキャンバス
 	    var canvas = document.getElementById("canvas");
@@ -196,39 +200,58 @@ var StampSelect = function()
 	    };
 	    
 	    //描画
-	    this.draw = function() {
+	    this.draw = function() 
+		{
 	        var ofsMax = 376;
 
 	        //タッチされていない場合の位置調整
-	        if (!isTouch){
-	            if (addX>=-40 && addX<=40){
-	                if (ofsX >= -ofsMax/2 && ofsX<0){
-	                    addX = 40;
+	        if (!isTouch)
+	    	{
+	            if (addX>=-25 && addX<=25)
+	        	{
+	                if (ofsX >= -ofsMax/2 && ofsX<0)
+	        		{
+	                    addX = 25;
 	                }
-	                if (ofsX <= ofsMax/2 && ofsX>0){
-	                    addX = -40;
+	                if (ofsX <= ofsMax/2 && ofsX>0)
+	        		{
+	                    addX = -25;
 	                }
 	            }
 
-	            if (addX < -60) addX=-60;
-	            if (addX > 60) addX=60;
-	            ofsX += addX;
-	            if (addX<0){
-	                if (ofsX < 0  && addX>=-40){
+	    		// 速度の下限
+	    		if (addX < -60) { addX = -60; }
+	    		if (addX > 60)  { addX = 60;  }
+	            
+	    		// 速度を足す
+	    		ofsX += addX;
+	    		
+	    		// 移動補正
+	            if (addX<0)
+	    		{
+	                if (ofsX < 0  && addX>=-25)
+	    			{
 	                    ofsX = 0;
 	                }
-	                addX += 4;
-	            } else {
+	                addX += 10;
+	    		//	if(addX <= 30)
+	            } 
+	    		else 
+	    		{
 	                ofsX += addX;
-	                if (ofsX > 0 && addX<=40){
+	                if (ofsX > 0 && addX<=25)
+	            	{
 	                    ofsX = 0;
 	                }
-	                addX -= 4;
+	                addX -= 10;
 	            }
-	        } else {
+	        } 
+			else 
+			{
 	            addX = ofsX - ofsXold;
 	        }
-
+			console.log("" + ofsX);
+			
 	        if (ofsX < -ofsMax/2){
 	            startX -= ofsMax/ofsRate;
 	            ofsX += ofsMax;
@@ -249,6 +272,20 @@ var StampSelect = function()
 	        sheet[(this.selectIx + 4)%5].draw(ofsX-ofsMax);
 	        sheet[(this.selectIx + 1)%5].draw(ofsX+ofsMax);
 	        sheet[this.selectIx].draw(ofsX);
+	    	
+	    	if(ofsX == 0 && iForceTouch)
+	    	{
+	        	isTouch = false;
+	     		bTouch  = false;
+	    		iForceTouch = false;
+	    		bOldTouch = false;
+	    	}
+			else if(iForceTouch)
+			{
+	        	isTouch = false;
+	     		bTouch  = false;	
+				bOldTouch = false;
+			}
 
 			// 合成して描画
 	      	ctx.drawImage(BackImage, 			
@@ -256,79 +293,124 @@ var StampSelect = function()
 				0, 
 				190, 
 				101);
-/*	    	
-			var PosX = 0;
-			var PosY = 215 + g_YOffset - 20;
-			var PosW = 112;
-			var PosH = 410;
-
-			ctx.globalAlpha = 0.5;
-			ctx.fillStyle = 'rgb(255, 0, 0)';
-	        ctx.fillRect(PosX, PosY, PosW, PosH);
-			ctx.globalAlpha = 1.0;	
 	    	
-			PosX = 527;
-			PosY = 215 + g_YOffset - 20;
-			PosW = 118;
-			PosH = 410;
-
-			ctx.globalAlpha = 0.5;
-			ctx.fillStyle = 'rgb(255, 0, 0)';
-	        ctx.fillRect(PosX, PosY, PosW, PosH);
-			ctx.globalAlpha = 1.0;	
-	    	
-	    	
-			PosX = 112;
-			PosY = 50 + g_YOffset - 20;
-			PosW = 416;
-			PosH = 740;
-
-			ctx.globalAlpha = 0.5;
-			ctx.fillStyle = 'rgb(0, 255, 0)';
-	        ctx.fillRect(PosX, PosY, PosW, PosH);
-			ctx.globalAlpha = 1.0;	
-	    			    			
-			if(
-				(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
-				(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
-				(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
-				(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
-			{	
-				st = STATUS.FADEOUT;
-				next = 1;
-			}	
-*/	    	
+	    	if((!isTouch) && bOldTouch && iForceTouch == false)
+	    	{
+				var PosX = 0;
+				var PosY = 215 + g_YOffset - 20;
+				var PosW = 112;
+				var PosH = 410;
+	    		
+	    		// 移動地がでかい
+	    		var vMove1 = Math.abs(sTouchStartX - sTouchMoveX);
+	    		var vMove2 = Math.abs(sTouchStartY - sTouchMoveY);
+	    		if(vMove1 + vMove2 < 10)
+	    		{
+	    		
+	    		
+		/*
+					ctx.globalAlpha = 0.5;
+					ctx.fillStyle = 'rgb(255, 0, 0)';
+			        ctx.fillRect(PosX, PosY, PosW, PosH);
+					ctx.globalAlpha = 1.0;	
+		*/	 
+					if(
+						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+					{	
+						iButtonStartClickIndex	= 0;
+						iButtonMoveClickIndex 	= 0;
+		        		isTouch = true;
+		     			bTouch  = true; 
+						iForceTouch = true;
+						ofsX	= 50;
+					}		    	
+					PosX = 527;
+					PosY = 215 + g_YOffset - 20;
+					PosW = 118;
+					PosH = 410;
+		/*
+					ctx.globalAlpha = 0.5;
+					ctx.fillStyle = 'rgb(255, 0, 0)';
+			        ctx.fillRect(PosX, PosY, PosW, PosH);
+					ctx.globalAlpha = 1.0;	
+		*/	    	
+					if(
+						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+					{	
+						iButtonStartClickIndex	= 1;
+						iButtonMoveClickIndex 	= 1;
+		        		isTouch = true;
+		     			bTouch  = true;  
+						iForceTouch = true;
+						ofsX	= -150;
+					}	
+			    	
+					PosX = 112;
+					PosY = 50 + g_YOffset - 20;
+					PosW = 416;
+					PosH = 740;
+		/*
+					ctx.globalAlpha = 0.5;
+					ctx.fillStyle = 'rgb(0, 255, 0)';
+			        ctx.fillRect(PosX, PosY, PosW, PosH);
+					ctx.globalAlpha = 1.0;	
+		*/	    			    			
+					if(
+						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+					{	
+						st = STATUS.FADEOUT;
+						next = 0;
+					}	
+	    		}
+	    	}
 	    };
   
 	    //マウスイベント
 	    this.onTouchStart = function(e)
 		{
-	        var pos = getTouchPos(e);
-	        sTouchStartX = pos.x;
-	        sTouchStartY = pos.y;
-	        sTouchMoveX  = pos.x;
-	        sTouchMoveY  = pos.y;
-	        startX  = pos.x - ofsX * ofsRate;
-	        isTouch = true;
-	     	bTouch  = true;   
+			if(!iForceTouch)
+			{
+		        var pos = getTouchPos(e);
+		        sTouchStartX = pos.x;
+		        sTouchStartY = pos.y;
+		        sTouchMoveX  = pos.x;
+		        sTouchMoveY  = pos.y;
+		        startX  = pos.x - ofsX * ofsRate;
+		        isTouch = true;
+		     	bTouch  = true;   
+			}
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
 	    this.onTouchMove = function(e) 
 		{
-	        if (isTouch) 
-	    	{
-	            var pos	= getTouchPos(e);
-				sTouchMoveX = pos.x;
-				sTouchMoveY = pos.y;
-	            ofsX 	= (pos.x - startX) * ofsRate;
-	    		bTouch 	= true;
-	        }
+			if(!iForceTouch)
+			{
+		        if (isTouch) 
+		    	{
+		            var pos	= getTouchPos(e);
+					sTouchMoveX = pos.x;
+					sTouchMoveY = pos.y;
+		            ofsX 	= (pos.x - startX) * ofsRate;
+		    		bTouch 	= true;
+		        }
+			}
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
 	    this.onTouchEnd = function(e)
 		{
-	        isTouch = false;
-
+			if(!iForceTouch)
+			{
+				isTouch = false;
+			}
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
 	    
@@ -390,6 +472,7 @@ var StampSelect = function()
 //	nBack.src = "img/08_stamp/s_btn_b000.png";
 //	sceen.appendChild(nBack.div);
 	//Yes
+	/*
 	var nYesHandle = new DivSprite(289,146);
 	nYesHandle.x=170; nYesHandle.y=950; nYesHandle.z=2;
 	nYesHandle.src = "img/08_stamp/s_btn_d000.png";
@@ -399,6 +482,7 @@ var StampSelect = function()
 		next = 0;
 	};
 	sceen.appendChild(nYesHandle.div);
+	*/
 	/*//No
 	var nNoHandle = new DivSprite(289,146);
 	nNoHandle.x=450; nNoHandle.y=950; nNoHandle.z=2;
@@ -445,7 +529,7 @@ var StampSelect = function()
 				// ----------------------------------------------
 				// タイトルへ戻る
 				// ----------------------------------------------
-				if((!bTouch) && bOldTouch)
+				if((!isTouch) && bOldTouch)
 				{
 					var TitleBackYesX = 0;
 					var TitleBackYesY = 0;
@@ -461,9 +545,9 @@ var StampSelect = function()
 						next = 1;
 					}	
 				}
-				bOldTouch = bTouch;
-				bTouch	  = false;
     			mainCanvas.draw();
+				bOldTouch = isTouch;
+			//	bTouch	  = false;			
 				break;
 			
 			//フェードアウト

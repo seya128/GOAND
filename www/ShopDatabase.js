@@ -490,7 +490,7 @@ var STAMP_LIFE_MAX = 30;
 // ------------------------------------------------------
 // コイン
 // ------------------------------------------------------
-var g_DefaultCoin 	= 99999;
+var g_DefaultCoin 	= 255;
 var g_Coin 			= g_DefaultCoin;
 function SetCoin(coin)
 {
@@ -501,6 +501,8 @@ function AddCoin(coin)
 {
 	LoadCoin();
 	g_Coin += coin;
+	if(g_Coin > 99999) { g_Coin = 99999; }
+	if(g_Coin < 0)     { g_Coin = 0;     }
 	SaveCoin();	
 }
 function GetCoin() { return g_Coin; }
@@ -584,13 +586,15 @@ function DummyStampDataSet()
 function BuySaveStampData(id, coin)
 {
 	// 購入できるか再チェック
-	if(GetIsBuyCoin(-coin) == false) { return false; }
+	if(GetIsBuyCoin(-coin) == false)             { return false; }
+	if(GetHaveStampDataNum() >= M_MAX_BUY_STAMP) { return false; }
 	// 追加
 	AddHasStamp(id, STAMP_LIFE_MAX);
 	// コイン
 	g_Coin += coin;
 	// セーブ
 	SaveHaveStampData();	
+	return true;
 }
 // 削除
 function DelSaveStampData(index)
@@ -659,12 +663,14 @@ function BuySaveSheetData(id, coin)
 {
 	// 購入できるか再チェック
 	if(GetIsBuyCoin(-coin) == false) { return false; }
+	if(GetHaveSheetDataNum() >= M_MAX_BUY_SHEET) { return false; }
 	// 追加
 	AddHasSheet(id);
 	// コイン
 	g_Coin += coin;
 	// セーブ
 	SaveHaveSheetData();	
+	return true;
 }
 // 削除
 function DelSaveSheetData(index)
