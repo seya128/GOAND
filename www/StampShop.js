@@ -48,20 +48,6 @@ function DrawFont(x, y, ctx, string, center)
 // -------------------------------------
 var timerID;
 
-
-var STATUS = {
-	INIT:			0,
-	FADEIN:			1,
-	MAIN:			2,
-	FADEOUT:		3,
-	END:			4,
-	
-	SELECTED_INIT:	5,
-	SELECTED_MOVE:	6,
-	SELECTED_END:	7,
-};
-var st = STATUS.INIT;
-
 //
 // スタンプシート
 //
@@ -345,7 +331,7 @@ StampSheet.prototype.drawOK= function()
 		this.ctx.drawImage(popImage, 
 			262/* - (STAMP_W * 0.7)/2*/, 
 			237/* - (STAMP_H * 0.7)/2*/, 
-			popImage.width * 0.7, 
+			popImage.width  * 0.7, 
 			popImage.height * 0.7);
 	}
 	else
@@ -845,9 +831,9 @@ var StampShop = function()
 				else 
 				{
 					// 移動量
-					sTouchAccelerator = (sTouchMoveY - sTouchLastY) 	// 移動量
+					sTouchAccelerator = (sTouchMoveY - sTouchLastY) 		// 移動量
 					sScrollY    += sTouchAccelerator; 						// 移動量を算出し移動させる
-					sTouchLastY = sTouchMoveY; 							// 最近の最新座標
+					sTouchLastY = sTouchMoveY; 								// 最近の最新座標
 					//g_bMoveList = true;
 		        }
 				// 範囲外
@@ -921,6 +907,7 @@ var StampShop = function()
 		// --------------------------------------
 	    this.onTouchStart = function(e)
 		{
+			if(g_eStatus != G_STATUS.MAIN) { return; }
 	        var pos = getTouchPos(e);
 	        sTouchStartX = pos.x;
 	        sTouchStartY = pos.y;
@@ -933,6 +920,7 @@ var StampShop = function()
 	    };
 	    this.onTouchMove = function(e) 
 		{
+			if(g_eStatus != G_STATUS.MAIN) { return; }
 	        if (bTouch) 
 			{
 	            var pos = getTouchPos(e);
@@ -943,6 +931,7 @@ var StampShop = function()
 	    };
 	    this.onTouchEnd = function(e)
 		{
+			if(g_eStatus != G_STATUS.MAIN) { return; }
 	        bTouch = false;
 	        e.preventDefault(); // デフォルトイベント処理をしない
 	    };
@@ -971,7 +960,7 @@ var StampShop = function()
 	};
 
 	var alpha = 0;
-	st = STATUS.INIT;	
+	g_eStatus = G_STATUS.INIT;	
 
     // すべてロード
     AllLoadStampGraphic();
@@ -1099,45 +1088,47 @@ var StampShop = function()
 	//
 	this.onframe = function() 
 	{
-		switch(st) 
+		switch(g_eStatus) 
 		{
 			//初期化
-			case STATUS.INIT:
+			case G_STATUS.INIT:
 				//各データが読み込まれるまで待つ
 				if (LoadingCounter <= 0)
 				{
-					st = STATUS.FADEIN;
+					g_eStatus = G_STATUS.FADEIN;
+					// メインキャンバスの描画
+    				mainCanvas.draw();
 				}
 				break;
 
 			//フェードイン
-			case STATUS.FADEIN:
+			case G_STATUS.FADEIN:
 				alpha += (1.0 / 4);
 				if (alpha >= 1.0) {
 					alpha = 1.0;
-					st = STATUS.MAIN;
+					g_eStatus = G_STATUS.MAIN;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//メイン処理
-			case STATUS.MAIN:
+			case G_STATUS.MAIN:
 				// メインキャンバスの描画
     			mainCanvas.draw();
 				break;
 			
 			//フェードアウト
-			case STATUS.FADEOUT:
+			case G_STATUS.FADEOUT:
 				alpha -= (1.0 / 4);
 				if (alpha <= 0) {
 					alpha = 0;
-					st = STATUS.END;
+					g_eStatus = G_STATUS.END;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//終了
-			case STATUS.END:
+			case G_STATUS.END:
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
@@ -1150,7 +1141,7 @@ var StampShop = function()
 
 function goTitle(e)  
 {
-	st = STATUS.FADEOUT;
+	g_eStatus = G_STATUS.FADEOUT;
 }
 function Coin1P()
 {

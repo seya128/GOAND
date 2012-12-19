@@ -18,7 +18,6 @@ var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
 // -------------------------------------
 var timerID;
 var g_YOffset = 90;
-var g_iSwitch = 0;
 
 // クリア
 function DeleteSheetClick(e)
@@ -204,7 +203,7 @@ var StampSelect = function()
 	        var ofsMax = 376;
 
 	        //タッチされていない場合の位置調整
-			if(g_iSwitch == 0)
+			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN)
 			{
 		        if (!isTouch)
 		    	{
@@ -309,7 +308,7 @@ var StampSelect = function()
 				0, 
 				190, 
 				101);
-				
+			if(g_eStatus != G_STATUS.MAIN) { return; }
 			if(g_iSwitch == 1)
 			{
 				// ウィンドウの描画
@@ -319,9 +318,9 @@ var StampSelect = function()
 				if(id == 1) { g_iSwitch = 0; }
 				else if(id == 0)
 				{
-					g_iSwitch = 0;
-					st        = STATUS.FADEOUT;
-					next      = -1;	
+					g_iSwitch 	= 0;
+					g_eStatus	= G_STATUS.FADEOUT;
+					next      	= -1;	
 				}
 			}
 	    	else if((!isTouch) && bOldTouch && iForceTouch == false)
@@ -397,8 +396,8 @@ var StampSelect = function()
 						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
 						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
 					{	
-						st = STATUS.FADEOUT;
-						next = 0;
+						g_eStatus 	= G_STATUS.FADEOUT;
+						next		= 0;
 					}	
 	    		}
 	    	}
@@ -460,7 +459,7 @@ var StampSelect = function()
 	    // 初期描画
 	    this.draw();
 	};	
-	st = STATUS.INIT;
+	g_eStatus = G_STATUS.INIT;
 	var next;
 	var alpha = 0;
 
@@ -509,7 +508,7 @@ var StampSelect = function()
 	nYesHandle.src = "img/08_stamp/s_btn_d000.png";
 	nYesHandle.onclick = function(){
 		event.preventDefault();
-		st = STATUS.FADEOUT;
+		g_eStatus = G_STATUS.FADEOUT;
 		next = 0;
 	};
 	sceen.appendChild(nYesHandle.div);
@@ -520,7 +519,7 @@ var StampSelect = function()
 	nNoHandle.src = "img/08_stamp/s_btn_e000.png";
 	nNoHandle.onclick = function(){
 		event.preventDefault();
-		st = STATUS.FADEOUT;
+		g_eStatus = G_STATUS.FADEOUT;
 		next = 1;
 	};	
 	sceen.appendChild(nNoHandle.div);	*/
@@ -534,28 +533,30 @@ var StampSelect = function()
 	//
 	this.onframe = function() {
 
-		switch(st) {
-
+		switch(g_eStatus) 
+		{
 			//初期化
-			case STATUS.INIT:
+			case G_STATUS.INIT:
 				//各データが読み込まれるまで待つ
-				if (LoadingCounter <= 0) {
-					st = STATUS.FADEIN;
+				if (LoadingCounter <= 0) 
+				{
+					g_eStatus = G_STATUS.FADEIN;
+					mainCanvas.draw();
 				}
 				break;
 
 			//フェードイン
-			case STATUS.FADEIN:
+			case G_STATUS.FADEIN:
 				alpha += (1.0 / 4);
 				if (alpha >= 1.0) {
 					alpha = 1.0;
-					st = STATUS.MAIN;
+					g_eStatus = G_STATUS.MAIN;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//メイン処理
-			case STATUS.MAIN:
+			case G_STATUS.MAIN:
 
 				// ----------------------------------------------
 				// タイトルへ戻る
@@ -572,7 +573,7 @@ var StampSelect = function()
 						(TitleBackYesX < sTouchStartX) && (TitleBackYesX + TitleBackYesW > sTouchStartX) &&
 						(TitleBackYesY < sTouchStartY) && (TitleBackYesY + TitleBackYesH > sTouchStartY))
 					{	
-						st = STATUS.FADEOUT;
+						g_eStatus = G_STATUS.FADEOUT;
 						next = 1;
 					}	
 				}
@@ -582,17 +583,17 @@ var StampSelect = function()
 				break;
 			
 			//フェードアウト
-			case STATUS.FADEOUT:
+			case G_STATUS.FADEOUT:
 				alpha -= (1.0 / 4);
 				if (alpha <= 0) {
 					alpha = 0;
-					st = STATUS.END;
+					g_eStatus = G_STATUS.END;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//終了
-			case STATUS.END:
+			case G_STATUS.END:
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				

@@ -755,6 +755,21 @@ var g_YesImageHandle 			= null;
 var g_NoImageHandle  			= null;
 var g_YesNoMessageImageHandle	= null;
 var g_WindowsScaleRate			= 1.0;
+var g_iSwitch = 0;
+var g_eStatus = 0;
+
+var G_STATUS = 
+{
+	INIT:			0,
+	FADEIN:			1,
+	MAIN:			2,
+	FADEOUT:		3,
+	END:			4,
+	
+	SELECTED_INIT:	5,
+	SELECTED_MOVE:	6,
+	SELECTED_END:	7,
+};
 
 function LoadWindowYesNo()
 {
