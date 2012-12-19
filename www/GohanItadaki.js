@@ -21,6 +21,7 @@ var SceenGohanItadaki = function() {
 		OUEN_OUT:		16,
 		
 		GOCHI_JYUNBI:	20,
+		GOCHI_JYUNBI_OUT:	21,
 		
 		
 	};
@@ -115,6 +116,23 @@ var SceenGohanItadaki = function() {
 	var fuki11 = new DivSprite(256,258);
 	fuki11.src = "img/00_common/g_g01_huk_e000.png";
 	animSprites.push(fuki11);
+	//ごちそうさまセリフ
+	var words20 = new DivSprite(360,72);
+	words20.src = "img/05_gotisousama/g_got_txt_01.png";
+	animSprites.push(words20);
+	var words21 = new DivSprite(360,72);
+	words21.src = "img/05_gotisousama/g_got_txt_02.png";
+	animSprites.push(words21);
+	var words22 = new DivSprite(360,72);
+	words22.src = "img/05_gotisousama/g_got_txt_03.png";
+	animSprites.push(words22);
+	var words23 = new DivSprite(360,72);
+	words23.src = "img/05_gotisousama/g_got_txt_04.png";
+	animSprites.push(words23);
+	var fuki20 = new DivSprite(463,205);
+	fuki20.src = "img/00_common/g_g01_huk_b000.png";
+	animSprites.push(fuki20);
+	
 	
 	
 	//ボタン
@@ -166,6 +184,7 @@ var SceenGohanItadaki = function() {
 					//st = STATUS.ITADAKI;
 					//st = STATUS.OUEN_IN;
 					//st = STATUS.OUEN_IN2;
+					//st = STATUS.GOCHI_JYUNBI;
 					stFrm = 0;
 				}
 				sceen.style.opacity = alpha;
@@ -545,11 +564,50 @@ var SceenGohanItadaki = function() {
 			//ごちそうさま準備
 			case STATUS.GOCHI_JYUNBI:
 				if (stFrm == 0) {
-
-					st = STATUS.FADEOUT;
+					selected = SELECTED.NO_SELECT;
+				} else if (stFrm == 1*10) {
+					//たべれましたね
+					fuki20.x=412; fuki20.y=148; fuki20.z=2;
+					fuki20.alpha = 1;
+					fuki20.animAlpha = null;
+					fuki20.scale = 0;
+					fuki20.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki20.div);
+					words20.x=420; words20.y=155; words20.z=3;
+					words20.alpha = 0;
+					words20.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words20.div);
+				} else if (stFrm == 5*10) {
+					//じゅんびはいい？
+					fuki11.x=180; fuki11.y=458; fuki11.z=2;
+					fuki11.alpha = 1;
+					fuki11.animAlpha = null;
+					fuki11.scale = 0;
+					fuki11.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki11.div);
+					words2.x=180; words2.y=470; words2.z=3;
+					words2.alpha = 0;
+					words2.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words2.div);
+				} else if (stFrm == 8*10) {
+					//はい
+					buttonYes.x=320; buttonYes.y=712; buttonYes.z=5;
+					buttonYes.alpha = 1;
+					buttonYes.scale = 0;
+					buttonYes.animScale = fukiInAnimScaleData;
+					buttonYes.animAlpha = null;
+					sceen.appendChild(buttonYes.div);
+					buttonYes.onclick = function(){
+						selected = SELECTED.YES;
+					};
+				} else if (stFrm==10*10) {
+					buttonYes.animScale = [1.1,2, 1,2, 1,10];
+				}
+/*					st = STATUS.FADEOUT;
 					stFrm = 0;
 					break;
 				}
+*/
 				
 				stFrm ++;
 				break;
