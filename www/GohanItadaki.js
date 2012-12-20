@@ -22,7 +22,10 @@ var SceenGohanItadaki = function() {
 		
 		GOCHI_JYUNBI:	20,
 		GOCHI_JYUNBI_OUT:	21,
+		GOCHI:			22,
+		GOCHI_END:		23,
 		
+		PRESENT_IN:		24,
 		
 	};
 	var st = STATUS.INIT;
@@ -132,7 +135,16 @@ var SceenGohanItadaki = function() {
 	var fuki20 = new DivSprite(463,205);
 	fuki20.src = "img/00_common/g_g01_huk_b000.png";
 	animSprites.push(fuki20);
-	
+	//ご褒美
+	var words30 = new DivSprite(360,72);
+	words30.src = "img/06_present/g_pre_txt_a.png";
+	animSprites.push(words30);
+	var words31 = new DivSprite(360,72);
+	words31.src = "img/06_present/g_pre_txt_b.png";
+	animSprites.push(words31);
+	var shop = new DivSprite(256,258);
+	shop.src = "img/06_present/g_pre_obj_a.png";
+	animSprites.push(shop);
 	
 	
 	//ボタン
@@ -184,7 +196,6 @@ var SceenGohanItadaki = function() {
 					//st = STATUS.ITADAKI;
 					//st = STATUS.OUEN_IN;
 					//st = STATUS.OUEN_IN2;
-					//st = STATUS.GOCHI_JYUNBI;
 					stFrm = 0;
 				}
 				sceen.style.opacity = alpha;
@@ -229,8 +240,8 @@ var SceenGohanItadaki = function() {
 					buttonYes.onclick = function(){
 						selected = SELECTED.YES;
 					};
-				} else if (stFrm==8*10+3*10+20) {
-					buttonYes.animScale = [1.1,2, 1,2, 1,10];
+				} else if (stFrm==8*10+3*10+10) {
+					buttonYes.animScale = [1,10, 1.1,2, 1,2];
 				}
 				stFrm ++;
 
@@ -292,13 +303,12 @@ var SceenGohanItadaki = function() {
 					words4.x=329; words4.y=131; words4.z=3;
 					words4.alpha = 0;
 					words4.animAlpha = wordsInAnimAlphaData;
-					words4.scale = 2;
+					words4.scale = 1;
 					sceen.appendChild(words4.div);
 					chara.anim = [3,100];
 				} else if (stFrm == 12*10) {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words4.animAlpha = wordsOutAnimAlphaData;
-					hands.animAlpha = [0, 5];
 				} else if (stFrm == 14*10) {
 					sceen.removeChild(words4.div);
 					sceen.removeChild(hands.div);
@@ -331,9 +341,9 @@ var SceenGohanItadaki = function() {
 					buttonNo.onclick = function(){
 						selected = SELECTED.NO;
 					};
-				} else if (stFrm==19*10) {
-					buttonYes.animScale = [1.1,2, 1,2, 1,10, 1,10];
-					buttonNo.animScale  = [1,10, 1.1,2, 1,2, 1,10];
+				} else if (stFrm==18*10) {
+					buttonYes.animScale = [1,10, 1.1,2, 1,2, 1,10];
+					buttonNo.animScale  = [1,10, 1,10, 1.1,2, 1,2];
 				}
 				
 				if (selected != SELECTED.NO_SELECT) {
@@ -461,9 +471,7 @@ var SceenGohanItadaki = function() {
 					buttonYes.animScale = fukiInAnimScaleData;
 					buttonYes.animAlpha = null;
 					sceen.appendChild(buttonYes.div);
-					buttonYes.onclick = function(){
-						selected = SELECTED.YES;
-					};
+					buttonYes.onclick = null;
 					//いいえ
 					buttonNo.x=466; buttonNo.y=712; buttonNo.z=5;
 					buttonNo.scale = 0;
@@ -471,18 +479,22 @@ var SceenGohanItadaki = function() {
 					buttonNo.animScale = fukiInAnimScaleData;
 					buttonNo.animAlpha = null;
 					sceen.appendChild(buttonNo.div);
-					buttonNo.onclick = function(){
-						selected = SELECTED.NO;
-					};
-				} else if (stFrm==7*10) {
-					buttonYes.animScale = [1.1,2, 1,2, 1,10, 1,10];
-					buttonNo.animScale  = [1,10, 1.1,2, 1,2, 1,10];
+					buttonNo.onclick = null;
+				} else if (stFrm==6*10) {
+					buttonYes.animScale = [1,10, 1.1,2, 1,2, 1,10];
+					buttonNo.animScale  = [1,10, 1,10, 1.1,2, 1,2];
 					fuki11.alpha = 0;
 					sceen.appendChild(fuki11.div);
 					words11.alpha = 0;
 					sceen.appendChild(words11.div);
 					words12.alpha = 0;
 					sceen.appendChild(words12.div);
+					buttonYes.onclick = function(){
+						selected = SELECTED.YES;
+					};
+					buttonNo.onclick = function(){
+						selected = SELECTED.NO;
+					};
 				} else if (stFrm==8*10) {
 					fuki11.x=180; fuki11.y=458; fuki11.z=2;
 					fuki11.alpha = 0;
@@ -597,24 +609,214 @@ var SceenGohanItadaki = function() {
 					buttonYes.animScale = fukiInAnimScaleData;
 					buttonYes.animAlpha = null;
 					sceen.appendChild(buttonYes.div);
+					buttonYes.onclick = null;
+				} else if (stFrm==9*10) {
+					buttonYes.animScale = [1,10, 1.1,2, 1,2];
 					buttonYes.onclick = function(){
 						selected = SELECTED.YES;
 					};
-				} else if (stFrm==10*10) {
-					buttonYes.animScale = [1.1,2, 1,2, 1,10];
 				}
-/*					st = STATUS.FADEOUT;
+				
+				stFrm ++;
+
+				if (selected == SELECTED.YES) {
+					st = STATUS.GOCHI_JYUNBI_OUT;
+					stFrm = 0;
+				}
+				break;
+
+			//ごちそうさま準備終了
+			case STATUS.GOCHI_JYUNBI_OUT:
+				if (stFrm == 0) {
+					buttonYes.animScale = [2.5,7];
+					buttonYes.animAlpha = [1,3, 0,4, 0,-1];
+				} else if (stFrm == 10) {
+					fuki20.animScale = fukiOutAnimScaleData;
+					words20.animAlpha = wordsOutAnimAlphaData;
+					fuki11.animScale = fukiOutAnimScaleData;
+					words2.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 2*10) {
+					sceen.removeChild(fuki20.div);
+					sceen.removeChild(words20.div);
+					sceen.removeChild(fuki11.div);
+					sceen.removeChild(words2.div);
+					sceen.removeChild(buttonYes.div);
+					st = STATUS.GOCHI;
+					stFrm = 0;
+					break;		
+				}
+				stFrm++;
+				break;
+
+			//ごちそうさま
+			case STATUS.GOCHI:
+				if (stFrm == 0) {
+					selected = SELECTED.NO_SELECT;
+				} else if (stFrm == 5) {
+					//手　登場
+					hands.x=147; hands.y=460; hands.z=2;
+					hands.alpha = 1;
+					hands.animAlpha = null;
+					hands.scale = 0;
+					hands.animScale = fukiInAnimScaleData;
+					hands.anim = [0,100];
+					sceen.appendChild(hands.div);
+				} else if (stFrm == 1*10) {
+					fuki20.x=412; fuki20.y=148; fuki20.z=2;
+					fuki20.alpha = 1;
+					fuki20.animAlpha = null;
+					fuki20.scale = 0;
+					fuki20.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki20.div);
+					words21.x=420; words21.y=155; words21.z=3;
+					words21.alpha = 0;
+					words21.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words21.div);
+					chara.anim = [2,100];
+					megami.anim = [2,100];
+				} else if (stFrm == 6*10) {
+					fuki20.animScale = fukiOutAnimScaleData;
+					words21.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 8*10) {
+					sceen.removeChild(words21.div);
+					//ごちそうさま
+					fuki20.scale = 0;
+					fuki20.animScale = fukiInAnimScaleData;
+					words22.x=420; words22.y=155; words22.z=3;
+					words22.alpha = 0;
+					words22.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words22.div);
+					chara.anim = [3,100];
+					megami.anim = [3,100];
+				} else if (stFrm == 13*10) {
+					fuki20.animScale = fukiOutAnimScaleData;
+					words22.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 15*10) {
+					sceen.removeChild(words22.div);
+					sceen.removeChild(hands.div);
+					//ちゃんとできた？
+					fuki20.scale = 0;
+					fuki20.animScale = fukiInAnimScaleData;
+					words23.x=420; words23.y=155; words23.z=3;
+					words23.alpha = 0;
+					words23.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words23.div);
+					chara.anim = [0,10, 1,10];
+					megami.anim = [0,40, 1,40];
+				} else if (stFrm == 18*10) {
+					//はい
+					buttonYes.x=168; buttonYes.y=712; buttonYes.z=5;
+					buttonYes.scale = 0;
+					buttonYes.alpha = 1;
+					buttonYes.animScale = fukiInAnimScaleData;
+					buttonYes.animAlpha = null;
+					sceen.appendChild(buttonYes.div);
+					buttonYes.onclick = null;
+					//いいえ
+					buttonNo.x=466; buttonNo.y=712; buttonNo.z=5;
+					buttonNo.scale = 0;
+					buttonNo.alpha = 1;
+					buttonNo.animScale = fukiInAnimScaleData;
+					buttonNo.animAlpha = null;
+					sceen.appendChild(buttonNo.div);
+					buttonNo.onclick = null;
+				} else if (stFrm==19*10) {
+					buttonYes.animScale = [1,10, 1.1,2, 1,2, 1,10];
+					buttonNo.animScale  = [1,10, 1,10, 1.1,2, 1,2];
+					buttonYes.onclick = function(){
+						selected = SELECTED.YES;
+					};
+					buttonNo.onclick = function(){
+						selected = SELECTED.NO;
+					};
+				}
+				
+				if (selected != SELECTED.NO_SELECT) {
+					st = STATUS.GOCHI_OUT;
 					stFrm = 0;
 					break;
 				}
-*/
+				
+				stFrm ++;
+				break;
+
+			//ごちそうさま out
+			case STATUS.GOCHI_OUT:
+				if (stFrm == 0) {
+					if (selected == SELECTED.YES) {
+						buttonYes.animScale = [2.5,7];
+						buttonYes.animAlpha = [1,3, 0,4, 0,-1];
+						buttonNo.animScale = [0,7];
+						buttonNo.animAlpha = [0,7];
+					} else {
+						buttonNo.animScale = [2.5,7];
+						buttonNo.animAlpha = [1,3, 0,4, 0,-1];
+						buttonYes.animScale = [0,7];
+						buttonYes.animAlpha = [0,7];
+					}
+					fuki20.animScale = fukiOutAnimScaleData;
+					words23.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 10) {
+					sceen.removeChild(fuki20.div);
+					sceen.removeChild(words23.div);
+					sceen.removeChild(buttonYes.div);
+					sceen.removeChild(buttonNo.div);
+					
+					if (selected == SELECTED.NO) {
+						st = STATUS.GOCHI_JYUNBI;
+					} else {
+						st = STATUS.PRESENT_IN;
+					}
+					stFrm = 0;
+					break;
+				}
+				
+				stFrm ++;
+				break;
+
+			//プレゼント
+			case STATUS.PRESENT_IN:
+				if (stFrm == 1*10) {
+					//よくできましたね
+					fuki20.x=412; fuki20.y=148; fuki20.z=2;
+					fuki20.alpha = 1;
+					fuki20.animAlpha = null;
+					fuki20.scale = 0;
+					fuki20.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki20.div);
+					words30.x=420; words30.y=155; words30.z=3;
+					words30.alpha = 0;
+					words30.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words30.div);
+				} else if (stFrm == 7*10) {
+					fuki20.animScale = fukiOutAnimScaleData;
+					words30.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 9*10) {
+					//しょっぷアイコン
+					shop.x=147; shop.y=460; shop.z=2;
+					shop.scale = 0;
+					shop.animScale = fukiInAnimScaleData;
+					sceen.appendChild(shop.div);
+				} else if (stFrm == 10*10) {
+					//しょっぷでつかってね
+					fuki20.x=412; fuki20.y=148; fuki20.z=2;
+					fuki20.scale = 0;
+					fuki20.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki20.div);
+					words31.x=420; words31.y=155; words31.z=3;
+					words31.alpha = 0;
+					words31.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words31.div);
+				} else if (stFrm == 16*10) {
+					st = STATUS.FADEOUT;
+				}
 				
 				stFrm ++;
 				break;
 				
 			//フェードアウト
 			case STATUS.FADEOUT:
-				alpha -= (1.0 / 4);
+				alpha -= (1.0 / 10);
 				if (alpha <= 0) {
 					alpha = 0;
 					st = STATUS.END;
@@ -627,7 +829,7 @@ var SceenGohanItadaki = function() {
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
-				nextSceen = new SceenTitle();
+				nextSceen = new SceenGohanCoinGet();
 				break;
 		}
 		
