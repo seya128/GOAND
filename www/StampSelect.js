@@ -30,7 +30,6 @@ function DeleteSheetClick(e)
 var StampSelect = function() 
 {
 	var BackImage 		= new Image();	// イメージクラス
-	var bTouch 			= false;
 	var bOldTouch		= false;
 	var sTouchStartX 	= -200;
 	var sTouchStartY 	= -200;
@@ -237,23 +236,19 @@ var StampSelect = function()
 		    		ofsX += addX;
 		    		
 		    		// 移動補正
-		            if (addX<0)
+		    		if(addX == 0 && ofsX != 0)
 		    		{
-		           ///     if (ofsX < 0  && addX>=-25)
-		    		//	{
-		            //        ofsX = 0;
-		            //    }
+		    			if(ofsX      <= -ofsMax/2) { addX = -8; }
+		    			else if(ofsX >= ofsMax/2)  { addX = 8;  }
+		    			else { if(ofsX < 0) { addX = 8; } else { addX = -8; } }
+		    		}
+		            else if (addX<0)
+		    		{
 		                addX += 8;
 		    			if (addX > -28) { addX = -28; }
-		    		//	if(addX <= 30)
 		            } 
 		    		else 
 		    		{
-		            //    ofsX += addX;
-		            //    if (ofsX > 0 && addX<=25)
-		            //	{
-		            //        ofsX = 0;
-		            //    }
 		                addX -= 8;
 		    			if (addX < 28) { addX = 28; }
 		            }
@@ -291,14 +286,12 @@ var StampSelect = function()
 	    	if(ofsX == 0 && iForceTouch)
 	    	{
 	        	isTouch = false;
-	     		bTouch  = false;
 	    		iForceTouch = false;
 	    		bOldTouch = false;
 	    	}
 			else if(iForceTouch)
 			{
 	        	isTouch = false;
-	     		bTouch  = false;	
 				bOldTouch = false;
 			}
 
@@ -352,7 +345,6 @@ var StampSelect = function()
 						iButtonStartClickIndex	= 0;
 						iButtonMoveClickIndex 	= 0;
 		        		isTouch = true;
-		     			bTouch  = true; 
 						iForceTouch = true;
 						ofsX	= 100;
 					}		    	
@@ -375,7 +367,6 @@ var StampSelect = function()
 						iButtonStartClickIndex	= 1;
 						iButtonMoveClickIndex 	= 1;
 		        		isTouch = true;
-		     			bTouch  = true;  
 						iForceTouch = true;
 						ofsX	= -100;
 					}	
@@ -415,7 +406,6 @@ var StampSelect = function()
 		        sTouchMoveY  = pos.y;
 		        startX  = pos.x - ofsX * ofsRate;
 		        isTouch = true;
-		     	bTouch  = true;   
 			}
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
@@ -429,7 +419,6 @@ var StampSelect = function()
 					sTouchMoveX = pos.x;
 					sTouchMoveY = pos.y;
 		            ofsX 	= (pos.x - startX) * ofsRate;
-		    		bTouch 	= true;
 		        }
 			}
 	        e.preventDefault(); //デフォルトイベント処理をしない
@@ -578,8 +567,8 @@ var StampSelect = function()
 					}	
 				}
     			mainCanvas.draw();
-				bOldTouch = isTouch;
-			//	bTouch	  = false;			
+				DispMemory();
+				bOldTouch = isTouch;		
 				break;
 			
 			//フェードアウト

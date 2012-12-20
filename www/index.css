@@ -14,7 +14,12 @@ body {
     left: 500px;
 }
 
-
+#memory {
+    position: fixed;
+    z-index: 10;
+    top: 0px;
+    left: 10px;
+}
 
 
 

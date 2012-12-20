@@ -731,7 +731,7 @@ var StampShop = function()
 				// -----------------------------------------
 				// タッチ終了
 				// -----------------------------------------
-				var sMaxScl = -(3280);
+				var sMaxScl = GetMaxBuyScl();
 		        if (!bTouch)
 				{
 					// -----------------------------------------
@@ -1115,6 +1115,7 @@ var StampShop = function()
 			case G_STATUS.MAIN:
 				// メインキャンバスの描画
     			mainCanvas.draw();
+				DispMemory();
 				break;
 			
 			//フェードアウト

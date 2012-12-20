@@ -45,6 +45,10 @@ var gStampEnum =
 	WATER_01:		6,
 	WATER_02:		7,
 	WATER_03:		8,
+	// シンコ様
+	SINKO_01:		9,
+	SINKO_02:		10,
+	SINKO_03:		11,
 
 	// スタンプ
 	// ごはん系
@@ -86,6 +90,17 @@ var gStampEnum =
 	KAMI_SIITAKE:	132,			// シイタケの神様
 	KAMI_TAMANEGI:	133,			// 玉ねぎの神様
 	KAMI_TOMATO:	134,			// トマトの神様
+	// 真子様
+	SIN_BAMU:		135,			// バーム
+	SIN_CHOCO:		136,			// チョコ
+	SIN_HEART:		137,			// ハート
+	SIN_KAI:		138,			// 貝
+	SIN_SIKAKU:		139,			// 四角
+	SIN_MARU:		140,			// 丸
+	SIN_SAMA:		141,			// シンコ様
+	SIN_AME:		142,			// 飴
+	SIN_HAZIKI:		143,			// はじきみたいな
+	
 };
 
 // 背景画像
@@ -102,7 +117,11 @@ var gStampBgFileName =
 	// 水系
     "img/08_stamp/s_s03_sta_a/s_s03_bgd_a000.png",
     "img/08_stamp/s_s03_sta_a/s_s03_bgd_b000.png",
-    "img/08_stamp/s_s03_sta_a/s_s03_bgd_c000.png"
+    "img/08_stamp/s_s03_sta_a/s_s03_bgd_c000.png",
+	// シンコ様
+    "img/08_stamp/s_s05_sta_a/s_s02_bgd_a000.png",
+    "img/08_stamp/s_s05_sta_a/s_s02_bgd_b000.png",
+    "img/08_stamp/s_s05_sta_a/s_s02_bgd_c000.png"
 ];
 
 // スタンプ画像
@@ -147,7 +166,17 @@ var gStampImgFileName =
     "img/08_stamp/s_s04_sta_a/s_s04_sta_sii.png",
     "img/08_stamp/s_s04_sta_a/s_s04_sta_tam.png",
     "img/08_stamp/s_s04_sta_a/s_s04_sta_tom.png",
-
+    // シンコ様
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_a000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_b000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_c000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_d000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_e000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_f000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_g000.png",
+    "img/08_stamp/s_s05_sta_a/s_s05_sta_h000.png",
+	"img/08_stamp/s_s05_sta_a/s_s05_sta_i000.png",
+   
 ];
 
 var M_OFFSET_STAMP = 100;
@@ -217,8 +246,28 @@ var gShopBuyListTable =
     { "id":gStampEnum.KAMI_TAMANEGI,	"gold":40 },	// 玉ねぎの神様
     { "id":gStampEnum.KAMI_TOMATO,		"gold":45 },	// トマトの神様
     
+ 	// 水の中
+    { "id":gStampEnum.SINKO_01,	"gold":999 },	// シンコ様1
+    { "id":gStampEnum.SINKO_02,	"gold":999 },	// シンコ様2
+    { "id":gStampEnum.SINKO_03,	"gold":999 },	// シンコ様3   
+	// 真子様
+    { "id":gStampEnum.SIN_BAMU,		"gold":10    },	// バーム
+    { "id":gStampEnum.SIN_CHOCO,	"gold":15    },	// チョコ
+    { "id":gStampEnum.SIN_HEART,	"gold":20    },	// ハート
+    { "id":gStampEnum.SIN_KAI,		"gold":25    },	// 貝
+    { "id":gStampEnum.SIN_SIKAKU,	"gold":30    },	// 四角
+    { "id":gStampEnum.SIN_MARU,		"gold":35    },	// 丸
+    { "id":gStampEnum.SIN_SAMA,		"gold":999 },	// シンコ様
+    { "id":gStampEnum.SIN_AME,		"gold":45    },	// 飴
+    { "id":gStampEnum.SIN_HAZIKI,	"gold":50    },	// はじきみたいな
+
+    
 ];
 var M_MAX_BUY_LIST = gShopBuyListTable.length;
+function GetMaxBuyScl()
+{
+	return -(MAX_SHOP_PANEL_START_Y + (MAX_SHOP_PANEL_HEIGHT * (M_MAX_BUY_LIST / 3)) - (MAX_SHOP_PANEL_HEIGHT * 3));
+}
 
 // ------------------------------------------------------
 // グラフィックデータ
@@ -742,12 +791,34 @@ function SaveActiveSheetIndex(sheetno)
 function DispMemory()
 {
 	// メモリ内の表示デバッグ
-	var Use    = performance.memory.usedJSHeapSize;
-	var Total  = performance.memory.totalJSHeapSize;
+	//var Use    = performance.memory.usedJSHeapSize;
+	//var Total  = performance.memory.totalJSHeapSize;
 	//var UseM   = Use   / 1024 / 1024;
 	//var TotalM = Total / 1024 / 1024;
-	document.getElementById("body").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]" + sActiveSheetNo;
-	//document.getElementById("body").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
+	//var rootSceen = document.getElementById("sceen");
+	//var sceen     = document.createElement("div");
+//	var w = window.innerWidth;
+//	var r = 640 / w;
+//	var h = window.innerHeight * r;
+//	document.getElementById("memory").innerHTML = "[" + w + "][" + h + "]" ;
+	
+//	document.body.scrollLeft - document.body.clientWidth
+	
+/*
+	window.innerWidth
+	document.body.clientWidth				// 実際の表示サイズ
+	document.documentElement.clientWidth	// ??
+	
+	window.innerWidth < window.innerHeight
+	document.body.style.width + "][" + document.body.style.height
+ 	im.width = 640;   
+	im.height = 1200;  
+	im.style.position = 'absolute';
+ 	im.style.top = "0px"; 
+ 	im.style.left ="0px"; 
+*/
+	//document.getElementById("memory").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";/* + sActiveSheetNo;*/
+	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
 
 var g_WindowImageHandle 		= null;
@@ -758,6 +829,23 @@ var g_WindowsScaleRate			= 1.0;
 var g_iSwitch = 0;
 var g_eStatus = 0;
 
+/*
+var g_bOldTouch					= false;
+var g_sTouchStartX 				= -200;
+var g_sTouchStartY 				= -200;
+var g_sTouchMoveX 				= -200;
+var g_sTouchMoveY 				= -200;	
+
+function ClearTouch()
+{
+	g_bOldTouch					= false;
+	g_sTouchStartX 				= -200;
+	g_sTouchStartY 				= -200;
+	g_sTouchMoveX 				= -200;
+	g_sTouchMoveY 				= -200;		
+}
+*/
+	
 var G_STATUS = 
 {
 	INIT:			0,
