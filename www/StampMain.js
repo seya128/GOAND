@@ -448,6 +448,29 @@ StampBar.prototype.selectStamp = function(x){
 }
 
 //選択スタンプ描画
+StampBar.prototype.drawSelectedStamp_t = function(ctx,x,y)
+{
+	var ix = this.selectedStampIx;		//選択された手持ちスタンプのID
+	var id = this.selectedStampId;		//選択されたスタンプオブジェクトのインデックス
+
+	// 持っているスタンプデータの取得
+    var s = getHasStampData(id);
+	
+    var a = Math.floor(s.ink / (STAMP_LIFE_MAX/5))+1;  //残りインクを５段階に(6-1)
+    if (a >= 6)			a = 1.0;
+    else if (s.ink > 0)	a = a / 5;
+    else 				a = 0;
+        
+    ctx.globalAlpha = a;
+	ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMP_H/2, STAMP_W,STAMP_H);
+    ctx.globalAlpha = 1.0;
+    
+    //描画データ保存
+    //g_sActiveDrawData.Add(x,y, s.id, a);
+    //g_sActiveDrawData.Save();	//オートセーブ
+}
+
+//選択スタンプ描画
 StampBar.prototype.drawSelectedStamp = function(ctx,x,y)
 {
 	var ix = this.selectedStampIx;		//選択された手持ちスタンプのID
@@ -553,10 +576,12 @@ var StampMain = function()
 	var sTouchMoveY 	= -200;		
 	var canvas_canvas;
 	var canvas_ctx;
+	var stamp_canvas;
+	var stamp_ctx;
 	var canvas_img = new Image();
 	var canvas_load_ix = 0;
 	var canvas_stamp_img = new Image();	
-	
+	var count = 0;
 	//背景描画
 	function canvas_Draw() {
 	    canvas_ctx.drawImage(canvas_img, 0,0);
@@ -572,21 +597,22 @@ var StampMain = function()
 		
 		canvas_canvas = document.getElementById("canvas");
 		canvas_ctx = canvas_canvas.getContext("2d");	
-
+		stamp_canvas = document.getElementById("stamp_c");
+		stamp_ctx = stamp_canvas.getContext("2d");	
 	    // マウスイベントリスナーの追加
 	    if (navigator.userAgent.indexOf('iPhone')>0 ||
 	        navigator.userAgent.indexOf('iPod')>0 ||
 	        navigator.userAgent.indexOf('iPad')>0 ||
 	        navigator.userAgent.indexOf('Android')>0) {
-	        canvas_canvas.addEventListener("touchstart",onTouchStart,false);
-	        canvas_canvas.addEventListener("touchmove",onTouchMove,false);
-	        canvas_canvas.addEventListener("touchend",onTouchEnd,false);
+	        stamp_canvas.addEventListener("touchstart", onTouchStart, true);
+	        stamp_canvas.addEventListener("touchmove" , onTouchMove, true);
+	        stamp_canvas.addEventListener("touchend"  , onTouchEnd,  true);
 	    } 
 		else 
 		{
-	        canvas_canvas.addEventListener("mousedown",onTouchStart,false);
-	        canvas_canvas.addEventListener("mousemove",onTouchMove,false);
-	        canvas_canvas.addEventListener("mouseup",onTouchEnd,false);
+	        stamp_canvas.addEventListener("mousedown", onTouchStart, true);
+	        stamp_canvas.addEventListener("mousemove", onTouchMove, true);
+	        stamp_canvas.addEventListener("mouseup"  , onTouchEnd, true);
 	    }
 		
 	    //背景ロード
@@ -627,8 +653,8 @@ var StampMain = function()
 	// キャンバス：マウスタッチイベント
 	function canvas_onTouchEvent(e, x, y) 
 	{
-	    drawStamp(x, y);
-		save();
+	  //  drawStamp(x, y);
+	//	save();
 	}
     //マウスイベント
     function onTouchStart(e)
@@ -639,44 +665,62 @@ var StampMain = function()
         sTouchMoveX  = pos.x;
         sTouchMoveY  = pos.y;
         bTouch = true;
-		canvas_onTouchEvent(e, pos.x, pos.y);
+		drawStamp_t(pos.x, pos.y);
         e.preventDefault(); //デフォルトイベント処理をしない
     };
     function onTouchMove(e) 
 	{
+		count ++;
         if (bTouch) 
     	{
+    		document.getElementById("memory").innerHTML = "[" + sTouchMoveX + "]" + "[" + sTouchMoveY + "][" + count + "]";
+    		
             var pos	= getTouchPos(e);
 			sTouchMoveX = pos.x;
 			sTouchMoveY = pos.y;
-  
-    		
-    		/*
-			canvas_ctx.globalAlpha = 1.0;
-	       	canvas_ctx.fillStyle = 'rgb(255, 0, 0)';		
-	        canvas_ctx.fillRect(pos.x, pos.y, 8, 8);
-			canvas_ctx.globalAlpha = 1.0;
-			*/
+			drawStamp_t(sTouchMoveX, sTouchMoveY);
+			//stamp_canvas.style.position = 'absolute';
+ 		//	stamp_canvas.style.top  = sTouchMoveY + "px";
+    	//	stamp_canvas.style.left = sTouchMoveX + "px";
+
         }
         e.preventDefault(); //デフォルトイベント処理をしない
     };
     function onTouchEnd(e)
 	{
-		bTouch = false;
+		if(bTouch)
+		{
+			drawStamp(sTouchMoveX, sTouchMoveY);
+			//canvas_ctx.drawImage(stamp_canvas, 0, 0, 640, 1200);
+			save();
+			bTouch = false;
+		}
         e.preventDefault(); //デフォルトイベント処理をしない
     };
 	
 
 	var timerID;
 
-	function drawStamp(x,y){
-		if (stampBar.selectedStampId >= 0){
-			stampBar.drawSelectedStamp(canvas_ctx, x,y);
+	function drawStamp(x,y)
+	{
+		if (stampBar.selectedStampId >= 0)
+		{
+			stamp_ctx.globalAlpha = 1.0;
+			stamp_ctx.clearRect(0, 0, 640, 1200);
+			stampBar.drawSelectedStamp(canvas_ctx, x, y);
 	        //playAudioSE_Stamp();
 		}
 	}
-
-
+	function drawStamp_t(x,y)
+	{
+		if (stampBar.selectedStampId >= 0)
+		{
+			stamp_ctx.globalAlpha = 1.0;
+			stamp_ctx.clearRect(0, 0, 640, 1200);
+			stampBar.drawSelectedStamp_t(stamp_ctx, x, y);
+	        //playAudioSE_Stamp();
+		}
+	}
 	//セーブ
 	function save()  { SaveHaveStampData(); }
 	
@@ -692,14 +736,28 @@ var StampMain = function()
 	rootSceen.appendChild(sceen);
 	sceen.style.opacity = alpha;
 	
+	// -----------------------------------------------
+	// メインキャンバス
+	// -----------------------------------------------
 	var im =document.createElement('canvas');
 	im.setAttribute('id', 'canvas');
  	im.width = 640;   
 	im.height = 1200;  
 	im.style.position = 'absolute';
- 	im.style.top = "0px"; 
+ 	//im.style.top = "0px"; 
  	//im.style.left ="0px"; 
 	sceen.appendChild(im);		
+	// -----------------------------------------------
+	// スタンプキャンバス
+	// -----------------------------------------------
+	im =document.createElement('canvas');
+	im.setAttribute('id', 'stamp_c');
+ 	im.width = 640;   
+	im.height = 1200;   
+	im.style.position = 'absolute';
+ 	im.style.top = "0px"; 
+ 	im.style.left ="0px"; 
+	sceen.appendChild(im);	
 	
 	// -----------------------------------------------
 	// クリアボタンの作成
