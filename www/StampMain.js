@@ -517,7 +517,7 @@ var nNextEvent = 0;
 
 // MENUボタンクリック
 function menuButtonClick(e){
-	st = STATUS.FADEOUT;
+	g_eStatus = G_STATUS.FADEOUT;
 	nNextEvent = 0;
    // e.preventDefault(); //デフォルトイベント処理をしない
 }
@@ -525,7 +525,7 @@ function menuButtonClick(e){
 function clearButtonClick(e){
 	g_sActiveDrawData.Clear();	//削除
 	g_sActiveDrawData.Save();	//オートセーブ
-	st = STATUS.FADEOUT;
+	g_eStatus = G_STATUS.FADEOUT;
 	nNextEvent = 1;
   //  e.preventDefault(); //デフォルトイベント処理をしない
 }
@@ -635,7 +635,7 @@ var StampMain = function()
 	// 描画データの設定
 	g_iEditSheetIndex = LoadActiveSheetIndex();
 	g_sActiveDrawData = GetStampDrawData(g_iEditSheetIndex);//new StampDrawData(g_iEditSheetIndex);
-
+	var alpha = 0;
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
 	rootSceen.appendChild(sceen);
@@ -647,17 +647,9 @@ var StampMain = function()
 	im.height = 1200;  
 	sceen.appendChild(im);		
 	
-	//stamp_bar
-   ///this.canvas = document.getElementById("stamp_bar");
-  ///  this.ctx = this.canvas.getContext("2d");
-/*	position: fixed;
-    overflow:hidden;	// はみ出した部分表示しない
-	position:fixed;
-    bottom:0px;
-    left:0px;
-    background-color: #555;	
-*/
-	
+	// -----------------------------------------------
+	// クリアボタンの作成
+	// -----------------------------------------------	
 	var iMenuDel =document.createElement('button');
 	iMenuDel.setAttribute('id', 'menu_del');
 	iMenuDel.style.position = "absolute";  
@@ -669,8 +661,10 @@ var StampMain = function()
 	var fd = new Function("clearButtonClick();");
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);		
-		
 	
+	// -----------------------------------------------
+	// ステータスバーキャンバスの作成
+	// -----------------------------------------------
 	var imstamp_bar =document.createElement('canvas');
 	imstamp_bar.setAttribute('id', 'stamp_bar');
  	imstamp_bar.width = 640;   
@@ -681,34 +675,9 @@ var StampMain = function()
 	imstamp_bar.overflow = "hidden";  
 	sceen.appendChild(imstamp_bar);		
 
-	
-//	<button id="menu_button" onclick="menuButtonClick()">MENU</button>
-/*
-  var element = document.getElementById('hoge');	
-  var e = document.createElement('button');
-  e.innerHTML = 'ボタン';
-  var f = new Function("alert('ok');");
-  e.onclick = f;
-  element.appendChild(e);
-*/
-/*
-#menu_button {
-	position: absolute;
-	bottom:0px;
-	right:0px;
-	width: 120px;
-	height: 160px;
-}
-	this.div.style.position = "fixed";
-	this.div.style.overflow = "hidden";
-	this.div.style.width = w + "px";
-	this.div.style.height = h + "px";
-	this.img.style.position = "absolute";
-	this.img.style.top = "0px";
-	this.img.style.left = "0px";
-	this.img.style.overflow = "hidden";
-	this.div.appendChild(this.img);
-*/
+	// -----------------------------------------------
+	// メニューボタンの作成
+	// -----------------------------------------------
 	var iMenu =document.createElement('button');
 	iMenu.setAttribute('id', 'menu_button');
 	iMenu.style.position = "absolute";  
@@ -721,67 +690,46 @@ var StampMain = function()
  	iMenu.onclick = f; 
 	sceen.appendChild(iMenu);		
 
-/*
-#menu_button {
-	position: absolute;
-	bottom:0px;
-	right:0px;
-	width: 120px;
-	height: 160px;
-}
-*/
+
     canvas_Init();
-    stampBar = new StampBar(3);
-	
-	st = STATUS.INIT;
+    stampBar = new StampBar(3);	
+	g_eStatus = G_STATUS.INIT;
 	var next;
 	var alpha = 0;
-	
-/*
-        <div id="ok"><img src="img/stamp/s_btn_d000.png" onMouseDown=goStamp() onTouchStart=goStamp()></img></div>
-        <div id="cancel"><img src="img/stamp/s_btn_e000.png" onMouseDown=goTitle() onTouchStart=goTitle()></img></div>
-#ok {
-    position: fixed;
-    bottom:5px;
-    left:20px;
-}
-
-#cancel {
-    position: fixed;
-    bottom:5px;
-    left:340px;
-	
-}
-
-*/
 
 	//
 	// フレーム処理
 	//
 	this.onframe = function() {
 
-		switch(st) {
+		switch(g_eStatus) {
 
 			//初期化
-			case STATUS.INIT:
+			case G_STATUS.INIT:
 				//各データが読み込まれるまで待つ
-				if (LoadingCounter <= 0) {
-					st = STATUS.FADEIN;
+				if (LoadingCounter <= 0) 
+				{
+					g_eStatus = G_STATUS.FADEIN;
+		        	stampBar.slide();
+		            stampBar.updateDispInfo();
+		            stampBar.imageLoad();
+		            stampBar.draw();
 				}
 				break;
 
 			//フェードイン
-			case STATUS.FADEIN:
+			case G_STATUS.FADEIN:
 				alpha += (1.0 / 4);
-				if (alpha >= 1.0) {
+				if (alpha >= 1.0) 
+				{
 					alpha = 1.0;
-					st = STATUS.MAIN;
+					g_eStatus = G_STATUS.MAIN;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//メイン処理
-			case STATUS.MAIN:
+			case G_STATUS.MAIN:
 				// メインキャンバスの描画
 			//	canvas_Draw();
     		//	mainCanvas.draw();
@@ -795,17 +743,17 @@ var StampMain = function()
 				break;
 			
 			//フェードアウト
-			case STATUS.FADEOUT:
+			case G_STATUS.FADEOUT:
 				alpha -= (1.0 / 4);
 				if (alpha <= 0) {
 					alpha = 0;
-					st = STATUS.END;
+					g_eStatus = G_STATUS.END;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//終了
-			case STATUS.END:
+			case G_STATUS.END:
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				canvas_img = null;
