@@ -10,6 +10,9 @@ var g_sActiveDrawData;
 // スタンプバー
 var stampBar;
 
+// キャンバスのオフセット
+var g_iCanvasOffsetY = 0;
+
 //
 var g_iEditSheetIndex = 0;					//シート番号
 
@@ -342,7 +345,8 @@ StampBar.prototype.setTouchEvent = function() {
     var touchX = 0;
 
     //タッチ開始
-    var touchStartEvent = function(e) {
+    var touchStartEvent = function(e) 
+	{
         _this.isTouched = true;
     	    
         var pos = getTouchPos(e);
@@ -434,13 +438,31 @@ StampBar.prototype.slide = function()
 };
 
 //スタンプ選択
-StampBar.prototype.selectStamp = function(x){
+StampBar.prototype.selectStamp = function(x)
+{
 	var offset = x + this.offset;
     offset %= g_HaveStampImageData.length*STAMP_W;
     if (offset < 0)    offset += g_HaveStampImageData.length*STAMP_W;
 	
 	var id = Math.floor(offset/STAMP_W);
 	this.selectedStampId = id;
+}
+
+//選択スタンプ描画
+StampBar.prototype.drawSelectedStamp_t = function(ctx,x,y)
+{
+	var ix = this.selectedStampIx;		//選択された手持ちスタンプのID
+	var id = this.selectedStampId;		//選択されたスタンプオブジェクトのインデックス
+	// 持っているスタンプデータの取得
+    var s = getHasStampData(id);
+    var a = Math.floor(s.ink / (STAMP_LIFE_MAX/5))+1;  //残りインクを５段階に(6-1)
+    if (a >= 6)			a = 1.0;
+    else if (s.ink > 0)	a = a / 5;
+    else 				a = 0;
+        
+    ctx.globalAlpha = a;
+	ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMP_H/2, STAMP_W,STAMP_H);
+    ctx.globalAlpha = 1.0;
 }
 
 //選択スタンプ描画
@@ -502,44 +524,43 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y)
 }
 
 
-//
-// キャンバス
-//
-/*
-var canvas_canvas;
-var canvas_ctx;
-var canvas_img = new Image();
-var canvas_load_ix = 0;
-var canvas_stamp_img = new Image();
-*/
 	
 var nNextEvent = 0;
 
 // MENUボタンクリック
-function menuButtonClick(e){
+function menuButtonClick(e)
+{
 	g_eStatus = G_STATUS.FADEOUT;
 	nNextEvent = 0;
-   // e.preventDefault(); //デフォルトイベント処理をしない
 }
 // クリア
-function clearButtonClick(e){
+function clearButtonClick(e)
+{
+	g_iSwitch = 0;
 	g_sActiveDrawData.Clear();	//削除
 	g_sActiveDrawData.Save();	//オートセーブ
 	g_eStatus = G_STATUS.FADEOUT;
 	nNextEvent = 1;
-  //  e.preventDefault(); //デフォルトイベント処理をしない
 }
 
 
 var StampMain = function() 
 {
-	
+	g_iCanvasOffsetY    = 0;
+	var bTouch			= false;
+	var bOldTouch		= false;
+	var sTouchStartX 	= -200;
+	var sTouchStartY 	= -200;
+	var sTouchMoveX 	= -200;
+	var sTouchMoveY 	= -200;		
 	var canvas_canvas;
 	var canvas_ctx;
+	var stamp_canvas;
+	var stamp_ctx;
 	var canvas_img = new Image();
 	var canvas_load_ix = 0;
 	var canvas_stamp_img = new Image();	
-	
+
 	//背景描画
 	function canvas_Draw() {
 	    canvas_ctx.drawImage(canvas_img, 0,0);
@@ -555,17 +576,24 @@ var StampMain = function()
 		
 		canvas_canvas = document.getElementById("canvas");
 		canvas_ctx = canvas_canvas.getContext("2d");	
-
-	    //マウスイベントリスナーの追加
+		stamp_canvas = document.getElementById("stamp_c");
+		stamp_ctx = stamp_canvas.getContext("2d");	
+	    // マウスイベントリスナーの追加
 	    if (navigator.userAgent.indexOf('iPhone')>0 ||
 	        navigator.userAgent.indexOf('iPod')>0 ||
 	        navigator.userAgent.indexOf('iPad')>0 ||
 	        navigator.userAgent.indexOf('Android')>0) {
-	        canvas_canvas.addEventListener("touchstart",canvas_onTouchEvent,false);
-	    } else {
-	        canvas_canvas.addEventListener("mousedown",canvas_onTouchEvent,false);
+	        stamp_canvas.addEventListener("touchstart", onTouchStart, true);
+	        stamp_canvas.addEventListener("touchmove" , onTouchMove, true);
+	        stamp_canvas.addEventListener("touchend"  , onTouchEnd,  true);
+	    } 
+		else 
+		{
+	        stamp_canvas.addEventListener("mousedown", onTouchStart, true);
+	        stamp_canvas.addEventListener("mousemove", onTouchMove, true);
+	        stamp_canvas.addEventListener("mouseup"  , onTouchEnd, true);
 	    }
-	    
+		
 	    //背景ロード
 	    canvas_img.onload = canvas_Draw;
 	    canvas_img.src = gStampBgFileName[g_HaveStampSheetData[g_iEditSheetIndex]["id"]];
@@ -600,37 +628,71 @@ var StampMain = function()
 		canvas_load_ix++;
 		canvas_StampImageLoad();	
 	}
-
-	// キャンバス：マウスタッチイベント
-	function canvas_onTouchEvent(e) {
-	    var pos = getTouchPos(e);
-	    
-	    drawStamp(pos.x, pos.y);
-		
-		save();
-		
-	    e.preventDefault(); //デフォルトイベント処理をしない
-	    
-	}
-
+    //マウスイベント
+    function onTouchStart(e)
+	{
+        var pos = getTouchPos(e);
+        sTouchStartX = pos.x;
+        sTouchStartY = pos.y;
+        sTouchMoveX  = pos.x;
+        sTouchMoveY  = pos.y;
+        bTouch = true;
+		drawStamp_t(pos.x, pos.y);
+        e.preventDefault(); //デフォルトイベント処理をしない
+    };
+    function onTouchMove(e) 
+	{
+        if (bTouch) 
+    	{
+    		//document.getElementById("memory").innerHTML = "[" + sTouchMoveX + "]" + "[" + sTouchMoveY + "][" + count + "]";
+    		
+            var pos	= getTouchPos(e);
+			sTouchMoveX = pos.x;
+			sTouchMoveY = pos.y;
+			drawStamp_t(sTouchMoveX, sTouchMoveY);
+        }
+        e.preventDefault(); //デフォルトイベント処理をしない
+    };
+    function onTouchEnd(e)
+	{
+		if(bTouch)
+		{
+			drawStamp(sTouchMoveX, sTouchMoveY);
+			//canvas_ctx.drawImage(stamp_canvas, 0, 0, 640, 1200);
+			save();
+			bTouch = false;
+		}
+        e.preventDefault(); //デフォルトイベント処理をしない
+    };
+	
 
 	var timerID;
 
-	function drawStamp(x,y){
-		if (stampBar.selectedStampId >= 0){
-			stampBar.drawSelectedStamp(canvas_ctx, x,y);
+	function drawStamp(x,y)
+	{
+		if (stampBar.selectedStampId >= 0)
+		{
+			stamp_ctx.globalAlpha = 1.0;
+			stamp_ctx.clearRect(0, 0, 640, 1200);
+			stampBar.drawSelectedStamp(canvas_ctx, x, y);
 	        //playAudioSE_Stamp();
 		}
 	}
-
-
-	//セーブ
-	function save() 
+	function drawStamp_t(x,y)
 	{
-		SaveHaveStampData();
+		if (stampBar.selectedStampId >= 0)
+		{
+			stamp_ctx.globalAlpha = 1.0;
+			stamp_ctx.clearRect(0, 0, 640, 1200);
+			stampBar.drawSelectedStamp_t(stamp_ctx, x, y);
+	        //playAudioSE_Stamp();
+		}
 	}
-
-
+	//セーブ
+	function save()  { SaveHaveStampData(); }
+	
+	// タッチイベントの初期化
+	//ClearTouch();
 	
 	// 描画データの設定
 	g_iEditSheetIndex = LoadActiveSheetIndex();
@@ -641,11 +703,28 @@ var StampMain = function()
 	rootSceen.appendChild(sceen);
 	sceen.style.opacity = alpha;
 	
+	// -----------------------------------------------
+	// メインキャンバス
+	// -----------------------------------------------
 	var im =document.createElement('canvas');
 	im.setAttribute('id', 'canvas');
  	im.width = 640;   
 	im.height = 1200;  
+	im.style.position = 'absolute';
+ 	//im.style.top = "0px"; 
+ 	//im.style.left ="0px"; 
 	sceen.appendChild(im);		
+	// -----------------------------------------------
+	// スタンプキャンバス
+	// -----------------------------------------------
+	im =document.createElement('canvas');
+	im.setAttribute('id', 'stamp_c');
+ 	im.width = 640;   
+	im.height = 1200;   
+	im.style.position = 'absolute';
+ 	im.style.top = "0px"; 
+ 	im.style.left ="0px"; 
+	sceen.appendChild(im);	
 	
 	// -----------------------------------------------
 	// クリアボタンの作成
@@ -693,6 +772,7 @@ var StampMain = function()
 
     canvas_Init();
     stampBar = new StampBar(3);	
+	g_iSwitch = 0;
 	g_eStatus = G_STATUS.INIT;
 	var next;
 	var alpha = 0;
@@ -740,6 +820,46 @@ var StampMain = function()
 
 				// スタンプエフェクト
 				if(sTimeHandle) { ExecEffect(); }
+/*						
+				// サイズ
+				var w = window.innerWidth;
+				var r = 640 / w;
+				var h = window.innerHeight * r;
+				g_iCanvasOffsetY = sTouchMoveY - sTouchStartY;
+			
+				var sCanvas = document.getElementById("canvas");
+				var nVal    = parseFloat(sCanvas.style.top);
+				nVal        += (g_iCanvasOffsetY * 5);
+				if(nVal > 0)              { nVal = 0;              }
+				if(nVal < h - 1138 - 160) { nVal = h - 1138 - 160; }			
+//window.innerWidth + "][" + window.innerHeight
+				document.getElementById("memory").innerHTML = "[" + sTouchStartY + "]" + "[" + sTouchMoveY + "]";
+			
+				sCanvas.style.position = 'absolute';
+ 				sCanvas.style.top = nVal + "px";
+	    		g_iCanvasOffsetY = 0;
+	    		sTouchStartY     = sTouchMoveY;
+*/
+				// メッセージ
+			/*	if(g_iSwitch == 1)
+				{
+					// ウィンドウの描画
+					g_WindowsScaleRate += 0.15;
+					if(g_WindowsScaleRate > 1.0) { g_WindowsScaleRate = 1.0; }
+					var id = DrawWindowYesNo(canvas_ctx, g_WindowsScaleRate, ((!bTouch) && bOldTouch), sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);	    
+					if(id == 1) { g_iSwitch = 0; }
+					else if(id == 0)
+					{
+						g_iSwitch = 0;
+						g_sActiveDrawData.Clear();	//削除
+						g_sActiveDrawData.Save();	//オートセーブ
+						g_eStatus = G_STATUS.FADEOUT;
+						nNextEvent = 1;
+					}
+					bOldTouch = bTouch;
+				}*/
+			
+				DispMemory();
 				break;
 			
 			//フェードアウト
