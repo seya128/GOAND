@@ -677,6 +677,7 @@ function DeleteHaveStampData()
 {
 	localStorage.removeItem(g_saveDataKeyHaveStampData);
 	AllDelHasStamp();
+	SaveHaveStampData();
 }
 
 // ------------------------------------------------------
@@ -770,6 +771,7 @@ function DeleteHaveSheetData()
 {
 	localStorage.removeItem(g_saveDataKeyHaveSheetData);
 	AllDelHasSheet();
+	SaveHaveSheetData() 
 }
 
 // アクティブシートのロード
