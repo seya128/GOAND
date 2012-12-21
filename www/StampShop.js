@@ -153,6 +153,12 @@ StampSheet.prototype.Proc = function(ofs)
 				
 				if(PosY < 135) { continue; }
 
+				var id = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["id"];	
+			//	if(GetIsSheetTrue(id) == false)
+			//	{
+			//		continue;
+			//	}
+				
 				if(
 					(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
 					(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY) &&
@@ -173,6 +179,8 @@ StampSheet.prototype.Proc = function(ofs)
 
 StampSheet.prototype.drawWindow = function()
 {
+	DrawBack(this.ctx);
+	
 	var GPosY = (1.0 - sScaleRate) * -64;
 
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
@@ -277,6 +285,8 @@ StampSheet.prototype.drawWindow = function()
 }
 StampSheet.prototype.drawOK= function()
 {
+	DrawBack(this.ctx);
+
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 	this.ctx.globalAlpha = sScaleRate;
@@ -379,6 +389,8 @@ StampSheet.prototype.drawOK= function()
 //描画
 StampSheet.prototype.draw = function(ofs)
 {
+	//DrawBack(this.ctx);
+	
 	// フォント
 	this.ctx.font = g_sFontName;
 	//if (this.isLoaded) 
@@ -440,7 +452,15 @@ StampSheet.prototype.draw = function(ofs)
 				}
 				var gold = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["gold"];
 				//this.ctx.fillText("" + gold, xx - 25 + x, yy + 35 + y); 
-				DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "" + gold, true);
+			
+				if(GetIsSheetTrue(id) == false)
+				{
+					DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "売り切れ", true);	
+				}
+				else
+				{
+					DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "" + gold, true);
+				}
 			}
 		}
 /*
@@ -510,14 +530,6 @@ StampSheet.prototype.draw = function(ofs)
 			640, 
 			200);
 		// --------------------------------------    
-		// 残り金額の描画
-		// --------------------------------------
-		this.ctx.drawImage(this.CoinImage, 
-			380, 
-			0, 
-			260, 
-			101);
-		// --------------------------------------    
 	    // タイトルへ戻る
 		// --------------------------------------
 		this.ctx.drawImage(this.BackImage, 
@@ -525,10 +537,6 @@ StampSheet.prototype.draw = function(ofs)
 			0, 
 			190, 
 			101);
-		this.ctx.font = g_sFontName;
-		//this.ctx.fillText("" + GetCoin(), 500, 70); 
-		DrawFont(540, 74, this.ctx, "" + GetCoin(), true);
-
     }
 };
    
@@ -868,8 +876,10 @@ var StampShop = function()
 					// 購入するお金があるかチェック
 					var id   = gShopBuyListTable[g_iClickDataIndex]["id"];
 					var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
+					// 持ってるか？
+					if(GetIsSheetTrue(id) == false)      { eSwitch = 4; }
 					// 持っているものが満タンかをチェック
-					if(GetIsBuyMax(id) == false)    { eSwitch = 4; }
+					if(GetIsBuyMax(id) == false)         { eSwitch = 4; }
 					// お金はあるかチェック
 					else if(GetIsBuyCoin(gold) == false) { eSwitch = 3; }
 				}
@@ -901,6 +911,18 @@ var StampShop = function()
 			{
 				this.draw_BuyWindow();
 			}
+			
+			// --------------------------------------    
+			// 残り金額の描画
+			// --------------------------------------
+			ctx.drawImage(sheet.CoinImage, 
+				380, 
+				0, 
+				260, 
+				101);		
+			ctx.font = g_sFontName;
+			//this.ctx.fillText("" + GetCoin(), 500, 70); 
+			DrawFont(540, 74, ctx, "" + GetCoin(), true);			
 	    };
 		// --------------------------------------    
 	    // マウスイベント
@@ -977,7 +999,7 @@ var StampShop = function()
  	im.width = 640;   
 	im.height = 1200;  
 	sceen.appendChild(im);	
-
+/*
 	// デバッグボタン[コイン-1]
 	var iMenuDel =document.createElement('button');
 	iMenuDel.setAttribute('id', 'Coin1M');
@@ -1027,16 +1049,16 @@ var StampShop = function()
 	fd = new Function("Coin10P();");
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);
-	
+	*/
 	// デバッグボタン[コイン-100]
 	var iMenuDel =document.createElement('button');
 	iMenuDel.setAttribute('id', 'Coin100M');
 	iMenuDel.style.position = "absolute";  
 	iMenuDel.innerHTML = '-100'
  	iMenuDel.style.top = "50px";
- 	iMenuDel.style.left = "320px";
- 	iMenuDel.style.width = "40px";   
-	iMenuDel.style.height = "25px";  
+ 	iMenuDel.style.left = "200px";
+ 	iMenuDel.style.width = "80px";   
+	iMenuDel.style.height = "40px";  
 	var fd = new Function("Coin100M();");
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);
@@ -1046,15 +1068,15 @@ var StampShop = function()
 	iMenuDel.style.position = "absolute";  
 	iMenuDel.innerHTML = '+100'
  	iMenuDel.style.top = "50px";
- 	iMenuDel.style.left = "360px";
- 	iMenuDel.style.width = "40px";   
-	iMenuDel.style.height = "25px";  
+ 	iMenuDel.style.left = "280px";
+ 	iMenuDel.style.width = "80px";   
+	iMenuDel.style.height = "40px";  
 	fd = new Function("Coin100P();");
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);	
 //
 	
-	
+/*	
 	// デバッグボタン[ItemMax]
 	iMenuDel =document.createElement('button');
 	iMenuDel.setAttribute('id', 'ItemMax');
@@ -1079,7 +1101,7 @@ var StampShop = function()
 	fd = new Function("ItemDel();");
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);			
-	
+*/	
 	// キャンバスの作成
 	mainCanvas = new MainCanvas(0);
 	
