@@ -278,6 +278,7 @@ var SceenGohanItadaki = function() {
 					hands.x=147; hands.y=460; hands.z=2;
 					hands.scale = 0;
 					hands.animScale = fukiInAnimScaleData;
+					hands.frame = 0;
 					sceen.appendChild(hands.div);
 				} else if (stFrm == 1*10) {
 //					playSound("sound/se/ok.mp3");
@@ -306,6 +307,7 @@ var SceenGohanItadaki = function() {
 					words4.scale = 1;
 					sceen.appendChild(words4.div);
 					chara.anim = [3,100];
+					hands.frame = 1;
 				} else if (stFrm == 12*10) {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words4.animAlpha = wordsOutAnimAlphaData;
@@ -659,7 +661,7 @@ var SceenGohanItadaki = function() {
 					hands.animAlpha = null;
 					hands.scale = 0;
 					hands.animScale = fukiInAnimScaleData;
-					hands.anim = [0,100];
+					hands.frame = 0;
 					sceen.appendChild(hands.div);
 				} else if (stFrm == 1*10) {
 					fuki20.x=412; fuki20.y=148; fuki20.z=2;
@@ -687,6 +689,7 @@ var SceenGohanItadaki = function() {
 					words22.alpha = 0;
 					words22.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words22.div);
+					hands.frame = 1;
 					chara.anim = [3,100];
 					megami.anim = [3,100];
 				} else if (stFrm == 13*10) {
