@@ -251,14 +251,17 @@ StampBar.prototype.updateDispInfo = function(){
     if (this.offsetAdd < -STAMP_W)  this.offsetAdd = -STAMP_W;
     if (this.offsetAdd > STAMP_W)   this.offsetAdd = STAMP_W;
     this.offset += this.offsetAdd;
-    
+	
+	if(this.offset > (g_HaveStampImageData.length - 3)*STAMP_W) { this.offset = (g_HaveStampImageData.length - 3)*STAMP_W; }	
+	if(this.offset < 0) { this.offset = 0; }
+
     //移動したら選択は解除
     if (this.offsetAdd !=0)	this.selectedStampId = -1;
 
     //計算用オフセット
     var offset = this.offset;
-    offset %= g_HaveStampImageData.length*STAMP_W;
-    if (offset < 0)    offset += g_HaveStampImageData.length*STAMP_W;
+   // offset %= g_HaveStampImageData.length*STAMP_W;
+   // if (offset < 0)    offset += g_HaveStampImageData.length*STAMP_W;
     
     //左端に表示されている所持スタンプＩＤ
     var idOld = this.leftHasStampId;
@@ -328,18 +331,18 @@ StampBar.prototype.draw = function(){
     this.ctx.fillStyle = 'rgb(255, 255, 255)';
     this.ctx.fillRect(0, 0, 640, STAMP_H);
     
-	var iDrawNum = NUM_STAMPBAR_W-2;
+	var iDrawNum = /*g_HaveStampImageData.length;//*/NUM_STAMPBAR_W-2;
     for (i=0; i<iDrawNum; i++)
 	{
-        var s = getHasStampData(id);
-        
 		// 空データ
-		if(i > g_HaveStampImageData.length - 1)
+		if(id >= g_HaveStampImageData.length)
 		{
 	        this.ctx.fillStyle = 'rgb(0, 0, 0)';
-	        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMP_H-4);	
-		}
-		else
+	        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMP_H-4);
+			x += STAMP_W;
+			continue;
+		}		
+        var s = getHasStampData(id);
 		{
 			//バック
 			if (id == this.selectedStampId) {
@@ -368,7 +371,8 @@ StampBar.prototype.draw = function(){
         ix ++;
         ix %= NUM_STAMPBAR_W;
         id ++;
-        id %= g_HaveStampImageData.length;
+		//if(id >= g_HaveStampImageData.length) { break; }
+        //id %= g_HaveStampImageData.length;
     }
 };
 
@@ -416,8 +420,8 @@ StampBar.prototype.setTouchEvent = function() {
 	            _this.touchOffset = startOffset - ofs;
 	    		
 				SBarbTouch			= true;
-				SBarsTouchStartX 	= pos.x;
-				SBarsTouchStartY 	= pos.y;
+				//SBarsTouchStartX 	= pos.x;
+				//SBarsTouchStartY 	= pos.y;
 				SBarsTouchMoveX 	= pos.x;
 				SBarsTouchMoveY 	= pos.y;	    		
 	        }
@@ -512,8 +516,9 @@ StampBar.prototype.slide = function()
 StampBar.prototype.selectStamp = function(x)
 {
 	var offset = x + this.offset;
-    offset %= g_HaveStampImageData.length*STAMP_W;
-    if (offset < 0)    offset += g_HaveStampImageData.length*STAMP_W;
+	if(offset > g_HaveStampImageData.length*STAMP_W) { offset = g_HaveStampImageData.length*STAMP_W; }
+  //  offset %= g_HaveStampImageData.length*STAMP_W;
+    if (offset < 0)    offset = 0;
 	
 	var id = Math.floor(offset/STAMP_W);
 	this.selectedStampId = id;
