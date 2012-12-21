@@ -305,14 +305,17 @@ var StampSelect = function()
 				0, 
 				190, 
 				101);
-			if(g_eStatus != G_STATUS.MAIN) { return; }
+			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
 	
+			// ------------------------------------------------
+			// シートが０の時の描画
+			// ------------------------------------------------
 			if(g_HaveStampSheetData.length == 0)
 			{
 				// ウィンドウの描画
-				g_WindowsScaleRate += 0.05;
+				g_WindowsScaleRate += 0.15;
 				if(g_WindowsScaleRate > 1.0) { g_WindowsScaleRate = 1.0; }
-				var id = DrawWindowYesNo(ctx, g_WindowsScaleRate, ((!isTouch) && bOldTouch), sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);	    
+				var id = DrawWindowOk(ctx, g_WindowsScaleRate, ((!isTouch) && bOldTouch), sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);	    
 				if(id == 1) 
 				{ 
 				}
@@ -322,6 +325,9 @@ var StampSelect = function()
 					next = 1;
 				}
 			}
+			// ------------------------------------------------
+			// メニューが出てる時の描画
+			// ------------------------------------------------
 			else if(g_iSwitch == 1)
 			{
 				// ウィンドウの描画
@@ -336,6 +342,9 @@ var StampSelect = function()
 					next      	= -1;	
 				}
 			}
+			// ------------------------------------------------
+			// タッチトリガー
+			// ------------------------------------------------
 	    	else if((!isTouch) && bOldTouch && iForceTouch == false)
 	    	{
 				var PosX = 0;
@@ -491,7 +500,7 @@ var StampSelect = function()
  	im.width = 640;   
 	im.height = 1200;  
 	sceen.appendChild(im);	
-	
+/*	
 	if(g_HaveStampSheetData.length != 0)
 	{
 		var iMenuDel = document.createElement('button');
@@ -505,8 +514,9 @@ var StampSelect = function()
 		var fd = new Function("DeleteSheetClick();");
 	 	iMenuDel.onclick = fd; 
 		sceen.appendChild(iMenuDel);
-	}	
-	var select = load();
+	}	*/
+	var select = LoadActiveSheetIndex();
+	if(g_StampDrawData.length <= select){ select = g_StampDrawData.length - 1; }
 	mainCanvas = new MainCanvas(select);
 	
 
@@ -609,11 +619,6 @@ var StampSelect = function()
 				break;
 		}
 	};
-	//ロード
-	function load() 
-	{
-		return LoadActiveSheetIndex()*1;
-	} 
 	//セーブ
 	function save() 
 	{
