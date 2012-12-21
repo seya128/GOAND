@@ -78,9 +78,9 @@ var StampSelect = function()
 			// シートに張り付けて描画
 			// -------------------------------------  
 			var iSheetNo = this.sheetNo;
-			var iNum     = GetStampDrawNum(iSheetNo);
 			if(GetStampDrawData(iSheetNo) != null && iSheetNo >= 0)
 			{
+				var iNum = GetStampDrawNum(iSheetNo);
 				for(var i = 0; i < iNum; i ++)
 				{
 					// -------------------------------------
@@ -158,13 +158,15 @@ var StampSelect = function()
 	    var canvas = document.getElementById("canvas");
 		var ctx    = canvas.getContext("2d");
 	    //スタンプシート準備
-	    var sheet = new Array();
-	    sheet[0] = new StampSheet(ctx, no);
-	    sheet[1] = new StampSheet(ctx, no + 1);
-	    sheet[2] = new StampSheet(ctx, no + 2);
-	    sheet[4] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 1);
-	    sheet[3] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 2);
-
+		if(g_HaveStampSheetData.length != 0)
+		{
+		    var sheet = new Array();
+		    sheet[0] = new StampSheet(ctx, no);
+		    sheet[1] = new StampSheet(ctx, no + 1);
+		    sheet[2] = new StampSheet(ctx, no + 2);
+		    sheet[4] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 1);
+		    sheet[3] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 2);
+		}
 	    //debug
 	    this.dubugDisp = function() {
 	        document.getElementById("body").innerHTML = 
@@ -202,7 +204,7 @@ var StampSelect = function()
 	        var ofsMax = 376;
 
 	        //タッチされていない場合の位置調整
-			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN)
+			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN && g_HaveStampSheetData.length != 0)
 			{
 		        if (!isTouch)
 		    	{
@@ -278,23 +280,25 @@ var StampSelect = function()
 		        ofsXold = ofsX;
 			}
 			// クリアと背景の表示
-	        this.clear();
-	        sheet[(this.selectIx + 4) % 5].draw(ofsX - ofsMax);
-	        sheet[(this.selectIx + 1) % 5].draw(ofsX + ofsMax);
-	        sheet[this.selectIx].draw(ofsX);
-	    	
-	    	if(ofsX == 0 && iForceTouch)
-	    	{
-	        	isTouch = false;
-	    		iForceTouch = false;
-	    		bOldTouch = false;
-	    	}
-			else if(iForceTouch)
+			this.clear();		
+			if(g_HaveStampSheetData.length != 0)
 			{
-	        	isTouch = false;
-				bOldTouch = false;
+		        sheet[(this.selectIx + 4) % 5].draw(ofsX - ofsMax);
+		        sheet[(this.selectIx + 1) % 5].draw(ofsX + ofsMax);
+		        sheet[this.selectIx].draw(ofsX);
+		    	
+		    	if(ofsX == 0 && iForceTouch)
+		    	{
+		        	isTouch = false;
+		    		iForceTouch = false;
+		    		bOldTouch = false;
+		    	}
+				else if(iForceTouch)
+				{
+		        	isTouch = false;
+					bOldTouch = false;
+				}
 			}
-
 			// 合成して描画
 	      	ctx.drawImage(BackImage, 			
 		      	0, 
@@ -302,7 +306,23 @@ var StampSelect = function()
 				190, 
 				101);
 			if(g_eStatus != G_STATUS.MAIN) { return; }
-			if(g_iSwitch == 1)
+	
+			if(g_HaveStampSheetData.length == 0)
+			{
+				// ウィンドウの描画
+				g_WindowsScaleRate += 0.05;
+				if(g_WindowsScaleRate > 1.0) { g_WindowsScaleRate = 1.0; }
+				var id = DrawWindowYesNo(ctx, g_WindowsScaleRate, ((!isTouch) && bOldTouch), sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);	    
+				if(id == 1) 
+				{ 
+				}
+				else if(id == 0)
+				{
+					g_eStatus = G_STATUS.FADEOUT;
+					next = 1;
+				}
+			}
+			else if(g_iSwitch == 1)
 			{
 				// ウィンドウの描画
 				g_WindowsScaleRate += 0.15;
@@ -431,7 +451,6 @@ var StampSelect = function()
 			}
 	        e.preventDefault(); //デフォルトイベント処理をしない
 	    };
-	    
 	    //マウスイベントリスナーの追加
 	    if (navigator.userAgent.indexOf('iPhone')>0 ||
 	        navigator.userAgent.indexOf('iPod')>0 ||
@@ -473,48 +492,22 @@ var StampSelect = function()
 	im.height = 1200;  
 	sceen.appendChild(im);	
 	
-	var iMenuDel =document.createElement('button');
-	iMenuDel.setAttribute('id', 'menu_del');
-	iMenuDel.style.position = "absolute";  
-	iMenuDel.innerHTML = '削除'
- 	iMenuDel.style.top = "50px";
- 	iMenuDel.style.left = "450px";
- 	iMenuDel.style.width = "60px";   
-	iMenuDel.style.height = "60px";  
-	var fd = new Function("DeleteSheetClick();");
- 	iMenuDel.onclick = fd; 
-	sceen.appendChild(iMenuDel);
-	
-	//Back
-//	var nBack = new DivSprite(601,222);
-//	nBack.x=290; nBack.y=120; nBack.z=2;
-//	nBack.src = "img/08_stamp/s_btn_b000.png";
-//	sceen.appendChild(nBack.div);
-	//Yes
-	/*
-	var nYesHandle = new DivSprite(289,146);
-	nYesHandle.x=170; nYesHandle.y=950; nYesHandle.z=2;
-	nYesHandle.src = "img/08_stamp/s_btn_d000.png";
-	nYesHandle.onclick = function(){
-		event.preventDefault();
-		g_eStatus = G_STATUS.FADEOUT;
-		next = 0;
-	};
-	sceen.appendChild(nYesHandle.div);
-	*/
-	/*//No
-	var nNoHandle = new DivSprite(289,146);
-	nNoHandle.x=450; nNoHandle.y=950; nNoHandle.z=2;
-	nNoHandle.src = "img/08_stamp/s_btn_e000.png";
-	nNoHandle.onclick = function(){
-		event.preventDefault();
-		g_eStatus = G_STATUS.FADEOUT;
-		next = 1;
-	};	
-	sceen.appendChild(nNoHandle.div);	*/
+	if(g_HaveStampSheetData.length != 0)
+	{
+		var iMenuDel = document.createElement('button');
+		iMenuDel.setAttribute('id', 'menu_del');
+		iMenuDel.style.position = "absolute";  
+		iMenuDel.innerHTML = '削除'
+	 	iMenuDel.style.top = "50px";
+	 	iMenuDel.style.left = "450px";
+	 	iMenuDel.style.width = "60px";   
+		iMenuDel.style.height = "60px";  
+		var fd = new Function("DeleteSheetClick();");
+	 	iMenuDel.onclick = fd; 
+		sceen.appendChild(iMenuDel);
+	}	
 	var select = load();
 	mainCanvas = new MainCanvas(select);
-	
 	
 
 	//
@@ -530,7 +523,10 @@ var StampSelect = function()
 				if (LoadingCounter <= 0) 
 				{
 					g_eStatus = G_STATUS.FADEIN;
-					mainCanvas.draw();
+					//if(g_HaveStampSheetData.length != 0)
+					{
+						mainCanvas.draw();
+					}
 				}
 				break;
 
@@ -546,29 +542,36 @@ var StampSelect = function()
 
 			//メイン処理
 			case G_STATUS.MAIN:
-
-				// ----------------------------------------------
-				// タイトルへ戻る
-				// ----------------------------------------------
-				if((!isTouch) && bOldTouch)
+				//if(g_HaveStampSheetData.length == 0)
+				//{
+				//	g_eStatus = G_STATUS.FADEOUT;
+				//	next = 1;
+				//}
+				//else
 				{
-					var TitleBackYesX = 0;
-					var TitleBackYesY = 0;
-					var TitleBackYesW = 260;
-					var TitleBackYesH = 101;		
-					if(
-						(TitleBackYesX < sTouchMoveX)  && (TitleBackYesX + TitleBackYesW > sTouchMoveX)  &&
-						(TitleBackYesY < sTouchMoveY)  && (TitleBackYesY + TitleBackYesH > sTouchMoveY)  &&
-						(TitleBackYesX < sTouchStartX) && (TitleBackYesX + TitleBackYesW > sTouchStartX) &&
-						(TitleBackYesY < sTouchStartY) && (TitleBackYesY + TitleBackYesH > sTouchStartY))
-					{	
-						g_eStatus = G_STATUS.FADEOUT;
-						next = 1;
+					// ----------------------------------------------
+					// タイトルへ戻る
+					// ----------------------------------------------
+					if((!isTouch) && bOldTouch)
+					{
+						var TitleBackYesX = 0;
+						var TitleBackYesY = 0;
+						var TitleBackYesW = 260;
+						var TitleBackYesH = 101;		
+						if(
+							(TitleBackYesX < sTouchMoveX)  && (TitleBackYesX + TitleBackYesW > sTouchMoveX)  &&
+							(TitleBackYesY < sTouchMoveY)  && (TitleBackYesY + TitleBackYesH > sTouchMoveY)  &&
+							(TitleBackYesX < sTouchStartX) && (TitleBackYesX + TitleBackYesW > sTouchStartX) &&
+							(TitleBackYesY < sTouchStartY) && (TitleBackYesY + TitleBackYesH > sTouchStartY))
+						{	
+							g_eStatus = G_STATUS.FADEOUT;
+							next = 1;
+						}	
 					}	
+	    			mainCanvas.draw();
+					DispMemory();
+					bOldTouch = isTouch;
 				}
-    			mainCanvas.draw();
-				DispMemory();
-				bOldTouch = isTouch;		
 				break;
 			
 			//フェードアウト
