@@ -206,7 +206,7 @@ var SceenGohanItadaki = function() {
 				if (stFrm==0) {
 					selected = SELECTED.NO_SELECT;
 				} else if (stFrm==10) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					//ぼくといっしょに
 					fuki1.x=320; fuki1.y=144; fuki1.z=2;
 					fuki1.scale = 0;
@@ -220,7 +220,7 @@ var SceenGohanItadaki = function() {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words1.animAlpha = wordsOutAnimAlphaData;
 				} else if (stFrm==8*10) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					//準備はいい？
 					sceen.removeChild(words1.div);
 					fuki1.scale = 0;
@@ -246,7 +246,7 @@ var SceenGohanItadaki = function() {
 				stFrm ++;
 
 				if (selected == SELECTED.YES) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					st = STATUS.JYUNBI_OUT;
 					stFrm = 0;
 				}
@@ -280,7 +280,7 @@ var SceenGohanItadaki = function() {
 					hands.animScale = fukiInAnimScaleData;
 					sceen.appendChild(hands.div);
 				} else if (stFrm == 1*10) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					//かんしゃして
 					fuki1.x=320; fuki1.y=144; fuki1.z=2;
 					fuki1.scale = 0;
@@ -296,7 +296,7 @@ var SceenGohanItadaki = function() {
 					words3.animAlpha = wordsOutAnimAlphaData;
 				} else if (stFrm == 7*10) {
 					sceen.removeChild(words3.div);
-					playSound("sound/se/ok.mp3");
+					playSound("sound/voice/itadakimasu_2.mp3");
 					//いただきます
 					fuki1.scale = 0;
 					fuki1.animScale = fukiInAnimScaleData;
@@ -313,7 +313,7 @@ var SceenGohanItadaki = function() {
 					sceen.removeChild(words4.div);
 					sceen.removeChild(hands.div);
 					//ちゃんとできた？
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					fuki1.scale = 0;
 					fuki1.animScale = fukiInAnimScaleData;
 					words5.x=329; words5.y=131; words5.z=3;
@@ -680,6 +680,7 @@ var SceenGohanItadaki = function() {
 				} else if (stFrm == 8*10) {
 					sceen.removeChild(words21.div);
 					//ごちそうさま
+					playSound("sound/voice/gochisousama_2.mp3");
 					fuki20.scale = 0;
 					fuki20.animScale = fukiInAnimScaleData;
 					words22.x=420; words22.y=155; words22.z=3;
