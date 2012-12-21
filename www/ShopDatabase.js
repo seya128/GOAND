@@ -890,14 +890,20 @@ function DispMemory()
 	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
 
-var g_WindowImageHandle 		= null;
-var g_YesImageHandle 			= null;
-var g_NoImageHandle  			= null;
-var g_YesNoMessageImageHandle	= null;
-var g_WindowsScaleRate			= 1.0;
+var g_WindowImageHandle 			= null;
+var g_YesImageHandle 				= null;
+var g_NoImageHandle  				= null;
+var g_YesNoMessageImageHandle		= null;
+var g_WindowsScaleRate				= 1.0;
 var g_iSwitch = 0;
 var g_eStatus = 0;
 
+// スタンプメイン画面
+var g_StampMainWindowImageHandle	= null;
+var g_StampMainKesuImageHandle		= null;
+var g_StampMainEndImageHandle		= null;
+var g_StampMainBackImageHandle		= null;
+var g_StampMainMenuImageHandle		= null;
 /*
 var g_bOldTouch					= false;
 var g_sTouchStartX 				= -200;
@@ -942,13 +948,120 @@ function LoadWindowYesNo()
 	// いいえ
 	g_NoImageHandle				= new Image();
     g_NoImageHandle.src = "img/07_shop/k_btn_b.png";
+	// スタンプメイン
+	g_StampMainWindowImageHandle		= new Image();
+    g_StampMainWindowImageHandle.src 	= "img/08_stamp/s_wak_a000.png";	
+	g_StampMainKesuImageHandle			= new Image();
+    g_StampMainKesuImageHandle.src 		= "img/08_stamp/s_btn_a000.png";	
+	g_StampMainEndImageHandle			= new Image();
+    g_StampMainEndImageHandle.src 		= "img/08_stamp/s_btn_b000.png";	
+	g_StampMainBackImageHandle			= new Image();
+    g_StampMainBackImageHandle.src 		= "img/08_stamp/s_btn_c000.png";	
+	// メニュー
+	g_StampMainMenuImageHandle			= new Image();
+    g_StampMainMenuImageHandle.src 		= "img/08_stamp/s_btn_e000.png";		
+
 }
 function DeleteWindowYesNo()
 {
-	g_WindowImageHandle 		= null;
-	g_YesImageHandle 			= null;
-	g_NoImageHandle  			= null;
-	g_YesNoMessageImageHandle	= null;	
+	g_WindowImageHandle 			= null;
+	g_YesImageHandle 				= null;
+	g_NoImageHandle  				= null;
+	g_YesNoMessageImageHandle		= null;	
+	g_StampMainWindowImageHandle	= null;
+	g_StampMainKesuImageHandle		= null;
+	g_StampMainEndImageHandle		= null;
+	g_StampMainBackImageHandle		= null;
+	g_StampMainMenuImageHandle		= null;
+}
+
+
+// メニュー
+function DrawMenu(ctx, bTrigger, sTouchStartX, sTouchStartY,
+								 sTouchMoveX,  sTouchMoveY)
+{
+	var PosYesX = 495;
+	var PosYesY = 0;
+	var PosYesW = 122;
+	var PosYesH = 160;
+	ctx.drawImage(g_StampMainMenuImageHandle,  PosYesX, PosYesY,  PosYesW,  PosYesH);
+	
+	if(bTrigger)
+	{
+		if(
+			(PosYesX < sTouchStartX) && (PosYesX + PosYesW > sTouchStartX) &&
+			(PosYesY < sTouchStartY) && (PosYesY + PosYesH > sTouchStartY) &&
+			(PosYesX < sTouchMoveX) && (PosYesX + PosYesW > sTouchMoveX)   &&
+			(PosYesY < sTouchMoveY) && (PosYesY + PosYesH > sTouchMoveY)) { return 0; }
+	}
+	return -1;
+}
+
+function DrawStampWindow(ctx, sScaleRate, bTrigger,
+									sTouchStartX, sTouchStartY,
+									sTouchMoveX, sTouchMoveY)
+{
+	DrawBack(ctx);
+	
+	var GPosY = (1.0 - sScaleRate) * -64;
+
+	ctx.globalAlpha = sScaleRate;
+	ctx.drawImage(g_StampMainWindowImageHandle, 
+		25, 
+		GPosY + 100, 
+		590, 
+		570);
+	
+	// ---------------------------------------------------
+	// YesNo
+	// ---------------------------------------------------
+	var PosYesX = 85;
+	var PosYesY = GPosY + 270;
+	var PosYesW = 480;
+	var PosYesH = 170;
+	var PosNoX  = 85;
+	var PosNoY  = GPosY + 450;
+	var PosNoW  = 480;
+	var PosNoH  = 170;
+	var PosBackX  = 470;
+	var PosBackY  = GPosY + 140;
+	var PosBackW  = 123;
+	var PosBackH  = 123;
+	ctx.globalAlpha = sScaleRate;
+	ctx.drawImage(g_StampMainKesuImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
+	ctx.drawImage(g_StampMainEndImageHandle,   PosNoX, PosNoY,  PosNoW,  PosNoH);
+	ctx.drawImage(g_StampMainBackImageHandle,   PosBackX, PosBackY,  PosBackW,  PosBackH);
+		
+	// ---------------------------------------------------
+	// アルファブレンド計算
+	// ---------------------------------------------------
+	ctx.globalAlpha = 1.0;
+	sScaleRate += 0.15;
+	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
+	
+	// ---------------------------------------------------
+	// クリックイベント
+	// ---------------------------------------------------
+	if(sScaleRate >= 1.0 && bTrigger)
+	{
+		if(
+			(PosYesX < sTouchStartX) && (PosYesX + PosYesW > sTouchStartX) &&
+			(PosYesY < sTouchStartY) && (PosYesY + PosYesH > sTouchStartY) &&
+			(PosYesX < sTouchMoveX) && (PosYesX + PosYesW > sTouchMoveX)   &&
+			(PosYesY < sTouchMoveY) && (PosYesY + PosYesH > sTouchMoveY)) { return 0; }
+			
+		if(
+			(PosNoX < sTouchStartX) && (PosNoX + PosNoW > sTouchStartX) &&
+			(PosNoY < sTouchStartY) && (PosNoY + PosNoH > sTouchStartY) &&
+			(PosNoX < sTouchMoveX) && (PosNoX + PosNoW > sTouchMoveX)   &&
+ 			(PosNoY < sTouchMoveY) && (PosNoY + PosNoH > sTouchMoveY)) { return 1; }
+		if(
+			(PosBackX < sTouchStartX) && (PosBackX + PosBackW > sTouchStartX) &&
+			(PosBackY < sTouchStartY) && (PosBackY + PosBackH > sTouchStartY) &&
+			(PosBackX < sTouchMoveX) && (PosBackX + PosBackW > sTouchMoveX)   &&
+ 			(PosBackY < sTouchMoveY) && (PosBackY + PosBackH > sTouchMoveY)) { return 2; }
+	}
+	return -1;
 }
 
 function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
