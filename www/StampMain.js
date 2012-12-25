@@ -503,6 +503,9 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y)
    // ctx.globalAlpha = a;
 	//ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMP_H/2, STAMP_W,STAMP_H);
    // ctx.globalAlpha = 1.0;
+    ctx.globalAlpha = a;
+	ctx.drawImage(GetStampGraphicHandle_StampImage(s.id), x - STAMP_W / 2, y - STAMP_H / 2, STAMP_W, STAMP_H);
+    ctx.globalAlpha = 1.0;
 	
 	var vData = AddScaleZoomEffect(stamp_ctx, GetStampGraphicHandle_StampImage(s.id), 
 						x - STAMP_W / 2,
