@@ -38,8 +38,8 @@
             d("Android is detected");
             params = common.merge(defaultParams, params);
 
-//            document.write('<meta name="viewport" content="width=device-width,target-densitydpi=device-dpi,user-scalable=no" />');
-            document.write('<meta name="viewport" content="width=device-width,target-densitydpi=device-dpi" />');
+            document.write('<meta name="viewport" content="width=device-width,target-densitydpi=device-dpi,user-scalable=no" />');
+//            document.write('<meta name="viewport" content="width=device-width,target-densitydpi=device-dpi" />');
 
             common.viewport.adjust = function() {
                 var scale = window.innerWidth / params.width;
