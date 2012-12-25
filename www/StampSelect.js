@@ -300,12 +300,15 @@ var StampSelect = function()
 				0, 
 				190, 
 				101);
-			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
-			
+			// 矢印を描画
 			ProcArrow();
 			DrawArrowL(ctx, 60,  450, 40);
 			DrawArrowR(ctx, 580, 450, 40);
 		
+			
+			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
+			
+
 			// ------------------------------------------------
 			// シートが０の時の描画
 			// ------------------------------------------------

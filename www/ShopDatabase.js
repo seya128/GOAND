@@ -1223,8 +1223,8 @@ function PuchArrowR()
 }
 function DrawArrowL(ctx, x, y, size)
 {
-	ctx.globalAlpha = 0.8 + (-g_nArrowCounterL * 0.05);
-	ctx.fillStyle = 'rgb(128, 0, 128)';
+	ctx.globalAlpha = 0.75 + (-g_nArrowCounterL * 0.05);
+	ctx.fillStyle = 'rgb(255, 0, 128)';
 	ctx.beginPath();
 	x -= (g_nArrowCounterL * 3);
 	ctx.moveTo(x, y);
@@ -1236,8 +1236,8 @@ function DrawArrowL(ctx, x, y, size)
 }
 function DrawArrowR(ctx, x, y, size)
 {
-	ctx.globalAlpha = 0.8 + (-g_nArrowCounterR * 0.05);
-	ctx.fillStyle = 'rgb(128, 0, 128)';
+	ctx.globalAlpha = 0.75 + (-g_nArrowCounterR * 0.05);
+	ctx.fillStyle = 'rgb(255, 0, 128)';
 	ctx.beginPath();
 	x += (g_nArrowCounterR * 3);
 	ctx.moveTo(x, y);
@@ -1495,6 +1495,34 @@ function AddScaleZoomEffect(ctx, image, x, y, w, h, a)
 	g_sEffectObject[no] = new GEffectData();
 	g_sEffectObject[no].SetScaleZoomEffect(ctx, image, x, y, w, h, a);
 	return g_sEffectObject[no];
+}
+
+// 耐久値の表示
+function DrawHp(ctx, x, y, hp)
+{
+	//x += (g_nArrowCounterR * 3);
+	hp *= 3;
+	
+	// 枠
+	ctx.globalAlpha = 1.0;	
+	ctx.fillStyle = 'rgb(255, 255, 255)';
+	ctx.beginPath();
+	ctx.moveTo(x - 1, y - 5);
+	ctx.lineTo(x + 90, y - 5);
+	ctx.lineTo(x + 90, y + 5);
+	ctx.lineTo(x - 1, y + 5);
+	ctx.closePath();
+	ctx.fill();
+	// 中
+	ctx.fillStyle = 'rgb(255, 0, 128)';
+	ctx.beginPath();
+	ctx.moveTo(x, y - 4);
+	ctx.lineTo(x + hp, y - 4);
+	ctx.lineTo(x + hp, y + 4);
+	ctx.lineTo(x, y + 4);
+	ctx.closePath();
+	ctx.fill();
+	ctx.globalAlpha = 1.0;		
 }
 
 
