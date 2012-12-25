@@ -206,7 +206,7 @@ var SceenGohanItadaki = function() {
 				if (stFrm==0) {
 					selected = SELECTED.NO_SELECT;
 				} else if (stFrm==10) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					//ぼくといっしょに
 					fuki1.x=320; fuki1.y=144; fuki1.z=2;
 					fuki1.scale = 0;
@@ -220,7 +220,7 @@ var SceenGohanItadaki = function() {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words1.animAlpha = wordsOutAnimAlphaData;
 				} else if (stFrm==8*10) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					//準備はいい？
 					sceen.removeChild(words1.div);
 					fuki1.scale = 0;
@@ -246,7 +246,7 @@ var SceenGohanItadaki = function() {
 				stFrm ++;
 
 				if (selected == SELECTED.YES) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					st = STATUS.JYUNBI_OUT;
 					stFrm = 0;
 				}
@@ -278,9 +278,10 @@ var SceenGohanItadaki = function() {
 					hands.x=147; hands.y=460; hands.z=2;
 					hands.scale = 0;
 					hands.animScale = fukiInAnimScaleData;
+					hands.frame = 0;
 					sceen.appendChild(hands.div);
 				} else if (stFrm == 1*10) {
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					//かんしゃして
 					fuki1.x=320; fuki1.y=144; fuki1.z=2;
 					fuki1.scale = 0;
@@ -296,7 +297,7 @@ var SceenGohanItadaki = function() {
 					words3.animAlpha = wordsOutAnimAlphaData;
 				} else if (stFrm == 7*10) {
 					sceen.removeChild(words3.div);
-					playSound("sound/se/ok.mp3");
+					playSound("sound/voice/itadakimasu_2.mp3");
 					//いただきます
 					fuki1.scale = 0;
 					fuki1.animScale = fukiInAnimScaleData;
@@ -306,6 +307,7 @@ var SceenGohanItadaki = function() {
 					words4.scale = 1;
 					sceen.appendChild(words4.div);
 					chara.anim = [3,100];
+					hands.frame = 1;
 				} else if (stFrm == 12*10) {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words4.animAlpha = wordsOutAnimAlphaData;
@@ -313,7 +315,7 @@ var SceenGohanItadaki = function() {
 					sceen.removeChild(words4.div);
 					sceen.removeChild(hands.div);
 					//ちゃんとできた？
-					playSound("sound/se/ok.mp3");
+//					playSound("sound/se/ok.mp3");
 					fuki1.scale = 0;
 					fuki1.animScale = fukiInAnimScaleData;
 					words5.x=329; words5.y=131; words5.z=3;
@@ -659,7 +661,7 @@ var SceenGohanItadaki = function() {
 					hands.animAlpha = null;
 					hands.scale = 0;
 					hands.animScale = fukiInAnimScaleData;
-					hands.anim = [0,100];
+					hands.frame = 0;
 					sceen.appendChild(hands.div);
 				} else if (stFrm == 1*10) {
 					fuki20.x=412; fuki20.y=148; fuki20.z=2;
@@ -680,12 +682,14 @@ var SceenGohanItadaki = function() {
 				} else if (stFrm == 8*10) {
 					sceen.removeChild(words21.div);
 					//ごちそうさま
+					playSound("sound/voice/gochisousama_2.mp3");
 					fuki20.scale = 0;
 					fuki20.animScale = fukiInAnimScaleData;
 					words22.x=420; words22.y=155; words22.z=3;
 					words22.alpha = 0;
 					words22.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words22.div);
+					hands.frame = 1;
 					chara.anim = [3,100];
 					megami.anim = [3,100];
 				} else if (stFrm == 13*10) {
