@@ -28,59 +28,34 @@ var SceenTitle = function() {
 	rootSceen.appendChild(sceen);
 	sceen.style.opacity = alpha;
 	
+	var animSprites = [];		//アニメーション処理呼び出しスプライト
+	
 	//BG
 	var bg = new DivSprite(640,1138);
 	bg.basePos={x:0, y:0};
 	bg.x=0; bg.y=0; bg.z=0;
-	bg.src = "img/title/h_h00_bgd_a/h_h00_bgd_a_00000.png";
+	bg.src = "img/01_title/t_bgd_a.png";
 	sceen.appendChild(bg.div);
 	
 	//ロゴ
-	var logo = new DivSprite(445,186);
-	logo.x=90+(445/2); logo.y=180+(186/2); logo.z=3;
-	logo.src = "img/title/t_rgo_a000.png";
+	var logo = new DivSprite(344,89);
+	logo.x=90+(445/2); logo.y=180+(186/2); logo.z=5;
+	logo.src = "img/01_title/t_rgo_a000.png";
+	logo.alpha = 0;
+	logo.animAlpha = [0,10, 1,4, 1,-1];
+	logo.scale = 2;
+	logo.animScale = [2,10, 1,4, 1.1,1, 1,1, 1.05,1, 1,-1];
 	sceen.appendChild(logo.div);
+	animSprites.push(logo);
 	
 	//女神
-	var megami = new DivSprite(316,452);
-	megami.x=160+(316/2); megami.y=-20+(452/2); megami.z=2;
-	megami.src = "img/title/t_meg_a/t_meg_a_00000.png";
+	var megami = new DivSprite(150,432);
+	megami.x=320; megami.y=166; megami.z=2;
+	megami.src = "img/01_title/t_bgd_a000.png";
+	megami.anim = [0,40, 1,40];
 	sceen.appendChild(megami.div);
-	
-	
-/*	 <img id="nasu" src="img/title/t_nas_a/t_nas_a_00000.png"></img>
-     <img id="ninjin" src="img/title/t_nin_a/t_nin_a_00000.png"></img>
-     <img id="piman" src="img/title/t_pii_a/t_pii_a_00000.png"></img>
-     <img id="tomato" src="img/title/t_tom_a/t_tom_a_00000.png"></img>
-*/
-
-	//ごはん
-	var gohan = new DivSprite(266,228);
-	gohan.x=20+(266/2); gohan.y=420+(228/2); gohan.z=2;
-	gohan.src = "img/title/t_btn_a000.png";
-	gohan.onclick = function(){
-		event.preventDefault();
-		next = NEXT.GOHAN;
-	};
-	sceen.appendChild(gohan.div);
-	
-	//スタンプ
-	var stamp = new DivSprite(258,224);
-	stamp.x=360+(258/2); stamp.y=420+(224/2); stamp.z=2;
-	stamp.src = "img/title/t_btn_b000.png";
-	stamp.onclick = function() {
-		event.preventDefault();
-		//document.location="StampSelect.html";	
-		next = NEXT.STAMP;	
-	};
-	sceen.appendChild(stamp.div);
-	
-	
-	//あそびかた
-	var help = new DivSprite(220,194);
-	help.x=40+(220/2); help.y=650+(194/2); help.z=2;
-	help.src = "img/title/t_btn_c000.png";
-	help.onclick = function(){
+	animSprites.push(megami);
+	megami.onclick = function(){
 		event.preventDefault();
 		window.localStorage.removeItem("CntGochi");
 		window.localStorage.removeItem("CntCoin");
@@ -93,17 +68,71 @@ var SceenTitle = function() {
 		DummyStampDataSet();
 		alert("ごちそうさました回数、スタンプデータをリセットしました。");
 	};
-	sceen.appendChild(help.div);
+	
+	//キャラクター
+	var charaData=[
+		{x:190,	y:180,	scale:0.95,	rot:-23,	anim:[ 1,20,  0,2,  1,2,  0,2]	},	//ピーマン
+		{x:578,	y:185,	scale:0.95,	rot:0,		anim:[ 3,40,  2,2,  3,2,  2,2]	},	//なす
+		{x:482,	y:58,	scale:0.95,	rot:5,		anim:[ 5,26,  4,2,  5,2,  4,2]	},	//トマト
+		{x:73,	y:331,	scale:0.95,	rot:-24,	anim:[ 7,18,  6,2,  7,2,  6,2]	},	//にく
+		{x:571,	y:340,	scale:0.95,	rot:12,		anim:[ 9,23,  8,2,  9,2,  8,2]	},	//しいたけ
+		{x:184,	y:59,	scale:0.95,	rot:15,		anim:[11,30, 10,2, 11,2, 10,2]	},	//たまねぎ
+		{x:459,	y:190,	scale:0.95,	rot:13,		anim:[13,28, 12,2, 13,2, 12,2]	},	//にんじん
+		{x:65,	y:183,	scale:0.95,	rot:0,		anim:[15,32, 14,2, 15,2, 14,2]	},	//さかな
+	];
+	
+	var chara = {};
+	
+	for (var i=0; i<charaData.length; i++) {
+		chara[i] = new DivSprite(2704/16,180);
+		chara[i].src = "img/00_common/k_zen_a.png"
+		chara[i].x = charaData[i].x;
+		chara[i].y = charaData[i].y;
+		chara[i].z = 3;
+		chara[i].scale = charaData[i].scale;
+		chara[i].anim = charaData[i].anim;
+		chara[i].alpha = 1;
+		chara[i].rotate = charaData[i].rot;
+		sceen.appendChild(chara[i].div);
+		animSprites.push(chara[i]);
+	}
+	
+	
+	//ごはん
+	var gohan = new DivSprite(286,238);
+	gohan.x=150; gohan.y=541; gohan.z=2;
+	gohan.src = "img/01_title/t_btn_a000.png";
+	gohan.animScale = [1,10, 1.1,2, 1,2, 1,10, 1,10];
+	gohan.onclick = function(){
+		event.preventDefault();
+		next = NEXT.GOHAN;
+	};
+	sceen.appendChild(gohan.div);
+	animSprites.push(gohan);
+	
+	//スタンプ
+	var stamp = new DivSprite(286,238);
+	stamp.x=490; stamp.y=541; stamp.z=2;
+	stamp.src = "img/01_title/t_btn_b000.png";
+	stamp.animScale = [1,10, 1,10, 1.1,2, 1,2, 1,10];
+	stamp.onclick = function(){
+		event.preventDefault();
+		next = NEXT.STAMP;
+	};
+	sceen.appendChild(stamp.div);
+	animSprites.push(stamp);
 	
 	//ショップ
-	var shop = new DivSprite(220,196);
-	shop.x=360+(220/2); shop.y=650+(196/2); shop.z=2;
-	shop.src = "img/title/t_btn_d000.png";
-	shop.onclick = function() {
+	var shop = new DivSprite(286,238);
+	shop.x=320; shop.y=722; shop.z=2;
+	shop.src = "img/01_title/t_btn_d000.png";
+	shop.animScale = [1,10, 1,10, 1,10, 1.1,2, 1,2];
+	shop.onclick = function(){
 		event.preventDefault();
 		next = NEXT.SHOP;
 	};
 	sceen.appendChild(shop.div);
+	animSprites.push(shop);
 	
 	// コインのロード処理
 	LoadCoin();
@@ -197,6 +226,12 @@ var SceenTitle = function() {
 				}
 				break;
 		}
+		
+		if (st != STATUS.END) {
+			//アニメーション処理
+			animSprites.forEach(function(s){ s.animExec(); });
+		}
+		
 	};
 	
 };

@@ -76,6 +76,7 @@ var DivSprite = function(w,h) {
 	this._basePos = {x:w/2,y:h/2};
 	this._scale = 1;
 	this._alpha = 1;
+	this,_rotate = 0;
 	this._anim = null;
 	this._animScale = null;
 	this._animPos = null;
@@ -134,6 +135,12 @@ DivSprite.prototype = {
 	set alpha(a) {
 		this._alpha = a;
 		this.div.style.opacity = a;
+	},
+	//rotate 回転角
+	get rotate() { return this._rotate; },
+	set rotate(a) {
+		this._rotate = a;
+		this.div.style.webkitTransform = 'rotate('+a+'deg)';
 	},
 	//src
 	set src(a) {
