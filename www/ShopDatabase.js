@@ -1203,6 +1203,51 @@ function DrawBack(ctx)
 	ctx.globalAlpha = 1.0;
 }
 
+var g_nArrowCounterL = 0;
+var g_nArrowCounterR = 0;
+
+function ProcArrow()
+{
+	g_nArrowCounterL --;
+	if(g_nArrowCounterL < 0) { g_nArrowCounterL = 0; }
+	g_nArrowCounterR --;
+	if(g_nArrowCounterR < 0) { g_nArrowCounterR = 0; }
+}
+function PuchArrowL()
+{
+	g_nArrowCounterL = 10;
+}
+function PuchArrowR()
+{
+	g_nArrowCounterR = 10;
+}
+function DrawArrowL(ctx, x, y, size)
+{
+	ctx.globalAlpha = 0.8 + (-g_nArrowCounterL * 0.05);
+	ctx.fillStyle = 'rgb(128, 0, 128)';
+	ctx.beginPath();
+	x -= (g_nArrowCounterL * 3);
+	ctx.moveTo(x, y);
+	ctx.lineTo(x + size, y - size);
+	ctx.lineTo(x + size, y + size);
+	ctx.closePath();
+	ctx.fill();
+	ctx.globalAlpha = 1.0;	
+}
+function DrawArrowR(ctx, x, y, size)
+{
+	ctx.globalAlpha = 0.8 + (-g_nArrowCounterR * 0.05);
+	ctx.fillStyle = 'rgb(128, 0, 128)';
+	ctx.beginPath();
+	x += (g_nArrowCounterR * 3);
+	ctx.moveTo(x, y);
+	ctx.lineTo(x - size, y - size);
+	ctx.lineTo(x - size, y + size);
+	ctx.closePath();
+	ctx.fill();
+	ctx.globalAlpha = 1.0;	
+}
+
 var G_EFFECT_STATUS = 
 {
 	SCALE_ZOOM:	0,
@@ -1428,6 +1473,8 @@ GEffectData.prototype.Exec = function()
 function GSetupEffect()
 {
 	g_sEffectObject = new Array();
+	g_nArrowCounterL = 0;
+	g_nArrowCounterR = 0;
 }
 function GGetEffectNum() { return g_sEffectObject.length; }
 
