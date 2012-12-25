@@ -78,7 +78,7 @@ var SBarsTouchMoveY 	= -200;
 var NUM_STAMPBAR_W = 5+2;   //スタンプバーが表示用に管理するスタンプの数
 
 function StampBar(ofs) {
-    this.offset = ofs;                      //オフセット座標
+    this.offset    = ofs;                      //オフセット座標
     this.offsetAdd = 0;
  //   this.stamp = Array(NUM_STAMPBAR_W);     //スタンプオブジェクト
 
@@ -226,14 +226,17 @@ StampBar.prototype.draw = function(){
         var s = getHasStampData(id);
 		{
 			//バック
-			if (id == this.selectedStampId) {
+			if (id == this.selectedStampId) 
+			{
 		        this.ctx.fillStyle = 'rgb(255, 0, 0)';
 		        this.ctx.fillRect(x+0, 0, STAMP_W-0, STAMP_H-0);
 		        this.ctx.fillStyle = 'rgb(0, 0, 0)';
 		        this.ctx.fillRect(x+8, 8, STAMP_W-8*2, STAMP_H-8*2);
 		        this.selectedStampIx = ix;
 				this.iSelectedX      = x;
-			} else {
+			} 
+			else 
+			{
 		        this.ctx.fillStyle = 'rgb(0, 0, 0)';
 		        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMP_H-4);
 	    	}
@@ -248,6 +251,9 @@ StampBar.prototype.draw = function(){
 	      //  this.ctx.drawImage(this.stamp[ix].img, x,0, STAMP_W,STAMP_H);
 			this.ctx.drawImage(GetStampGraphicHandle_StampImage(s.id), x, 0, STAMP_W, STAMP_H);
 	        this.ctx.globalAlpha = 1.0;
+			
+			// HP
+		//	DrawHp(this.ctx, x + 35, 140, s.ink);
         }
         x += STAMP_W;
         ix ++;
@@ -256,6 +262,26 @@ StampBar.prototype.draw = function(){
 		//if(id >= g_HaveStampImageData.length) { break; }
         //id %= g_HaveStampImageData.length;
     }
+	// 矢印を描画
+	ProcArrow();
+	if(g_HaveStampImageData.length <= 3)
+	{
+	}
+	else if(this.offset <= 0)
+	{
+		//DrawArrowL(this.ctx, 30,  80, 30);
+		DrawArrowR(this.ctx, 470, 125, 26);
+	}
+	else if(this.offset >= (g_HaveStampImageData.length - 3) * STAMP_W)
+	{
+		DrawArrowL(this.ctx, 30,  125, 26);
+		//DrawArrowR(this.ctx, 470, 80, 30);
+	}
+	else
+	{
+		DrawArrowL(this.ctx, 30,  125, 26);	
+		DrawArrowR(this.ctx, 470, 125, 26);
+	}
 };
 
 //タッチイベントリスナーの追加
@@ -785,7 +811,7 @@ var StampMain = function()
 */
 
     canvas_Init();
-    stampBar = new StampBar(3);	
+    stampBar = new StampBar(0);	
 	g_iSwitch = 0;
 	g_eStatus = G_STATUS.INIT;
 	var next;
