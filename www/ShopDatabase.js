@@ -73,14 +73,15 @@ var gStampEnum =
 	EDAMAME:	116,				// 枝豆
 	TOMATO:		117,				// トマト
 	// 神様
-	KAMI_NASU:		118,			// ナスの神様
-	KAMI_NIKU:		119,			// 肉の神様
-	KAMI_NINZIN:	120,			// 人参の神様
-	KAMI_PIMAN:		121,			// ピーマンの神様
-	KAMI_SAKANA:	122,			// 魚の神様
+	KAMI_PIMAN:		118,			// ピーマンの神様
+	KAMI_NASU:		119,			// ナスの神様
+	KAMI_TOMATO:	120,			// トマトの神様	
+	KAMI_NINZIN:	121,			// 人参の神様
+	KAMI_TAMANEGI:	122,			// 玉ねぎの神様	
 	KAMI_SIITAKE:	123,			// シイタケの神様
-	KAMI_TAMANEGI:	124,			// 玉ねぎの神様
-	KAMI_TOMATO:	125,			// トマトの神様
+	KAMI_SAKANA:	124,			// 魚の神様
+	KAMI_NIKU:		125,			// 肉の神様
+
 	// 真子様
 	SIN_BAMU:		126,			// バーム
 	SIN_CHOCO:		127,			// チョコ
@@ -150,14 +151,15 @@ var gStampImgFileName =
     "img/08_stamp/s_s02_sta_a/s_s02_sta_h000.png",
     "img/08_stamp/s_s02_sta_a/s_s02_sta_i000.png",
     // 神様
-    "img/08_stamp/s_s04_sta_a/s_s04_sta_nas.png",
-    "img/08_stamp/s_s04_sta_a/s_s04_sta_nik.png",
-    "img/08_stamp/s_s04_sta_a/s_s04_sta_nin.png",
     "img/08_stamp/s_s04_sta_a/s_s04_sta_pii.png",
-    "img/08_stamp/s_s04_sta_a/s_s04_sta_sak.png",
-    "img/08_stamp/s_s04_sta_a/s_s04_sta_sii.png",
-    "img/08_stamp/s_s04_sta_a/s_s04_sta_tam.png",
+    "img/08_stamp/s_s04_sta_a/s_s04_sta_nas.png",
     "img/08_stamp/s_s04_sta_a/s_s04_sta_tom.png",
+    "img/08_stamp/s_s04_sta_a/s_s04_sta_nin.png",
+    "img/08_stamp/s_s04_sta_a/s_s04_sta_tam.png",
+    "img/08_stamp/s_s04_sta_a/s_s04_sta_sii.png",
+    "img/08_stamp/s_s04_sta_a/s_s04_sta_sak.png",
+    "img/08_stamp/s_s04_sta_a/s_s04_sta_nik.png",
+
     // シンコ様
     "img/08_stamp/s_s05_sta_a/s_s05_sta_a000.png",
     "img/08_stamp/s_s05_sta_a/s_s05_sta_b000.png",
@@ -259,18 +261,16 @@ var gShopBuyListTable =
     { "id":gStampEnum.NIMO,		"gold":50 },	// ニモ
   */     
     // 神様
+	{ "id":gStampEnum.KAMI_PIMAN,		"gold":2 },	// ピーマンの神様   
     { "id":gStampEnum.KAMI_NASU,		"gold":2 },	// ナスの神様
-    { "id":gStampEnum.KAMI_NIKU,		"gold":2 },	// 肉の神様
+    { "id":gStampEnum.KAMI_TOMATO,		"gold":2 },	// トマトの神様 
     { "id":gStampEnum.KAMI_NINZIN,		"gold":2 },	// 人参の神様
-    { "id":gStampEnum.KAMI_PIMAN,		"gold":2 },	// ピーマンの神様
-    { "id":gStampEnum.KAMI_SAKANA,		"gold":2 },	// 魚の神様
+    { "id":gStampEnum.KAMI_TAMANEGI,	"gold":2 },	// 玉ねぎの神様     
     { "id":gStampEnum.KAMI_SIITAKE,		"gold":2 },	// シイタケの神様
-    { "id":gStampEnum.KAMI_TAMANEGI,	"gold":2 },	// 玉ねぎの神様
-    { "id":gStampEnum.KAMI_TOMATO,		"gold":2 },	// トマトの神様
- 
-
-    
+    { "id":gStampEnum.KAMI_SAKANA,		"gold":2 },	// 魚の神様
+    { "id":gStampEnum.KAMI_NIKU,		"gold":2 },	// 肉の神様
 ];
+
 var M_MAX_BUY_LIST = gShopBuyListTable.length;
 function GetMaxBuyScl()
 {
@@ -552,7 +552,7 @@ function AllDeleteStampDrawData()
 // ------------------------------------------------------
 // コイン
 // ------------------------------------------------------
-var g_DefaultCoin 	= 255;
+var g_DefaultCoin 	= 30;
 var g_Coin 			= g_DefaultCoin;
 function SetCoin(coin)
 {
@@ -639,13 +639,13 @@ function DummyStampDataSet()
 	// 複数追加
 	AllDelHasStamp();
 	
-/*
-	全データセット
-	for(var i = 0; i < M_MAX_STAMP; i ++)
-	{
-		AddHasStamp(i, STAMP_LIFE_MAX);
-	}
-*/
+
+	// 全データセット
+//	for(var i = 0; i < M_MAX_STAMP; i ++)
+//	{
+//		AddHasStamp(i, 2);
+//	}
+
 	// 必要なもの[ぴーまん、にんじん、とまと、なす]
 	AddHasStamp(gStampEnum.KAMI_PIMAN  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	AddHasStamp(gStampEnum.KAMI_NINZIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
@@ -899,11 +899,12 @@ var g_iSwitch = 0;
 var g_eStatus = 0;
 
 // スタンプメイン画面
-var g_StampMainWindowImageHandle	= null;
-var g_StampMainKesuImageHandle		= null;
-var g_StampMainEndImageHandle		= null;
-var g_StampMainBackImageHandle		= null;
-var g_StampMainMenuImageHandle		= null;
+var g_StampMainWindowImageHandle		= null;
+var g_StampMainKesuImageHandle			= null;
+var g_StampMainEndImageHandle			= null;
+var g_StampMainBackImageHandle			= null;
+var g_StampMainMenuImageHandle			= null;
+var g_SheetDeleteMessageImageHandle		= null;
 /*
 var g_bOldTouch					= false;
 var g_sTouchStartX 				= -200;
@@ -960,7 +961,9 @@ function LoadWindowYesNo()
 	// メニュー
 	g_StampMainMenuImageHandle			= new Image();
     g_StampMainMenuImageHandle.src 		= "img/08_stamp/s_btn_e000.png";		
-
+	// 本当に消す？
+	g_SheetDeleteMessageImageHandle			= new Image();
+    g_SheetDeleteMessageImageHandle.src 	= "img/08_stamp/s_txt_d000.png";		
 }
 function DeleteWindowYesNo()
 {
@@ -1070,7 +1073,7 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = (1.0 - sScaleRate) * -64;
+	var GPosY = ((1.0 - sScaleRate) * -64) - 120;
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -1078,9 +1081,9 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 		GPosY + 214, 
 		460, 
 		440);
-	ctx.drawImage(g_YesNoMessageImageHandle, 
+	ctx.drawImage(g_SheetDeleteMessageImageHandle, 
 		128, 
-		GPosY + 380, 
+		GPosY + 370, 
 		386, 
 		162);
 	
@@ -1188,6 +1191,7 @@ function DrawBack(ctx)
 var G_EFFECT_STATUS = 
 {
 	SCALE_ZOOM:	0,
+	SCALE_FADE_ZOOM:	1,
 };
 var G_EFFECT_WORK = 
 {
@@ -1239,76 +1243,168 @@ GEffectData.prototype.SetScaleZoomEffect = function(ctx, image, x, y, w, h, a)
 	this.nVal2			= 0;
 	this.nVal3			= 0;
 	this.nVal4			= 0;
+	this.nCrsW			= 640;
+	this.nCrsH			= 1200;
+	this.nCrsFlg		= true;	
 };
 // データ追加
 GEffectData.prototype.Exec = function()
 {
-	if(this.nWork == G_EFFECT_WORK.A)
+	if(this.nStatus == G_EFFECT_STATUS.SCALE_ZOOM)
 	{
-		if(this.nNowTime < this.nMaxTime)
-		{	
-			this.nNowTime ++;
-			this.nCount += 1;
-		//	this.nWA    -= 0.2;
-			
-			// 描画
-			var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-			var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				
-		//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
-		//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
-	        this.sCtx.globalAlpha = 1.0;
-	        //this.sCtx.clearRect(0, 0, 640, 1200);
-	        this.sCtx.clearRect(this.nX - (vTargetW / 2) + this.nW / 2, 
-	 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
-	        this.sCtx.globalAlpha = this.nA;
-	        this.sCtx.drawImage(this.sImage, 
-								 this.nX - (vTargetW / 2) + this.nW / 2, 
-	 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
-	        this.sCtx.globalAlpha = 1.0;
-		}
-		else
+		if(this.nWork == G_EFFECT_WORK.A)
 		{
-			//this.bEnd = true;
-			//this.sCtx.clearRect(0, 0, 640, 1200);
-			////if(this.EndCallBack != null) { this.EndCallBack(this); }
-			//return false;
-			this.nWork 		= G_EFFECT_WORK.B;
-			this.nNowTime  	= 0;
+			if(this.nNowTime < this.nMaxTime)
+			{	
+				this.nNowTime ++;
+				this.nCount += 1;
+			//	this.nWA    -= 0.2;
+				
+				// 描画
+				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+					
+			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
+			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
+		        this.sCtx.globalAlpha = 1.0;
+				
+				if(this.nCrsFlg)
+				{
+		        	this.sCtx.clearRect (this.nX - (vTargetW / 2) + this.nW / 2, 
+		 								 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+				}
+		        this.sCtx.globalAlpha = this.nA;
+		        this.sCtx.drawImage(this.sImage, 
+									 this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        this.sCtx.globalAlpha = 1.0;
+			}
+			else
+			{
+				this.bEnd = true;
+				if(this.nCrsW != 0 && this.nCrsW != 0)
+				{
+					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
+				}
+				if(this.EndCallBack != null) { this.EndCallBack(this); }
+				return false;
+				/*
+				this.nWork 		= G_EFFECT_WORK.B;
+				this.nNowTime  	= 0;*/
+			}
 		}
+		/*
+		if(this.nWork == G_EFFECT_WORK.B)
+		{
+			if(this.nNowTime > 0)
+			{	
+				this.nNowTime --;
+				this.nCount += 1;
+				
+				// 描画
+				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+					
+			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
+			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
+		        this.sCtx.globalAlpha = 1.0;
+				if(this.nCrsFlg)
+				{
+		      	  this.sCtx.clearRect( this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							   this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+				}
+		        this.sCtx.globalAlpha = this.nA;
+		        this.sCtx.drawImage(this.sImage, 
+									 this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        this.sCtx.globalAlpha = 1.0;
+			}
+			else
+			{
+				this.bEnd = true;
+				if(this.nCrsW != 0 && this.nCrsW != 0)
+				{
+					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
+				}
+				if(this.EndCallBack != null) { this.EndCallBack(this); }
+				return false;
+			}		
+		}
+		*/
 	}
-	if(this.nWork == G_EFFECT_WORK.B)
+	else
 	{
-		if(this.nNowTime > 0)
-		{	
-			this.nNowTime --;
-			this.nCount += 1;
-			
-			// 描画
-			var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-			var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				
-		//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
-		//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
-	        this.sCtx.globalAlpha = 1.0;
-	       // this.sCtx.clearRect(0, 0, 640, 1200);
-	        this.sCtx.clearRect( this.nX - (vTargetW / 2) + this.nW / 2, 
-	 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
-	        this.sCtx.globalAlpha = this.nA;
-	        this.sCtx.drawImage(this.sImage, 
-								 this.nX - (vTargetW / 2) + this.nW / 2, 
-	 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
-	        this.sCtx.globalAlpha = 1.0;
-		}
-		else
+		if(this.nWork == G_EFFECT_WORK.A)
 		{
-			this.bEnd = true;
-			this.sCtx.clearRect(0, 0, 640, 1200);
-	      //  this.sCtx.clearRect(this.nX/* - this.nW / 2*/, 
-	 		//					this.nY/* - this.nH / 2*/, this.nW, this.nH);
-			if(this.EndCallBack != null) { this.EndCallBack(this); }
-			return false;
-		}		
+			if(this.nNowTime < this.nMaxTime)
+			{	
+				this.nNowTime ++;
+				this.nCount += 1;
+			//	this.nWA    -= 0.2;
+				
+				// 描画
+				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+					
+			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
+			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
+		        this.sCtx.globalAlpha = 1.0;
+				
+				if(this.nCrsFlg)
+				{
+		        	this.sCtx.clearRect (this.nX - (vTargetW / 2) + this.nW / 2, 
+		 								 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+				}
+		        this.sCtx.globalAlpha = this.nA;
+		        this.sCtx.drawImage(this.sImage, 
+									 this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        this.sCtx.globalAlpha = 1.0;
+			}
+			else
+			{
+				this.nWork 		= G_EFFECT_WORK.B;
+				this.nMaxTime   *= 2;
+				this.nNowTime   = this.nMaxTime;
+				
+			}
+		}
+		if(this.nWork == G_EFFECT_WORK.B)
+		{
+			if(this.nNowTime > 0)
+			{	
+				this.nNowTime --;
+				this.nCount += 1;
+				
+				// 描画
+				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+					
+			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
+			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
+		        this.sCtx.globalAlpha = 1.0;
+				if(this.nCrsFlg)
+				{
+		      	  this.sCtx.clearRect( this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							   this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+				}
+		        this.sCtx.globalAlpha = this.nA;
+		        this.sCtx.drawImage(this.sImage, 
+									 this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        this.sCtx.globalAlpha = 1.0;
+			}
+			else
+			{
+				this.bEnd = true;
+				if(this.nCrsW != 0 && this.nCrsW != 0)
+				{
+					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
+				}
+				if(this.EndCallBack != null) { this.EndCallBack(this); }
+				return false;
+			}		
+		}
 	}
 	return true;
 };
