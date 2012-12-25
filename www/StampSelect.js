@@ -147,7 +147,7 @@ var StampSelect = function()
 	var MainCanvas = function(no)
 	{
 	    var _this = this;
-	    this.selectIx = 0;
+	    this.selectIx = no;
 	    var startX=0;
 	    var ofsX=0;
 	    var addX=0, ofsXold=0;
@@ -217,19 +217,6 @@ var StampSelect = function()
 		    				addX = 0;
 		    			}
 		    		}
-		    		/*	
-		            if (addX>=-25 && addX<=25)
-		        	{
-		                if (ofsX >= -ofsMax/2 && ofsX<0)
-		        		{
-		                    addX = 25;
-		                }
-		                if (ofsX <= ofsMax/2 && ofsX>0)
-		        		{
-		                    addX = -25;
-		                }
-		            }
-*/
 		    		// 速度の下限
 		    		if (addX < -60) { addX = -60; }
 		    		if (addX > 60)  { addX = 60;  }
@@ -261,6 +248,14 @@ var StampSelect = function()
 		        }
 				
 				// 代入
+				if(iOldSelecterID > this.selectIx)
+				{
+					PuchArrowL();
+				}
+				else if(iOldSelecterID < this.selectIx)
+				{
+					PuchArrowR();
+				}
 				iOldSelecterID = this.selectIx;
 				
 		        if (ofsX < -ofsMax / 2){
@@ -306,7 +301,11 @@ var StampSelect = function()
 				190, 
 				101);
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
-	
+			
+			ProcArrow();
+			DrawArrowL(ctx, 60,  450, 40);
+			DrawArrowR(ctx, 580, 450, 40);
+		
 			// ------------------------------------------------
 			// シートが０の時の描画
 			// ------------------------------------------------
@@ -376,6 +375,7 @@ var StampSelect = function()
 		        		isTouch = true;
 						iForceTouch = true;
 						ofsX	= 100;
+						PuchArrowL();
 					}		    	
 					PosX = 527;
 					PosY = 215 + g_YOffset - 20;
@@ -398,6 +398,7 @@ var StampSelect = function()
 		        		isTouch = true;
 						iForceTouch = true;
 						ofsX	= -100;
+						PuchArrowR();
 					}	
 			    	
 					PosX = 112;
