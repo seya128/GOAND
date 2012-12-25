@@ -781,6 +781,8 @@ var SceenGohanItadaki = function() {
 			//プレゼント
 			case STATUS.PRESENT_IN:
 				if (stFrm == 1*10) {
+					//コイン追加
+					AddCoin(1);
 					//よくできましたね
 					fuki20.x=412; fuki20.y=148; fuki20.z=2;
 					fuki20.alpha = 1;

@@ -594,7 +594,7 @@ function GetIsBuyMax(id)
 // 全セーブ
 function SaveCoin() 
 {
-	localStorage.setItem(g_saveDataKeyCoin, JSON.stringify(g_HaveStampImageData));
+	localStorage.setItem(g_saveDataKeyCoin, JSON.stringify(g_Coin));
 	console.log("Save" + g_saveDataKeyCoin);
 }
 // 全削除
@@ -606,7 +606,7 @@ function DeleteCoin()
 // ロード
 function LoadCoin() 
 {
-	var data = localStorage.getItem(g_HaveStampImageData);
+	var data = localStorage.getItem(g_saveDataKeyCoin);
 	if (!data) { return false; }
 	
 	g_Coin = JSON.parse(data);
