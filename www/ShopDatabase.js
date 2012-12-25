@@ -645,6 +645,19 @@ function DummyStampDataSet()
 //	{
 //		AddHasStamp(i, 2);
 //	}
+	// [各３こづつ]
+	// シンコ
+	AddHasStamp(gStampEnum.SIN_BAMU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.SIN_CHOCO  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.SIN_HEART  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// ごはん
+	AddHasStamp(gStampEnum.NIKU  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.PURIN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.SUPA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// 雲の上
+	AddHasStamp(gStampEnum.KUMO  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.HUUSEN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.HANA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
 
 	// 必要なもの[ぴーまん、にんじん、とまと、なす]
 	AddHasStamp(gStampEnum.KAMI_PIMAN  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
@@ -737,8 +750,10 @@ function DummySheetDataSet()
 	}
 */
 	// 必要なもの[シンコ様テーブル左]
-	AddHasSheet(gStampEnum.SINKO_01);
-	
+	AddHasSheet(gStampEnum.SINKO_01);	// シンコ
+	AddHasSheet(gStampEnum.GOHAN_01);	// ランチ
+	AddHasSheet(gStampEnum.SKY_01);		// 雲の上
+		
 	
 	// セーブ
 	SaveHaveSheetData();

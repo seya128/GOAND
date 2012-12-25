@@ -132,7 +132,7 @@ StampSheet.prototype.Proc = function(ofs)
 		//	YVal  = Math.floor(YVal);
 		//	YVal *= MAX_SHOP_PANEL_INTERVAL_Y;
 			
-			// できる限り軽くする
+			// できる限SKY_01軽くする
 		//	var YPos = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y;
 		//	if(YPos + y < 300) { iCounter += MAX_SHOP_LIST_WIDTH; continue; }
 		//	else if(YPos + y > 1280)       { iCounter += MAX_SHOP_LIST_WIDTH; continue; }
@@ -455,7 +455,7 @@ StampSheet.prototype.draw = function(ofs)
 			
 				if(GetIsSheetTrue(id) == false)
 				{
-					DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "売り切れ", true);	
+					DrawFont(xx + 3 + x + 10, yy + 35 + y, this.ctx, "うりきれ", true);	
 				}
 				else
 				{
