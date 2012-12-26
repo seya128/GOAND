@@ -378,7 +378,7 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 // ------------------------------------------------------
 
 // スタンプの最大回数
-var STAMP_LIFE_MAX = 30;
+var STAMP_LIFE_MAX = 3 * 15;	// 45
 var g_HaveStampImageData = 
 [
     {"id":0, "ink":STAMP_LIFE_MAX},	// ダミー
@@ -1223,26 +1223,28 @@ function PuchArrowR()
 }
 function DrawArrowL(ctx, x, y, size)
 {
-	ctx.globalAlpha = 0.8 + (-g_nArrowCounterL * 0.05);
-	ctx.fillStyle = 'rgb(128, 0, 128)';
+	ctx.globalAlpha = 0.60 + (-g_nArrowCounterL * 0.05);
+	ctx.fillStyle = 'rgb(255, 0, 255)';
 	ctx.beginPath();
 	x -= (g_nArrowCounterL * 3);
 	ctx.moveTo(x, y);
-	ctx.lineTo(x + size, y - size);
-	ctx.lineTo(x + size, y + size);
+	var hSize = size / 2;
+	ctx.lineTo(x + size, y - hSize);
+	ctx.lineTo(x + size, y + hSize);
 	ctx.closePath();
 	ctx.fill();
 	ctx.globalAlpha = 1.0;	
 }
 function DrawArrowR(ctx, x, y, size)
 {
-	ctx.globalAlpha = 0.8 + (-g_nArrowCounterR * 0.05);
-	ctx.fillStyle = 'rgb(128, 0, 128)';
+	ctx.globalAlpha = 0.60 + (-g_nArrowCounterR * 0.05);
+	ctx.fillStyle = 'rgb(255, 0, 255)';
 	ctx.beginPath();
 	x += (g_nArrowCounterR * 3);
 	ctx.moveTo(x, y);
-	ctx.lineTo(x - size, y - size);
-	ctx.lineTo(x - size, y + size);
+	var hSize = size / 2;
+	ctx.lineTo(x - size, y - hSize);
+	ctx.lineTo(x - size, y + hSize);
 	ctx.closePath();
 	ctx.fill();
 	ctx.globalAlpha = 1.0;	
@@ -1497,4 +1499,51 @@ function AddScaleZoomEffect(ctx, image, x, y, w, h, a)
 	return g_sEffectObject[no];
 }
 
+// 耐久値の表示
+var nMinHpWakuW  = 2;
+var nMaxHpWakuW  = 90 + 2
+var nHpSizeWakuH = 2;
+var nHpSizeNAKAH = nHpSizeWakuH/* - 1*/;
+function DrawHp(ctx, x, y, hp)
+{
+	// STAMP_LIFE_MAX = 90
+	// 
+	//
+	hp *= 2;
+	
+	// 枠
+	ctx.globalAlpha = 1.0;	
+	ctx.fillStyle = 'rgb(128, 128, 128)';
+	ctx.beginPath();
+	ctx.moveTo(x - nMinHpWakuW, y - nHpSizeWakuH);
+	ctx.lineTo(x + nMaxHpWakuW, y - nHpSizeWakuH);
+	ctx.lineTo(x + nMaxHpWakuW, y + nHpSizeWakuH);
+	ctx.lineTo(x - nMinHpWakuW, y + nHpSizeWakuH);
+	ctx.closePath();
+	ctx.fill();
+	if(hp == 0) { return; }
+	
+	// 15回中
+	// 3回
+	if(18 >= hp)
+	{
+		ctx.fillStyle = 'rgb(255, 0, 0)';
+	}
+	// 15回
+	else if(45 >= hp)
+	{
+		ctx.fillStyle = 'rgb(255, 255, 0)';
+	}
+	else
+	{
+		ctx.fillStyle = 'rgb(0, 255, 0)';
+	}	
+	ctx.beginPath();
+	ctx.moveTo(x, 		y - nHpSizeNAKAH);
+	ctx.lineTo(x + hp, 	y - nHpSizeNAKAH);
+	ctx.lineTo(x + hp, 	y + nHpSizeNAKAH);
+	ctx.lineTo(x, 		y + nHpSizeNAKAH);
+	ctx.closePath();
+	ctx.fill();	
+}
 
