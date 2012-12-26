@@ -70,14 +70,14 @@ var SceenGohan = function() {
 	
 	//キャラクター
 	var charaData=[
-		{x:38,	y:185,	anim:[ 0,20,  1,2,  0,2,  1,2],	inAlpha:[0,3+1, 1,5, 1,-1],	src:"k_pii_a.png",	msg:"g_g01_pii_txt_a000.png"	},
-		{x:11,	y:321,	anim:[ 2,40,  3,2,  2,2,  3,2],	inAlpha:[0,3+2, 1,5, 1,-1],	src:"k_nas_a.png",	msg:"g_g01nas_txt_a000.png"	},
-		{x:34,	y:470,	anim:[ 4,26,  5,2,  4,2,  5,2],	inAlpha:[0,3+3, 1,5, 1,-1],	src:"k_tom_a.png",	msg:"g_g01_tom_txt_a000.png"	},
-		{x:176,	y:578,	anim:[ 6,18,  7,2,  6,2,  7,2],	inAlpha:[0,3+4, 1,5, 1,-1],	src:"k_nik_a.png",	msg:"g_g01_nik_txt_a000.png"	},
-		{x:340,	y:578,	anim:[ 8,23,  9,2,  8,2,  9,2],	inAlpha:[0,3+5, 1,5, 1,-1],	src:"k_sii_a.png",	msg:"g_g01_sii_txt_a000.png"	},
-		{x:485,	y:468,	anim:[10,30, 11,2, 10,2, 11,2],	inAlpha:[0,3+6, 1,5, 1,-1],	src:"k_tam_a.png",	msg:"g_g01_tam_txt_a000.png"	},
-		{x:506,	y:322,	anim:[12,28, 13,2, 12,2, 13,2],	inAlpha:[0,3+7, 1,5, 1,-1],	src:"k_nin_a.png",	msg:"g_g01_nin_txt_a000.png"	},
-		{x:485,	y:181,	anim:[14,32, 15,2, 14,2, 15,2],	inAlpha:[0,3+8, 1,5, 1,-1],	src:"k_sak_a.png",	msg:"g_g01_sak_txt_a000.png"	},
+		{x:38,	y:185,	anim:[ 1,20,  0,2,  1,2,  0,2],	inAlpha:[0,3+1, 1,5, 1,-1],	src:"k_pii_a.png",	msg:"g_g01_pii_txt_a000.png"	},
+		{x:11,	y:321,	anim:[ 3,40,  2,2,  3,2,  2,2],	inAlpha:[0,3+2, 1,5, 1,-1],	src:"k_nas_a.png",	msg:"g_g01nas_txt_a000.png"	},
+		{x:34,	y:470,	anim:[ 5,26,  4,2,  5,2,  4,2],	inAlpha:[0,3+3, 1,5, 1,-1],	src:"k_tom_a.png",	msg:"g_g01_tom_txt_a000.png"	},
+		{x:176,	y:578,	anim:[ 7,18,  6,2,  7,2,  6,2],	inAlpha:[0,3+4, 1,5, 1,-1],	src:"k_nik_a.png",	msg:"g_g01_nik_txt_a000.png"	},
+		{x:340,	y:578,	anim:[ 9,23,  8,2,  9,2,  8,2],	inAlpha:[0,3+5, 1,5, 1,-1],	src:"k_sii_a.png",	msg:"g_g01_sii_txt_a000.png"	},
+		{x:485,	y:468,	anim:[11,30, 10,2, 11,2, 10,2],	inAlpha:[0,3+6, 1,5, 1,-1],	src:"k_tam_a.png",	msg:"g_g01_tam_txt_a000.png"	},
+		{x:506,	y:322,	anim:[13,28, 12,2, 13,2, 12,2],	inAlpha:[0,3+7, 1,5, 1,-1],	src:"k_nin_a.png",	msg:"g_g01_nin_txt_a000.png"	},
+		{x:485,	y:181,	anim:[15,32, 14,2, 15,2, 14,2],	inAlpha:[0,3+8, 1,5, 1,-1],	src:"k_sak_a.png",	msg:"g_g01_sak_txt_a000.png"	},
 	];
 	
 	var chara = {};
