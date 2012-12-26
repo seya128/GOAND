@@ -55,18 +55,16 @@ var SceenGohan = function() {
 	var fuki = new DivSprite(515,227);
 	fuki.x=66+515/2; fuki.y=0+227/2, fuki.z=2;
 	fuki.src = "img/00_common/g_g01_huk_a000.png";
-	fuki.scale = 0;
-	fuki.animScale = [0,10, 1.15,3, 1,2, 1,-1]
-	sceen.appendChild(fuki.div);
 	animSprites.push(fuki);
 	//セリフ
 	var words = new DivSprite(310,87);
 	words.x=166+310/2; words.y=61+87/2, words.z=3;
 	words.src = "img/02_charaselect/g_g01_txt_a.png";
-	words.alpha = 0;
-	words.animAlpha = [0,10, 0,5, 1,5, 1,-1]
-	sceen.appendChild(words.div);
 	animSprites.push(words);
+	var words2 = new DivSprite(310,87);
+	words2.x=166+310/2; words2.y=61+87/2, words2.z=3;
+	words2.src = "img/02_charaselect/g_g01_txt_b.png";
+	animSprites.push(words2);
 	
 	//キャラクター
 	var charaData=[
@@ -75,14 +73,13 @@ var SceenGohan = function() {
 		{x:34,	y:470,	anim:[ 5,26,  4,2,  5,2,  4,2],	inAlpha:[0,3+3, 1,5, 1,-1],	src:"k_tom_a.png",	msg:"g_g01_tom_txt_a000.png"	},
 		{x:176,	y:578,	anim:[ 7,18,  6,2,  7,2,  6,2],	inAlpha:[0,3+4, 1,5, 1,-1],	src:"k_nik_a.png",	msg:"g_g01_nik_txt_a000.png"	},
 		{x:340,	y:578,	anim:[ 9,23,  8,2,  9,2,  8,2],	inAlpha:[0,3+5, 1,5, 1,-1],	src:"k_sii_a.png",	msg:"g_g01_sii_txt_a000.png"	},
-		{x:485,	y:468,	anim:[11,30, 10,2, 11,2, 10,2],	inAlpha:[0,3+6, 1,5, 1,-1],	src:"k_tam_a.png",	msg:"g_g01_tam_txt_a000.png"	},
-		{x:506,	y:322,	anim:[13,28, 12,2, 13,2, 12,2],	inAlpha:[0,3+7, 1,5, 1,-1],	src:"k_nin_a.png",	msg:"g_g01_nin_txt_a000.png"	},
+		{x:485,	y:475,	anim:[11,30, 10,2, 11,2, 10,2],	inAlpha:[0,3+6, 1,5, 1,-1],	src:"k_tam_a.png",	msg:"g_g01_tam_txt_a000.png"	},
+		{x:506,	y:332,	anim:[13,28, 12,2, 13,2, 12,2],	inAlpha:[0,3+7, 1,5, 1,-1],	src:"k_nin_a.png",	msg:"g_g01_nin_txt_a000.png"	},
 		{x:485,	y:181,	anim:[15,32, 14,2, 15,2, 14,2],	inAlpha:[0,3+8, 1,5, 1,-1],	src:"k_sak_a.png",	msg:"g_g01_sak_txt_a000.png"	},
 	];
 	
 	var chara = {};
 	var ofsx=-28;
-	var scale = 1;
 	
 	for (var i=0; i<charaData.length; i++) {
 		chara[i] = new DivSprite(2704/16,180);
@@ -91,7 +88,8 @@ var SceenGohan = function() {
 		chara[i].x = charaData[i].x + ofsx +(2704/16)/2;
 		chara[i].y = charaData[i].y + 180/2;
 		chara[i].z = 4;
-		chara[i].scale = scale;
+		chara[i].scale = 1;
+		chara[i].animScale = [1,10*(i+1), 1.1,2, 1,4, 1,(charaData.length-i)*10];
 		chara[i].anim = charaData[i].anim;
 		chara[i].alpha = 0;
 		chara[i].animAlpha = charaData[i].inAlpha;
@@ -112,6 +110,11 @@ var SceenGohan = function() {
 	var mega_fuki,mega_words;
 	var chara_fuki,chara_words;
 
+	// アニメーションデータ
+	var fukiInAnimScaleData = [1.15,3, 1,2, 1,-1];
+	var wordsInAnimAlphaData = [0,5, 1,5, 1,-1];
+	var fukiOutAnimScaleData = [0,3, 0,-1];
+	var wordsOutAnimAlphaData = [0,2, 0,-1];
 
 	
 	
@@ -136,12 +139,32 @@ var SceenGohan = function() {
 				if (alpha >= 1.0) {
 					alpha = 1.0;
 					st = STATUS.MAIN;
+					stFrm = 0;
 				}
 				sceen.style.opacity = alpha;
 				break;
 
 			//メイン処理
 			case STATUS.MAIN:
+				if (stFrm == 0) {
+					fuki.scale = 0;
+					fuki.animScale = fukiInAnimScaleData;
+					sceen.appendChild(fuki.div);
+					words2.alpha = 0;
+					words2.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words2.div);
+				} else if (stFrm == 5*10) {
+					fuki.animScale = fukiOutAnimScaleData;
+					words2.animAlpha = wordsOutAnimAlphaData;
+				} else if (stFrm == 6*10) {
+					fuki.scale = 0;
+					fuki.animScale = fukiInAnimScaleData;
+					words.alpha = 0;
+					words.animAlpha = wordsInAnimAlphaData;
+					sceen.appendChild(words.div);
+				}
+				stFrm ++;
+				
 				//キャラが選択されたら次へ
 				if (selected != -1) {
 					//選択したキャラクターをグローバル変数にセット
@@ -154,8 +177,9 @@ var SceenGohan = function() {
 			//選択された：初期化
 			case STATUS.SELECTED_INIT:
 				if (stFrm == 0) {
-					fuki.animScale = [0,3, 0,-1];
-					words.animAlpha = [0,2, 0,-1];
+					fuki.animScale = fukiOutAnimScaleData;
+					words.animAlpha = wordsOutAnimAlphaData;
+					words2.animAlpha = wordsOutAnimAlphaData;
 					
 					chara[0].animPos = [-200,chara[0].y,10, -200,chara[0].y,-1];
 					chara[1].animPos = [-200,chara[1].y,10, -200,chara[1].y,-1];
@@ -225,24 +249,24 @@ var SceenGohan = function() {
 					case 0: //めがみセリフセット
 						mega_fuki.x=180+463/2; mega_fuki.y=-20+205/2; mega_fuki.z=2;
 						mega_fuki.scale = 0;
-						mega_fuki.animScale = [1.15,3, 1,2, 1,-1]
+						mega_fuki.animScale = fukiInAnimScaleData;
 						sceen.appendChild(mega_fuki.div);
 						animSprites.push(mega_fuki);
 						mega_words.x=260+304/2; mega_words.y=40+80/2; mega_words.z=3;
 						mega_words.alpha = 0;
-						mega_words.animAlpha = [0,5, 1,5, 1,-1]
+						mega_words.animAlpha = wordsInAnimAlphaData;
 						sceen.appendChild(mega_words.div);
 						animSprites.push(mega_words);
 						break;
 					case 4*10: //キャラクターセリフセット
 						chara_fuki.x=340+300/2; chara_fuki.y=200+224/2; chara_fuki.z=5;
 						chara_fuki.scale = 0;
-						chara_fuki.animScale = [1.15,3, 1,2, 1,-1]
+						chara_fuki.animScale = fukiInAnimScaleData;
 						sceen.appendChild(chara_fuki.div);
 						animSprites.push(chara_fuki);
 						chara_words.x=390+210/2; chara_words.y=250+87/2; chara_words.z=6;
 						chara_words.alpha = 0;
-						chara_words.animAlpha = [0,5, 1,5, 1,-1]
+						chara_words.animAlpha = wordsInAnimAlphaData;
 						sceen.appendChild(chara_words.div);
 						animSprites.push(chara_words);
 						chara2.anim = [2,10, 3,10];
