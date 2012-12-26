@@ -73,7 +73,11 @@ var StampSelect = function()
 	        var y = (800 - h) / 2 + g_YOffset;
 			// そのまま描画
 			this.CanvasSheet_2d.drawImage(this.img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
+			
+//			this.CanvasSheet_2d.drawImage(this.img, 0, 0, 640, window.innerHeight, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+//document.body.clientWidth;
+//document.body.clientHeight; 
+//document.documentElement.clientHeight
 			// -------------------------------------
 			// シートに張り付けて描画
 			// -------------------------------------  
@@ -300,12 +304,15 @@ var StampSelect = function()
 				0, 
 				190, 
 				101);
-			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
-			
+			// 矢印を描画
 			ProcArrow();
 			DrawArrowL(ctx, 60,  450, 40);
 			DrawArrowR(ctx, 580, 450, 40);
 		
+			
+			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
+			
+
 			// ------------------------------------------------
 			// シートが０の時の描画
 			// ------------------------------------------------
