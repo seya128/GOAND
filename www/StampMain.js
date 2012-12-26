@@ -951,7 +951,7 @@ var stamp_ctx;
 					g_WindowsScaleRate += 0.15;
 					if(g_WindowsScaleRate > 1.0) { g_WindowsScaleRate = 1.0; }
 					DrawStampWindow(stamp_ctx, 1.0, false, sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);
-					DrawBack(stamp_ctx);
+					//DrawBack(stamp_ctx);
 					var id = DrawWindowYesNo(stamp_ctx, g_WindowsScaleRate, ((!bTouch) && bOldTouch), sTouchStartX, sTouchStartY, sTouchMoveX, sTouchMoveY);
 					if(id == 0) 
 					{ 
