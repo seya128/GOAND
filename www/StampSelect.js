@@ -488,8 +488,7 @@ var StampSelect = function()
 	var next;
 	var alpha = 0;
 
-	// 描画データ[初回一回のみ]
-	LoadWindowYesNo();
+	// セーブされた描画データ
 	AllLoadStampDrawData();
     // 画像ロード[初回一回のみ]
     AllLoadStampGraphic();
@@ -537,13 +536,17 @@ var StampSelect = function()
 		{
 			//初期化
 			case G_STATUS.INIT:
-				//各データが読み込まれるまで待つ
-				if (LoadingCounter <= 0) 
-				{
-					g_eStatus = G_STATUS.FADEIN;
-					//if(g_HaveStampSheetData.length != 0)
+				// スタンプとシートのロードが終わってる
+				if(g_sSheetLoadFlg.bLoadFlg && g_sStampLoadFlg.bLoadFlg)
+				{			
+					//各データが読み込まれるまで待つ
+					if (LoadingCounter <= 0) 
 					{
-						mainCanvas.draw();
+						g_eStatus = G_STATUS.FADEIN;
+						//if(g_HaveStampSheetData.length != 0)
+						{
+							mainCanvas.draw();
+						}
 					}
 				}
 				break;

@@ -341,7 +341,6 @@ function GetStampGraphicImage(no)
 function GStampGraphic()
 {
 	this.m_ImageNo 	= -1;
-    this.m_bLoaded  = false;			// ロードフラグ
     this.m_Image	= new Image();	// イメージクラス
 }
 // -------------------------------------
@@ -352,10 +351,6 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 	// 自分のポインタ
     var _this  = this;
 	var iIndex = eStampEnum;//GetStampGraphicIndex(eStampEnum);
-    // ロード
-    this.m_bLoaded = false;
-	// ロードが終わっていたらフラグを立てる
-    this.m_Image.onload = function(){ _this.m_bLoaded = true; }
 	
 	// スタンプ
 	if(eStampEnum >= M_MAX_SHEET)
@@ -394,6 +389,58 @@ var g_HaveStampSheetData =
 function GetHaveStampDataNum() { return g_HaveStampImageData.length; }
 function GetHaveSheetDataNum() { return g_HaveStampSheetData.length; }
 
+
+// グラフィックロード
+var g_sGraphicLoadFlg			= new LoadingObject("g_sGraphicLoadFlg");
+var g_sStampLoadFlg				= new LoadingObject("g_sStampLoadFlg");
+var g_sSheetLoadFlg				= new LoadingObject("g_sSheetLoadFlg");
+
+// スタンプ描画データクラス
+function CallBackStatus(sObject) 
+{
+}
+
+// スタンプ描画データクラス
+function LoadingObject(name) 
+{
+	this.strName  = name;
+	this.bLoadFlg = false;
+	this.aImage   = [];
+	this.aLoad    = [];
+	this.iLength  = 0;
+	
+    this.AddLoadFile = function(img)
+	{
+		this.aLoad[this.iLength]  = false;
+		this.aImage[this.iLength] = img;
+		this.iLength ++;
+    };	
+    this.AddLoadFileEx = function(img, name)
+	{
+		img.src = name;
+		this.aLoad[this.iLength]  = false;
+		this.aImage[this.iLength] = img;
+		this.iLength ++;
+    };	
+	
+	this.CallBackStatus = function()
+	{
+	    var iCount = 0;
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+	    	if(this.aImage[i].complete) { this.aLoad[i] = true; iCount ++; }
+	    }
+		// ロード完了
+		if(iCount == this.iLength) { this.bLoadFlg = true; return; }
+		// 待つ
+		setTimeout(this.strName + ".CallBackStatus()", 100);
+	}
+	
+	this.Loading = function()
+	{
+		this.CallBackStatus();
+	}
+}
 
 // -------------------------------------
 // データのロード
@@ -496,13 +543,18 @@ function AllLoadStampGraphic()
 		{
 			g_StampGraphicHandle[i] = new GStampGraphic();
 			g_StampGraphicHandle[i].LoadImage(i);
+			g_sStampLoadFlg.AddLoadFile(g_StampGraphicHandle[i].m_Image);
 		}
 		// スタンプロード
 		for(var i = M_MAX_SHEET; i < g_StampGraphicNum; i ++)
 		{
 			g_StampGraphicHandle[i] = new GStampGraphic();
 			g_StampGraphicHandle[i].LoadImage(i);
+			g_sSheetLoadFlg.AddLoadFile(g_StampGraphicHandle[i].m_Image);
 		}
+		// ローディング開始
+		g_sStampLoadFlg.Loading();
+		g_sSheetLoadFlg.Loading();	
 	}
 }
 // ------------------------------------------------------
@@ -905,6 +957,8 @@ function DispMemory()
 	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
 
+
+
 var g_WindowImageHandle 			= null;
 var g_YesImageHandle 				= null;
 var g_NoImageHandle  				= null;
@@ -913,6 +967,7 @@ var g_WindowsScaleRate				= 1.0;
 var g_iSwitch = 0;
 var g_eStatus = 0;
 
+
 // スタンプメイン画面
 var g_StampMainWindowImageHandle		= null;
 var g_StampMainKesuImageHandle			= null;
@@ -920,22 +975,7 @@ var g_StampMainEndImageHandle			= null;
 var g_StampMainBackImageHandle			= null;
 var g_StampMainMenuImageHandle			= null;
 var g_SheetDeleteMessageImageHandle		= null;
-/*
-var g_bOldTouch					= false;
-var g_sTouchStartX 				= -200;
-var g_sTouchStartY 				= -200;
-var g_sTouchMoveX 				= -200;
-var g_sTouchMoveY 				= -200;	
 
-function ClearTouch()
-{
-	g_bOldTouch					= false;
-	g_sTouchStartX 				= -200;
-	g_sTouchStartY 				= -200;
-	g_sTouchMoveX 				= -200;
-	g_sTouchMoveY 				= -200;		
-}
-*/
 	
 var G_STATUS = 
 {
@@ -950,49 +990,36 @@ var G_STATUS =
 	SELECTED_END:	7,
 };
 
+
 function LoadWindowYesNo()
 {
-	// ウィンドウ
-	g_WindowImageHandle     	= new Image();
-    g_WindowImageHandle.src = "img/00_common/g_g01_huk_e000.png";
-	// メッセージ
-	g_YesNoMessageImageHandle 	= new Image();
-    g_YesNoMessageImageHandle.src = "img/00_common/g_hand_01.png";
-	// はい
-	g_YesImageHandle 			= new Image();
-    g_YesImageHandle.src = "img/07_shop/k_btn_a.png";
-	// いいえ
-	g_NoImageHandle				= new Image();
-    g_NoImageHandle.src = "img/07_shop/k_btn_b.png";
-	// スタンプメイン
-	g_StampMainWindowImageHandle		= new Image();
-    g_StampMainWindowImageHandle.src 	= "img/08_stamp/s_wak_a000.png";	
-	g_StampMainKesuImageHandle			= new Image();
-    g_StampMainKesuImageHandle.src 		= "img/08_stamp/s_btn_a000.png";	
-	g_StampMainEndImageHandle			= new Image();
-    g_StampMainEndImageHandle.src 		= "img/08_stamp/s_btn_b000.png";	
-	g_StampMainBackImageHandle			= new Image();
-    g_StampMainBackImageHandle.src 		= "img/08_stamp/s_btn_c000.png";	
-	// メニュー
-	g_StampMainMenuImageHandle			= new Image();
-    g_StampMainMenuImageHandle.src 		= "img/08_stamp/s_btn_e000.png";		
-	// 本当に消す？
-	g_SheetDeleteMessageImageHandle			= new Image();
-    g_SheetDeleteMessageImageHandle.src 	= "img/08_stamp/s_txt_d000.png";		
+	// ２度ロードはしない
+	if(g_WindowImageHandle != null) { return; }
+	g_WindowImageHandle     				= new Image();
+	g_YesNoMessageImageHandle 				= new Image();
+	g_YesImageHandle 						= new Image();	
+	g_NoImageHandle							= new Image();
+	g_StampMainWindowImageHandle			= new Image();
+	g_StampMainKesuImageHandle				= new Image();	
+	g_StampMainEndImageHandle				= new Image();	
+	g_StampMainBackImageHandle				= new Image();	
+	g_StampMainMenuImageHandle				= new Image();
+	g_SheetDeleteMessageImageHandle			= new Image();	
+	
+	// ロード
+	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 "img/00_common/g_g01_huk_e000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 "img/00_common/g_hand_01.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 "img/07_shop/k_btn_a.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 "img/07_shop/k_btn_b.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainWindowImageHandle, 	 "img/08_stamp/s_wak_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainKesuImageHandle,	 	 "img/08_stamp/s_btn_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainEndImageHandle, 		 "img/08_stamp/s_btn_b000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainBackImageHandle, 	 "img/08_stamp/s_btn_c000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainMenuImageHandle, 	 "img/08_stamp/s_btn_e000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, "img/08_stamp/s_txt_d000.png");
+	// ローディング開始
+	g_sGraphicLoadFlg.Loading();
 }
-function DeleteWindowYesNo()
-{
-	g_WindowImageHandle 			= null;
-	g_YesImageHandle 				= null;
-	g_NoImageHandle  				= null;
-	g_YesNoMessageImageHandle		= null;	
-	g_StampMainWindowImageHandle	= null;
-	g_StampMainKesuImageHandle		= null;
-	g_StampMainEndImageHandle		= null;
-	g_StampMainBackImageHandle		= null;
-	g_StampMainMenuImageHandle		= null;
-}
-
 
 // メニュー
 function DrawMenu(ctx, bTrigger, sTouchStartX, sTouchStartY,

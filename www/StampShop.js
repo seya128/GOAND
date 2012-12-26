@@ -1114,12 +1114,16 @@ var StampShop = function()
 		{
 			//初期化
 			case G_STATUS.INIT:
-				//各データが読み込まれるまで待つ
-				if (LoadingCounter <= 0)
-				{
-					g_eStatus = G_STATUS.FADEIN;
-					// メインキャンバスの描画
-    				mainCanvas.draw();
+				// スタンプとシートのロードが終わってる
+				if(g_sSheetLoadFlg.bLoadFlg && g_sStampLoadFlg.bLoadFlg)
+				{	
+					//各データが読み込まれるまで待つ
+					if (LoadingCounter <= 0)
+					{
+						g_eStatus = G_STATUS.FADEIN;
+						// メインキャンバスの描画
+	    				mainCanvas.draw();
+					}
 				}
 				break;
 
