@@ -49,71 +49,66 @@ function DrawFont(x, y, ctx, string, center)
 var timerID;
 
 //
-// スタンプシート
+// ショップシート
 //
-function StampSheet(canvas_ctx, no)
+function ShopSheet(canvas_ctx)
 {
     var _this = this;
     this.ctx = canvas_ctx;
-    this.isLoaded = false;
-    this.sheetNo = no;
     this.sheetSrc = "";
 
-	// イメージ
-	this.img = new Image();											// イメージクラス
-    this.img.onload = function(){ _this.isLoaded = true; }			// ロードが終わっていたらフラグを立てる
-    this.img.src = "img/07_shop/004.png";								// イメージの名前を代入[StampData.js]
-    this.stampImageNo = no;											// イメージ番号  
-	// ウィンドウ
-	this.window = new Image();										// イメージクラス
-    this.window.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.window.src = "img/07_shop/o_wak_a.png";						// イメージの名前を代入[StampData.js]
-	// ウィンドウ
-	this.YesNoImage = new Image();										// イメージクラス
-    this.YesNoImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.YesNoImage.src = "img/07_shop/o_txt_a.png";						// イメージの名前を代入[StampData.js]
-	// はい
-	this.YesImage = new Image();										// イメージクラス
-    this.YesImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.YesImage.src = "img/07_shop/k_btn_a.png";						// イメージの名前を代入[StampData.js]
-	// いいえ
-	this.NoImage = new Image();										// イメージクラス
-    this.NoImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.NoImage.src = "img/07_shop/k_btn_b.png";						// イメージの名前を代入[StampData.js]
-	// ウィンドウ
-	this.BuyOkImage = new Image();										// イメージクラス
-    this.BuyOkImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BuyOkImage.src = "img/07_shop/o_txt_d.png";						// イメージの名前を代入[StampData.js]
-	// ウィンドウ
-	this.BuyNoImage = new Image();										// イメージクラス
-    this.BuyNoImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BuyNoImage.src = "img/07_shop/o_txt_b.png";						// イメージの名前を代入[StampData.js]
-	// ウィンドウ
-	this.BuyIppaiImage = new Image();										// イメージクラス
-    this.BuyIppaiImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BuyIppaiImage.src = "img/07_shop/o_txt_c.png";						// イメージの名前を代入[StampData.js]
-
-	// コイン
-	this.CoinImage = new Image();										// イメージクラス
-    this.CoinImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.CoinImage.src = "img/07_shop/002.png";							// イメージの名前を代入[StampData.js]
-	// ショップ
-	this.ShopImage = new Image();										// イメージクラス
-    this.ShopImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.ShopImage.src = "img/07_shop/001.png";							// イメージの名前を代入[StampData.js]
-	// 戻る
-	this.BackImage = new Image();										// イメージクラス
-    this.BackImage.onload = function(){ _this.isLoaded = true; }		// ロードが終わっていたらフラグを立てる
-    this.BackImage.src = "img/07_shop/003.png";							// イメージの名前を代入[StampData.js]
-	// コイン
-	this.CoinChipImage = new Image();									// イメージクラス
-    this.CoinChipImage.onload = function(){ _this.isLoaded = true; }	// ロードが終わっていたらフラグを立てる
-    this.CoinChipImage.src = "img/07_shop/coin.png";					// イメージの名前を代入[StampData.js]
+	// 購入枠
+	this.BuyWakuImage = new Image();
+    this.BuyWakuImage.src = "img/07_shop/004.png";
+	g_sShopLoadFlg.AddLoadFile(this.BuyWakuImage);
 	
+	// 購入ウィンドウ
+	this.BuyWindowImage = new Image();
+    this.BuyWindowImage.src = "img/07_shop/o_wak_a.png";
+	g_sShopLoadFlg.AddLoadFile(this.BuyWakuImage);	
+	
+	// はい、いいえメッセージメッセージ
+	this.YesNoMessageImage = new Image();
+    this.YesNoMessageImage.src = "img/07_shop/o_txt_a.png";
+	g_sShopLoadFlg.AddLoadFile(this.YesNoMessageImage);		
+	
+	// 購入しましたのOKメッセージ
+	this.BuyOkMessageImage = new Image();
+    this.BuyOkMessageImage.src = "img/07_shop/o_txt_d.png";
+	g_sShopLoadFlg.AddLoadFile(this.BuyOkMessageImage);	
+	
+	// コインが足らないよメッセージ
+	this.BuyNoCoinMessageImage = new Image();
+    this.BuyNoCoinMessageImage.src = "img/07_shop/o_txt_b.png";
+	g_sShopLoadFlg.AddLoadFile(this.BuyNoCoinMessageImage);	
+	
+	// スタンプいっぱいメッセージ
+	this.BuyStampIppaiMessageImage = new Image();
+    this.BuyStampIppaiMessageImage.src = "img/07_shop/o_txt_c.png";
+	g_sShopLoadFlg.AddLoadFile(this.BuyStampIppaiMessageImage);	
+	
+	// コインバック
+	this.CoinBackImage = new Image();
+    this.CoinBackImage.src = "img/07_shop/002.png";
+	g_sShopLoadFlg.AddLoadFile(this.CoinBackImage);	
+
+	// ショップ
+	this.ShopImage = new Image();
+    this.ShopImage.src = "img/07_shop/001.png";
+	g_sShopLoadFlg.AddLoadFile(this.ShopImage);	
+	
+	// コインチップ
+	this.CoinChipImage = new Image();									// イメージクラス
+    this.CoinChipImage.src = "img/07_shop/coin.png";					// イメージの名前を代入[StampData.js]
+	g_sShopLoadFlg.AddLoadFile(this.CoinChipImage);	
+		
+	
+	// ローディング開始
+	g_sShopLoadFlg.Loading();	
 }
 
 // プロック
-StampSheet.prototype.Proc = function(ofs)
+ShopSheet.prototype.Proc = function(ofs)
 {
 	if(bOldTouch == false || bTouch == true) { return; }
 	
@@ -177,7 +172,7 @@ StampSheet.prototype.Proc = function(ofs)
 	}
 }
 
-StampSheet.prototype.drawWindow = function()
+ShopSheet.prototype.drawWindow = function()
 {
 	DrawBack(this.ctx);
 	
@@ -186,12 +181,12 @@ StampSheet.prototype.drawWindow = function()
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 	this.ctx.globalAlpha = sScaleRate;
-	this.ctx.drawImage(this.window, 
+	this.ctx.drawImage(this.BuyWindowImage, 
 		89  /*- 460 / 2*/, 
 		GPosY + 214 /*- 440 / 2*/, 
 		460, 
 		440);
-	this.ctx.drawImage(this.YesNoImage, 
+	this.ctx.drawImage(this.YesNoMessageImage, 
 		128  /*- 460 / 2*/, 
 		GPosY + 380 /*- 440 / 2*/, 
 		386, 
@@ -227,12 +222,12 @@ StampSheet.prototype.drawWindow = function()
 	var PosNoH = 184;
 	this.ctx.globalAlpha = sScaleRate;// - 1.0;
 	//if(this.ctx.globalAlpha < 0) { this.ctx.globalAlpha = 0; }
-	this.ctx.drawImage(this.YesImage, 
+	this.ctx.drawImage(g_YesImageHandle, 
 		PosYesX  /*- 460 / 2*/, 
 		PosYesY /*- 440 / 2*/, 
 		PosYesW, 
 		PosYesH);
-	this.ctx.drawImage(this.NoImage, 
+	this.ctx.drawImage(g_NoImageHandle, 
 		PosNoX  /*- 460 / 2*/, 
 		PosNoY /*- 440 / 2*/, 
 		PosNoW, 
@@ -283,21 +278,21 @@ StampSheet.prototype.drawWindow = function()
 	sScaleRate += 0.15;
 	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
 }
-StampSheet.prototype.drawOK= function()
+ShopSheet.prototype.drawOK= function()
 {
 	DrawBack(this.ctx);
 
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 	this.ctx.globalAlpha = sScaleRate;
-	this.ctx.drawImage(this.window, 
+	this.ctx.drawImage(this.BuyWindowImage, 
 		89  /*- 460 / 2*/, 
 		214 /*- 440 / 2*/, 
 		460, 
 		440);
 	if(eSwitch == 2)
 	{
-		this.ctx.drawImage(this.BuyOkImage, 
+		this.ctx.drawImage(this.BuyOkMessageImage, 
 			128  /*- 460 / 2*/, 
 			380 /*- 440 / 2*/, 
 			386, 
@@ -305,7 +300,7 @@ StampSheet.prototype.drawOK= function()
 	}
 	else if(eSwitch == 3)
 	{
-		this.ctx.drawImage(this.BuyNoImage, 
+		this.ctx.drawImage(this.BuyNoCoinMessageImage, 
 			128  /*- 460 / 2*/, 
 			380 /*- 440 / 2*/, 
 			386, 
@@ -314,7 +309,7 @@ StampSheet.prototype.drawOK= function()
 	}
 	else if(eSwitch == 4)
 	{
-		this.ctx.drawImage(this.BuyIppaiImage, 
+		this.ctx.drawImage(this.BuyStampIppaiMessageImage, 
 			128  /*- 460 / 2*/, 
 			380 /*- 440 / 2*/, 
 			386, 
@@ -357,7 +352,7 @@ StampSheet.prototype.drawOK= function()
 	var PosYesW = 281;
 	var PosYesH = 184;
 
-	this.ctx.drawImage(this.YesImage, 
+	this.ctx.drawImage(g_YesImageHandle, 
 		PosYesX  /*- 460 / 2*/, 
 		PosYesY /*- 440 / 2*/, 
 		PosYesW, 
@@ -387,13 +382,12 @@ StampSheet.prototype.drawOK= function()
 
 
 //描画
-StampSheet.prototype.draw = function(ofs)
+ShopSheet.prototype.draw = function(ofs)
 {
 	//DrawBack(this.ctx);
 	
 	// フォント
 	this.ctx.font = g_sFontName;
-	//if (this.isLoaded) 
 	{
         var rate = 0;//Math.abs(ofs)/320 * 0.25 ;
         var w = SCREEN_WIDTH;
@@ -426,7 +420,7 @@ StampSheet.prototype.draw = function(ofs)
 				
 				var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 				var yy  = YPos;
-				this.ctx.drawImage(this.img, 
+				this.ctx.drawImage(this.BuyWakuImage, 
 					(xx)-214/2 + x, 
 					(yy)-237/2 + y, 
 					214, 
@@ -532,7 +526,7 @@ StampSheet.prototype.draw = function(ofs)
 		// --------------------------------------    
 	    // タイトルへ戻る
 		// --------------------------------------
-		this.ctx.drawImage(this.BackImage, 
+		this.ctx.drawImage(g_BackImageHandle, 
 			0, 
 			0, 
 			190, 
@@ -580,7 +574,7 @@ var StampShop = function()
 		// デフォルトキャンバス
 	    var canvas = document.getElementById("canvas");
 		var ctx    = canvas.getContext("2d");
-	    var sheet = new StampSheet(ctx, 0);
+	    var sheet = new ShopSheet(ctx);
 		
 	    //キャンバスクリア
 	    this.clear = function()
@@ -915,7 +909,7 @@ var StampShop = function()
 			// --------------------------------------    
 			// 残り金額の描画
 			// --------------------------------------
-			ctx.drawImage(sheet.CoinImage, 
+			ctx.drawImage(sheet.CoinBackImage, 
 				380, 
 				0, 
 				260, 
@@ -1115,7 +1109,7 @@ var StampShop = function()
 			//初期化
 			case G_STATUS.INIT:
 				// スタンプとシートのロードが終わってる
-				if(g_sSheetLoadFlg.bLoadFlg && g_sStampLoadFlg.bLoadFlg)
+				if(g_sSheetLoadFlg.bLoadFlg && g_sStampLoadFlg.bLoadFlg && g_sShopLoadFlg.bLoadFlg)
 				{	
 					//各データが読み込まれるまで待つ
 					if (LoadingCounter <= 0)

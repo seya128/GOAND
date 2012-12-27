@@ -29,7 +29,6 @@ function DeleteSheetClick(e)
 	
 var StampSelect = function() 
 {
-	var BackImage 		= new Image();	// イメージクラス
 	var bOldTouch		= false;
 	var sTouchStartX 	= -200;
 	var sTouchStartY 	= -200;
@@ -299,7 +298,7 @@ var StampSelect = function()
 				}
 			}
 			// 合成して描画
-	      	ctx.drawImage(BackImage, 			
+	      	ctx.drawImage(g_BackImageHandle, 			
 		      	0, 
 				0, 
 				190, 
@@ -493,10 +492,6 @@ var StampSelect = function()
     // 画像ロード[初回一回のみ]
     AllLoadStampGraphic();
 
-	// 戻る
-    BackImage.onload = function() {}		// ロードが終わっていたらフラグを立てる
-    BackImage.src = "img/07_shop/003.png";							// イメージの名前を代入[StampData.js]
-	
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
 	rootSceen.appendChild(sceen);

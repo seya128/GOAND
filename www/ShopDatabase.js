@@ -394,6 +394,7 @@ function GetHaveSheetDataNum() { return g_HaveStampSheetData.length; }
 var g_sGraphicLoadFlg			= new LoadingObject("g_sGraphicLoadFlg");
 var g_sStampLoadFlg				= new LoadingObject("g_sStampLoadFlg");
 var g_sSheetLoadFlg				= new LoadingObject("g_sSheetLoadFlg");
+var g_sShopLoadFlg				= new LoadingObject("g_sShopLoadFlg");
 
 // スタンプ描画データクラス
 function CallBackStatus(sObject) 
@@ -976,6 +977,8 @@ var g_StampMainBackImageHandle			= null;
 var g_StampMainMenuImageHandle			= null;
 var g_SheetDeleteMessageImageHandle		= null;
 
+// 戻る
+var g_BackImageHandle					= null;
 	
 var G_STATUS = 
 {
@@ -1005,18 +1008,21 @@ function LoadWindowYesNo()
 	g_StampMainBackImageHandle				= new Image();	
 	g_StampMainMenuImageHandle				= new Image();
 	g_SheetDeleteMessageImageHandle			= new Image();	
-	
+	g_BackImageHandle						= new Image();	
+
 	// ロード
-	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 "img/00_common/g_g01_huk_e000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 "img/00_common/g_hand_01.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 "img/07_shop/k_btn_a.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 "img/07_shop/k_btn_b.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainWindowImageHandle, 	 "img/08_stamp/s_wak_a000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainKesuImageHandle,	 	 "img/08_stamp/s_btn_a000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainEndImageHandle, 		 "img/08_stamp/s_btn_b000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainBackImageHandle, 	 "img/08_stamp/s_btn_c000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainMenuImageHandle, 	 "img/08_stamp/s_btn_e000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, "img/08_stamp/s_txt_d000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 	"img/00_common/g_g01_huk_e000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 	"img/00_common/g_hand_01.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 	"img/07_shop/k_btn_a.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 	"img/07_shop/k_btn_b.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainWindowImageHandle, 	 	"img/08_stamp/s_wak_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainKesuImageHandle,	 	 	"img/08_stamp/s_btn_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainEndImageHandle, 		 	"img/08_stamp/s_btn_b000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainBackImageHandle, 	 	"img/08_stamp/s_btn_c000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainMenuImageHandle, 	 	"img/08_stamp/s_btn_e000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, 	"img/08_stamp/s_txt_d000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_BackImageHandle, 					"img/07_shop/003.png");
+		
 	// ローディング開始
 	g_sGraphicLoadFlg.Loading();
 }
