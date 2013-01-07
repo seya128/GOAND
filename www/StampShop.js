@@ -30,6 +30,34 @@ var g_bOldMoveList				= false;
 var g_iFontSize = 20;
 var g_sFontName = g_iFontSize + "pt Arial";
 
+function DrawCoinL(img, ctx, x, y, gold)
+{
+	var iSizeH = 15;
+	y -= iSizeH;
+	for(var i = 0; i < gold; i ++)
+	{
+		ctx.drawImage(img, x + (i * iSizeH * 2), y);	
+	}
+}
+function DrawCoin(img, ctx, x, y, gold)
+{
+	var iSizeH = 15;
+	y -= iSizeH;
+	for(var i = 0; i < gold; i ++) { x -= iSizeH; }
+	for(var i = 0; i < gold; i ++)
+	{
+		ctx.drawImage(img, x + (i * iSizeH * 2), y);	
+	}
+}
+
+function DrawCoinA(img, ctx, x, y, gold, a)
+{
+	ctx.globalAlpha = a;
+	DrawCoin(img, ctx, x, y, gold)
+	ctx.globalAlpha = 1.0;
+}
+
+
 function DrawFont(x, y, ctx, string, center)
 {
 	if(center)
@@ -149,10 +177,6 @@ ShopSheet.prototype.Proc = function(ofs)
 				if(PosY < 135) { continue; }
 
 				var id = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["id"];	
-			//	if(GetIsSheetTrue(id) == false)
-			//	{
-			//		continue;
-			//	}
 				
 				if(
 					(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
@@ -200,8 +224,8 @@ ShopSheet.prototype.drawWindow = function()
 		this.ctx.drawImage(popImage, 
 			262/* - (STAMP_W * 0.7)/2*/, 
 			GPosY + 237/* - (STAMP_H * 0.7)/2*/, 
-			popImage.width  * 0.7, 
-			popImage.height * 0.7);
+			popImage.width, 
+			popImage.height);
 	}
 	else
 	{
@@ -237,11 +261,13 @@ ShopSheet.prototype.drawWindow = function()
 		400, GPosY + 290,
 		60, 
 		60);	
-	this.ctx.fillStyle = 'rgb(255, 255, 255)';
-	this.ctx.font = g_sFontName;
+
+//	this.ctx.fillStyle = 'rgb(255, 255, 255)';
+//	this.ctx.font = g_sFontName;
 	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
 //	this.ctx.fillText("" + gold, 128 + 320 + 24, GPosY + 335);
-	DrawFont(128 + 320 + 42, GPosY + 335, this.ctx, "" + gold, true);
+//	DrawFont(128 + 320 + 42, GPosY + 335, this.ctx, "" + gold, true);
+	DrawCoinL(this.CoinChipImage, this.ctx, 128 + 273, GPosY + 305, gold);
 	this.ctx.fillStyle = 'rgb(0, 0, 0)';
 	this.ctx.globalAlpha = 0.5;
 	
@@ -325,7 +351,8 @@ ShopSheet.prototype.drawOK= function()
 	this.ctx.font = g_sFontName;
 	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
 //	this.ctx.fillText("" + gold, 128 + 320 + 24, 335); 
-	DrawFont(128 + 320 + 42, 335, this.ctx, "" + gold, true);
+//	DrawFont(128 + 320 + 42, 335, this.ctx, "" + gold, true);
+	DrawCoinL(this.CoinChipImage, this.ctx, 128 + 273, 305, gold);
 	this.ctx.fillStyle = 'rgb(0, 0, 0)';
 	
 	var id       = gShopBuyListTable[g_iClickDataIndex]["id"];
@@ -336,8 +363,8 @@ ShopSheet.prototype.drawOK= function()
 		this.ctx.drawImage(popImage, 
 			262/* - (STAMP_W * 0.7)/2*/, 
 			237/* - (STAMP_H * 0.7)/2*/, 
-			popImage.width  * 0.7, 
-			popImage.height * 0.7);
+			popImage.width, 
+			popImage.height);
 	}
 	else
 	{
@@ -449,11 +476,12 @@ ShopSheet.prototype.draw = function(ofs)
 			
 				if(GetIsSheetTrue(id) == false)
 				{
-					DrawFont(xx + 3 + x + 10, yy + 35 + y, this.ctx, "うりきれ", true);	
+					DrawFont(xx + 3 + x + 10, yy + 35 + y, this.ctx, "×", true);	
 				}
 				else
 				{
-					DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "" + gold, true);
+					DrawCoin(this.CoinChipImage, this.ctx, xx + x - 12, yy + 5 + y, gold);
+					//DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "" + gold, true);
 				}
 			}
 		}
@@ -481,7 +509,7 @@ ShopSheet.prototype.draw = function(ofs)
 		// 小物を表示[ここは領域に制限をかけてのちのち高速化]
 		// -------------------------------------  
 /*
-		if(bMoveList == false && (eSwitch == 0))
+		if((eSwitch == 0))
 		{
 			for(var i = 0; i < MAX_SHOP_LIST_HEIGHT; i ++)
 			{
@@ -514,7 +542,8 @@ ShopSheet.prototype.draw = function(ofs)
 
 				}
 			}
-		}*/
+		}
+*/
 		// -------------------------------------
 		// ショップの描画
 		// -------------------------------------  
@@ -544,7 +573,11 @@ var StampShop = function()
 	sTouchMoveY 	= -200;
 	sTouchLastX 	= -200;
 	sTouchLastY 	= -200;
-
+	
+	// ショップデータ
+	SetupShopAllData();
+	//SetupShopTutorialData();
+	
 	bTouch 			= false;
 	bOldTouch		= false;
 	sActiveSheetNo = 0;
@@ -611,6 +644,7 @@ var StampShop = function()
 			{
 				if(sScaleRate >= 1.0)
 				{
+					// 購入
 					if(eSwitch == 1)
 					{
 						// Yes
@@ -623,11 +657,15 @@ var StampShop = function()
 							
 							if(id >= M_OFFSET_STAMP)
 							{
-								BuySaveStampData(id - M_OFFSET_STAMP, -gold);
+								BuySaveStampData(id - M_OFFSET_STAMP, 0/*-gold*/);
 							}
 							else
 							{
-								BuySaveSheetData(id, -gold)
+								BuySaveSheetData(id, 0/*-gold*/)
+							}
+							for(var i = 0; i < gold; i ++)
+							{
+								AddCoinEffect(ctx, sheet.CoinChipImage, 415, 26, 60, 60, 1.0, i);
 							}
 							bOldTouch = false; 
 							bTouch = false;
@@ -1135,6 +1173,7 @@ var StampShop = function()
 			case G_STATUS.MAIN:
 				// メインキャンバスの描画
     			mainCanvas.draw();
+				GExecEffect();
 				DispMemory();
 				break;
 			
