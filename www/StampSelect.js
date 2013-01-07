@@ -204,13 +204,52 @@ var StampSelect = function()
 		var ctx    = canvas.getContext("2d");
 		var sheet = new Array();
 	    //スタンプシート準備
+		if(g_HaveStampSheetData.length - 1 <= no) { no = g_HaveStampSheetData.length - 1; }
 		if(g_HaveStampSheetData.length != 0)
 		{
+			// 正面
 		    sheet[0] = new StampSheet(ctx, no);
-		    sheet[1] = new StampSheet(ctx, no + 1);
-		    sheet[2] = new StampSheet(ctx, no + 2);
-		    sheet[4] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 1);
-		    sheet[3] = new StampSheet(ctx, no + g_HaveStampSheetData.length - 2);
+			// 次
+		   // sheet[1] = new StampSheet(ctx, no + 1);
+		    //sheet[2] = new StampSheet(ctx, no + 2);
+			
+			// 次
+			if(no + 1 >= g_HaveStampSheetData.length)
+			{
+				sheet[1] = new StampSheet(ctx, g_HaveStampSheetData.length - 1);
+			}
+			else
+			{
+		    	sheet[1] = new StampSheet(ctx, no + 1);
+			}
+			// 次次
+			if(no + 2 >= g_HaveStampSheetData.length)
+			{
+				sheet[2] = new StampSheet(ctx, g_HaveStampSheetData.length - 1);
+			}
+			else
+			{
+		    	sheet[2] = new StampSheet(ctx, no + 2);
+			}
+			
+			// 前
+			if(no - 1 < 0)
+			{
+				sheet[4] = new StampSheet(ctx, 0);
+			}
+			else
+			{
+		    	sheet[4] = new StampSheet(ctx, no - 1);
+			}
+			// 前前
+			if(no - 2 < 0)
+			{
+				sheet[3] = new StampSheet(ctx, 0);
+			}
+			else
+			{
+		    	sheet[3] = new StampSheet(ctx, no - 2);
+			}
 		}
 	    //debug
 	    this.dubugDisp = function() {

@@ -914,7 +914,7 @@ function LoadActiveSheetIndex()
 {
 	var sheet = localStorage.getItem(g_saveDataKeyActiveSheetIndex);
 	if (!sheet)    sheet = 0;
-	return sheet;
+	return parseInt(sheet);
 }
 function SaveActiveSheetIndex(sheetno) 
 {
@@ -927,7 +927,7 @@ function LoadActiveStampIndex()
 {
 	var stamp = localStorage.getItem(g_saveDataKeyActiveStampIndex);
 	if (!stamp) { stamp = 0; }
-	return stamp;
+	return parseInt(stamp);
 }
 function SaveActiveStampIndex(sheetno) 
 {
