@@ -7,7 +7,7 @@
 // 2.5 256 480
 // 3   213 400
 // 4   160 300
-var REDUCTION_SIZE 		= 2.5;
+var REDUCTION_SIZE 		= 2.0;
 var SCREEN_WIDTH   		= 640;
 var SCREEN_HEIGHT  		= 1200;
 var CANVAS_WIDTH   		= SCREEN_WIDTH  / REDUCTION_SIZE;
@@ -33,41 +33,6 @@ function DeleteSheetClick(e)
 	g_iSwitch = 1;
 	g_WindowsScaleRate = 0;
 }
-
-function GetBrowserWidth()
-{
-    /*if(document.documentElement && document.documentElement.clientWidth != 0)
-	{
-		return document.documentElement.clientWidth + 15;
-    }
-    else*/ if(document.body) 
-	{
-		return document.body.clientWidth + 15;
-    }
-    else if(window.innerWidth)
-	{
-		return window.innerWidth + 15;
-    }	
-    return 0;
-}
-function GetBrowserHeight() 
-{
-    /*if(document.documentElement && document.documentElement.clientHeight != 0)
-	{
-		return document.documentElement.clientHeight + 15;
-    }
-    else*/ if(document.body) 
-	{
-		return document.body.clientHeight + 15;
-    }
-    else if(window.innerHeight) 
-	{
-		return window.innerHeight + 15;
-    }	
-    return 0;
-}
-
-	
 	
 var StampSelect = function() 
 {
@@ -89,22 +54,6 @@ var StampSelect = function()
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
 	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE) - (STAMP_H * BROWSER_RATE);	// 画面領域
 	
-	// キャンパスサイズ
-/*
-	REDUCTION_SIZE 		= 2.5;
-	SCREEN_WIDTH   		= 640;
-	SCREEN_HEIGHT  		= BROWSER_HEIGHT;
-	CANVAS_WIDTH   		= SCREEN_WIDTH  / REDUCTION_SIZE;
-	CANVAS_HEIGHT 		= SCREEN_HEIGHT / REDUCTION_SIZE;
-	STAMP_W_REDUCTION	= STAMP_W / REDUCTION_SIZE;
-	STAMP_H_REDUCTION	= STAMP_H / REDUCTION_SIZE;
-	STAMP_W_REDUCTION_W	= STAMP_W_REDUCTION / 2;
-	STAMP_H_REDUCTION_H	= STAMP_H_REDUCTION / 2;
-	BROWSER_HEIGHT		= 0;
-	BROWSER_WIDTH		= 0;
-	BROWSER_RATE		= 0;
-	BROWSER_SCREEN_H	= 0;	
-*/	
 	
 	//
 	// スタンプシート
@@ -117,6 +66,10 @@ var StampSelect = function()
 	    this.isLoaded = false;
 	    this.sheetNo = no;
 	    this.sheetSrc = "";
+		this.iDrawX   = 0;
+		this.iDrawY   = 0;
+		this.iDrawW   = 0;
+		this.iDrawH   = 0;
 
 		// 動的キャンバス
 		this.CanvasSheet = document.createElement("canvas");
@@ -209,10 +162,10 @@ var StampSelect = function()
 			//M_PRINT("[" + document.body.clientWidth + "][" + document.documentElement.clientWidth + "][" + window.innerWidth + "]");
 			//M_PRINT("[" + document.body.clientHeight + "][" + document.documentElement.clientHeight + "][" + window.innerHeight + "]");
 	        this.ctx.drawImage(this.CanvasSheet, x, y, w, h);
-			//this.ctx.drawImage(this.CanvasSheet, 
-			//	0, 0,	w, h, 		// 画像座標 x y w h
-			//	x, y,	w, h);		// 表示座標 x y w h
-			//this.ctx.drawImage(this.CanvasSheet, 0, 0, w, document.documentElement.clientHeight, x, y, w, document.documentElement.clientHeight);
+			this.iDrawX = x;
+			this.iDrawY = y;
+			this.iDrawW = w;
+			this.iDrawH = (ScreenH * scl);
 	    }
 	};
 
@@ -239,20 +192,20 @@ var StampSelect = function()
 	var MainCanvas = function(no)
 	{
 	    var _this = this;
-	    this.selectIx = no;
+	    this.selectIx = 0;
 	    var startX=0;
 	    var ofsX=0;
 	    var addX=0, ofsXold=0;
 	    var ofsRate=1.2;
-		var iOldSelecterID = no;
+		var iOldSelecterID = 0;
 
 		// デフォルトキャンバス
 	    var canvas = document.getElementById("canvas");
 		var ctx    = canvas.getContext("2d");
+		var sheet = new Array();
 	    //スタンプシート準備
 		if(g_HaveStampSheetData.length != 0)
 		{
-		    var sheet = new Array();
 		    sheet[0] = new StampSheet(ctx, no);
 		    sheet[1] = new StampSheet(ctx, no + 1);
 		    sheet[2] = new StampSheet(ctx, no + 2);
@@ -293,11 +246,23 @@ var StampSelect = function()
 	    //描画
 	    this.draw = function() 
 		{
-	        var ofsMax = 376;
+	        var ofsMax    = 376;
 
 	        //タッチされていない場合の位置調整
 			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN && g_HaveStampSheetData.length != 0)
 			{
+				
+	/*			if(-ofsMax / 2 < ofsX && sheet[this.selectIx].sheetNo <= 0)
+				{
+					ofsX = -ofsMax / 2;
+					addX = 0;
+				}
+				else if(ofsMax / 2 > ofsX && sheet[this.selectIx].sheetNo + 1 >= g_HaveStampSheetData.length)
+				{
+					ofsX = ofsMax / 2;
+					addX = 0;				
+				}
+			*/	
 		        if (!isTouch)
 		    	{
 		    		// 切り替わった瞬間
@@ -353,30 +318,77 @@ var StampSelect = function()
 					PuchArrowR();
 				}*/
 				iOldSelecterID = this.selectIx;
-				
-		        if (ofsX < -ofsMax / 2){
-		            startX -= ofsMax / ofsRate;
-		            ofsX += ofsMax;
-		            this.selectIx += 1;
-		            this.selectIx %= 5;
-		            sheet[(this.selectIx + 2) % 5].setImage( sheet[this.selectIx].sheetNo + 2);
+
+		        if (ofsX < -ofsMax / 8)
+				{
+					// 前
+					if(sheet[this.selectIx].sheetNo + 1 < g_HaveStampSheetData.length)
+					{
+					}
+					else
+					{
+						ofsX = -ofsMax /  8;
+						addX = 12;
+					}
 		        }
-		        if (ofsX > ofsMax / 2){
-		            startX += ofsMax/ofsRate;
-		            ofsX -= ofsMax;
-		            this.selectIx += 5 - 1;
-		            this.selectIx %= 5;
-		            sheet[(this.selectIx + 3) % 5].setImage( sheet[this.selectIx].sheetNo - 2);
+		        if (ofsX > ofsMax / 8)
+				{		        	
+					// 次
+		        	if(sheet[this.selectIx].sheetNo > 0)
+					{
+					}
+					else
+					{
+						ofsX = ofsMax / 8;
+						addX = -12;
+					}								
+		        }
+				
+		        if (ofsX < -ofsMax / 2)
+				{
+					// 前
+					//if(sheet[this.selectIx].sheetNo + 1 < g_HaveStampSheetData.length)
+					{
+						startX -= ofsMax / ofsRate;
+						ofsX += ofsMax;						
+						this.selectIx += 1;
+						this.selectIx %= 5;
+		            	sheet[(this.selectIx + 2) % 5].setImage(sheet[this.selectIx].sheetNo + 2);
+					}
+		        }
+		        if (ofsX > ofsMax / 2)
+				{		        	
+					// 次
+		        	//if(sheet[this.selectIx].sheetNo > 0)
+					{
+			            startX += ofsMax/ofsRate;
+			            ofsX -= ofsMax;						
+						this.selectIx += 5 - 1;
+						this.selectIx %= 5;
+						sheet[(this.selectIx + 3) % 5].setImage(sheet[this.selectIx].sheetNo - 2);
+					}							
 		        }
 		        ofsXold = ofsX;
 			}
 			// クリアと背景の表示
 			this.clear();		
+			var bL = false;
+			var bR = false;
 			if(g_HaveStampSheetData.length != 0)
 			{
-		        sheet[(this.selectIx + 4) % 5].draw(ofsX - ofsMax);
-		        sheet[(this.selectIx + 1) % 5].draw(ofsX + ofsMax);
-		        sheet[this.selectIx].draw(ofsX);
+				// 前
+				if(sheet[this.selectIx].sheetNo > 0)
+				{
+		        	sheet[(this.selectIx + 4) % 5].draw(ofsX - ofsMax);
+					bL = true;
+				}
+		        // 次
+				if(sheet[this.selectIx].sheetNo + 1 < g_HaveStampSheetData.length)
+				{
+					sheet[(this.selectIx + 1) % 5].draw(ofsX + ofsMax);
+					bR = true;
+				}
+				sheet[this.selectIx].draw(ofsX);
 		    	
 		    	if(ofsX == 0 && iForceTouch)
 		    	{
@@ -398,8 +410,8 @@ var StampSelect = function()
 				101);
 			// 矢印を描画
 			ProcArrow();
-			DrawArrowL(ctx, 60,  450, 40);
-			DrawArrowR(ctx, 580, 450, 40);
+			if(bL) { DrawArrowL(ctx, 60,  450, 40); }
+			if(bR) { DrawArrowR(ctx, 580, 450, 40); }
 		
 			
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
@@ -445,71 +457,83 @@ var StampSelect = function()
 			// ------------------------------------------------
 	    	else if((!isTouch) && bOldTouch && iForceTouch == false)
 	    	{
-				var PosX = 0;
-				var PosY = 215 + g_YOffset - 20;
-				var PosW = 112;
-				var PosH = 410;
 	    		
 	    		// 移動地がでかい
 	    		var vMove1 = Math.abs(sTouchStartX - sTouchMoveX);
 	    		var vMove2 = Math.abs(sTouchStartY - sTouchMoveY);
 	    		if(vMove1 + vMove2 < 10)
-	    		{
-	    		
-	    		
-		/*
-					ctx.globalAlpha = 0.5;
-					ctx.fillStyle = 'rgb(255, 0, 0)';
-			        ctx.fillRect(PosX, PosY, PosW, PosH);
-					ctx.globalAlpha = 1.0;	
-		*/	 
-					if(
-						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
-						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
-						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
-						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
-					{	
-						iButtonStartClickIndex	= 0;
-						iButtonMoveClickIndex 	= 0;
-		        		isTouch = true;
-						iForceTouch = true;
-						ofsX	= 100;
-						//PuchArrowL();
-					}		    	
-					PosX = 527;
-					PosY = 215 + g_YOffset - 20;
-					PosW = 118;
-					PosH = 410;
-		/*
-					ctx.globalAlpha = 0.5;
-					ctx.fillStyle = 'rgb(255, 0, 0)';
-			        ctx.fillRect(PosX, PosY, PosW, PosH);
-					ctx.globalAlpha = 1.0;	
-		*/	    	
-					if(
-						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
-						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
-						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
-						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
-					{	
-						iButtonStartClickIndex	= 1;
-						iButtonMoveClickIndex 	= 1;
-		        		isTouch = true;
-						iForceTouch = true;
-						ofsX	= -100;
-						//PuchArrowR();
-					}	
-			    	
-					PosX = 112;
-					PosY = 50 + g_YOffset - 20;
-					PosW = 416;
-					PosH = 740;
-		/*
-					ctx.globalAlpha = 0.5;
-					ctx.fillStyle = 'rgb(0, 255, 0)';
-			        ctx.fillRect(PosX, PosY, PosW, PosH);
-					ctx.globalAlpha = 1.0;	
-		*/	    			    			
+	    		{ 
+	    			// 次
+	    			var PosX;
+	    			var PosY;
+	    			var PosW;
+	    			var PosH;
+	    			if(bL)
+	    			{
+	    				var aSheet = sheet[(this.selectIx + 4) % 5];
+						PosX = aSheet.iDrawX;
+						PosY = aSheet.iDrawY;
+						PosW = aSheet.iDrawW;
+						PosH = aSheet.iDrawH;
+						//ctx.globalAlpha = 0.5;
+						//ctx.fillStyle = 'rgb(255, 0, 0)';
+				        //ctx.fillRect(PosX, PosY, PosW, PosH);
+						//ctx.globalAlpha = 1.0;	
+
+						if(
+							(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+							(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+							(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+							(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+						{	
+							iButtonStartClickIndex	= 0;
+							iButtonMoveClickIndex 	= 0;
+			        		isTouch = true;
+							iForceTouch = true;
+							ofsX	= 100;
+							//PuchArrowL();
+						}		
+	    			}
+	    			
+	    			// 前
+	    			if(bR)
+	    			{
+	    				var aSheet = sheet[(this.selectIx + 1) % 5];
+						PosX = aSheet.iDrawX;
+						PosY = aSheet.iDrawY;
+						PosW = aSheet.iDrawW;
+						PosH = aSheet.iDrawH;
+						//ctx.globalAlpha = 0.5;
+						//ctx.fillStyle = 'rgb(255, 0, 0)';
+				        //ctx.fillRect(PosX, PosY, PosW, PosH);
+						//ctx.globalAlpha = 1.0;		    				
+						if(
+							(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+							(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+							(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+							(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+						{	
+							iButtonStartClickIndex	= 1;
+							iButtonMoveClickIndex 	= 1;
+			        		isTouch = true;
+							iForceTouch = true;
+							ofsX	= -100;
+							//PuchArrowR();
+						}	
+	    			}
+	    			
+	    			
+	    			// 正面決定
+    				var aSheet = sheet[this.selectIx];
+					PosX = aSheet.iDrawX;
+					PosY = aSheet.iDrawY;
+					PosW = aSheet.iDrawW;
+					PosH = aSheet.iDrawH;
+					//ctx.globalAlpha = 0.5;
+					//ctx.fillStyle = 'rgb(0, 255, 0)';
+			        //ctx.fillRect(PosX, PosY, PosW, PosH);
+					//ctx.globalAlpha = 1.0;	
+			    			    			
 					if(
 						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
 						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
