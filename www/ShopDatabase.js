@@ -23,12 +23,13 @@ var STAMP_H = 160;
 // -------------------------------------
 // リダクションサイズを設定する「処理を軽くするためサムネイル」
 // -------------------------------------
+/*
 var REDUCTION_SIZE = 2.0;
 var SCREEN_WIDTH   = 640;
 var SCREEN_HEIGHT  = 1200;
 var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
 var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
-
+*/
 
 // 背景画像
 var gStampEnum = 
@@ -373,7 +374,7 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 // ------------------------------------------------------
 
 // スタンプの最大回数
-var STAMP_LIFE_MAX = 3 * 15;	// 45
+var STAMP_LIFE_MAX = 3 * 30;	// 45
 var g_HaveStampImageData = 
 [
     {"id":0, "ink":STAMP_LIFE_MAX},	// ダミー
@@ -700,23 +701,23 @@ function DummyStampDataSet()
 //	}
 	// [各３こづつ]
 	// シンコ
-	AddHasStamp(gStampEnum.SIN_BAMU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.SIN_CHOCO  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.SIN_HEART  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+//	AddHasStamp(gStampEnum.SIN_BAMU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+//	AddHasStamp(gStampEnum.SIN_CHOCO  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+//	AddHasStamp(gStampEnum.SIN_HEART  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// ごはん
 	AddHasStamp(gStampEnum.NIKU  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	AddHasStamp(gStampEnum.PURIN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	AddHasStamp(gStampEnum.SUPA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// 雲の上
-	AddHasStamp(gStampEnum.KUMO  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.HUUSEN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.HANA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	//AddHasStamp(gStampEnum.KUMO  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	//AddHasStamp(gStampEnum.HUUSEN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	//AddHasStamp(gStampEnum.HANA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
 
 	// 必要なもの[ぴーまん、にんじん、とまと、なす]
 	AddHasStamp(gStampEnum.KAMI_PIMAN  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.KAMI_NINZIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	//AddHasStamp(gStampEnum.KAMI_NINZIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	AddHasStamp(gStampEnum.KAMI_TOMATO - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.KAMI_NASU   - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	//AddHasStamp(gStampEnum.KAMI_NASU   - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 
 	// セーブ
 	SaveHaveStampData();
@@ -803,9 +804,9 @@ function DummySheetDataSet()
 	}
 */
 	// 必要なもの[シンコ様テーブル左]
-	AddHasSheet(gStampEnum.SINKO_01);	// シンコ
+//	AddHasSheet(gStampEnum.SINKO_01);	// シンコ
 	AddHasSheet(gStampEnum.GOHAN_01);	// ランチ
-	AddHasSheet(gStampEnum.SKY_01);		// 雲の上
+//	AddHasSheet(gStampEnum.SKY_01);		// 雲の上
 		
 	
 	// セーブ
@@ -956,6 +957,10 @@ function DispMemory()
 */
 	//document.getElementById("memory").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";/* + sActiveSheetNo;*/
 	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
+}
+function M_PRINT(sData)
+{
+	document.getElementById("memory").innerHTML = "<font color='white'>" + "[data]" + sData + "</font>";
 }
 
 
@@ -1248,18 +1253,28 @@ function ProcArrow()
 }
 function PuchArrowL()
 {
-	g_nArrowCounterL = 10;
+	g_nArrowCounterL = 16;
 }
 function PuchArrowR()
 {
-	g_nArrowCounterR = 10;
+	g_nArrowCounterR = 16;
 }
+function MoveArrowL()
+{
+	if(g_nArrowCounterL <= 0) { PuchArrowL(); }
+}
+function MoveArrowR()
+{
+	if(g_nArrowCounterR <= 0) { PuchArrowR(); }
+}
+
 function DrawArrowL(ctx, x, y, size)
 {
-	ctx.globalAlpha = 0.60 + (-g_nArrowCounterL * 0.05);
+ 	var a = 1.0 - (g_nArrowCounterL * 0.05);
+	x -= (g_nArrowCounterL * 2);
+	ctx.globalAlpha = a;
 	ctx.fillStyle = 'rgb(255, 0, 255)';
 	ctx.beginPath();
-	x -= (g_nArrowCounterL * 3);
 	ctx.moveTo(x, y);
 	var hSize = size / 2;
 	ctx.lineTo(x + size, y - hSize);
@@ -1267,13 +1282,45 @@ function DrawArrowL(ctx, x, y, size)
 	ctx.closePath();
 	ctx.fill();
 	ctx.globalAlpha = 1.0;	
+	
+/*
+	var a;
+	if(g_nArrowCounterL > 8)
+	{
+		a = 0.60 + (-g_nArrowCounterL * 0.05);
+	}
+	else
+	{
+		a = 0.60 + (16-g_nArrowCounterL * 0.05);
+	}
+	if(g_nArrowCounterL > 8)
+	{
+		x -= (g_nArrowCounterL * 3);
+	}
+	else
+	{
+		x -= ((16-g_nArrowCounterL) * 3);
+	}
+	
+	ctx.globalAlpha = a;
+	ctx.fillStyle = 'rgb(255, 0, 255)';
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+	var hSize = size / 2;
+	ctx.lineTo(x + size, y - hSize);
+	ctx.lineTo(x + size, y + hSize);
+	ctx.closePath();
+	ctx.fill();
+	ctx.globalAlpha = 1.0;	
+*/
 }
 function DrawArrowR(ctx, x, y, size)
 {
-	ctx.globalAlpha = 0.60 + (-g_nArrowCounterR * 0.05);
+ 	var a = 1.0 - (g_nArrowCounterR * 0.05);
+	x += (g_nArrowCounterR * 2);
+	ctx.globalAlpha = a;	
 	ctx.fillStyle = 'rgb(255, 0, 255)';
 	ctx.beginPath();
-	x += (g_nArrowCounterR * 3);
 	ctx.moveTo(x, y);
 	var hSize = size / 2;
 	ctx.lineTo(x - size, y - hSize);
@@ -1533,16 +1580,16 @@ function AddScaleZoomEffect(ctx, image, x, y, w, h, a)
 }
 
 // 耐久値の表示
-var nMinHpWakuW  = 2;
-var nMaxHpWakuW  = 90 + 2
-var nHpSizeWakuH = 2;
+var nMinHpWakuW  = 0;
+var nMaxHpWakuW  = 90 + 0
+var nHpSizeWakuH = 3;
 var nHpSizeNAKAH = nHpSizeWakuH/* - 1*/;
 function DrawHp(ctx, x, y, hp)
 {
 	// STAMP_LIFE_MAX = 90
 	// 
 	//
-	hp *= 2;
+	hp *= 1;
 	
 	// 枠
 	ctx.globalAlpha = 1.0;	

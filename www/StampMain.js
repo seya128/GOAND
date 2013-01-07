@@ -1,7 +1,5 @@
 
 // 定義
-var STAMP_W 	= 160;
-var STAMP_H 	= 160;
 var STAMPS_H 	= STAMP_H;//STAMP_H + 15;
 var nArrowSize	= 22;
 var nGaugeMaxStlong = 3;
@@ -233,7 +231,7 @@ StampBar.prototype.draw = function(){
 		        this.ctx.fillStyle = 'rgb(255, 0, 0)';
 		        this.ctx.fillRect(x+0, 0, STAMP_W-0, STAMPS_H-0);
 		        this.ctx.fillStyle = 'rgb(0, 0, 0)';
-		        this.ctx.fillRect(x+8, 8, STAMP_W-8*2, STAMPS_H-8*2);
+		        this.ctx.fillRect(x+6, 6, STAMP_W-12, STAMPS_H-12);
 		        this.selectedStampIx = ix;
 				this.iSelectedX      = x;
 			} 
@@ -491,7 +489,7 @@ StampBar.prototype.AddStamp = function(_This)
     _This.nVal3.globalAlpha = 1.0;
 	
     //描画データ保存
-    g_sActiveDrawData.Add(x,y, s.id, a);
+    g_sActiveDrawData.Add(x + (STAMP_W / 2), y + (STAMP_H / 2), s.id, a);
     g_sActiveDrawData.Save();	//オートセーブ
     
 	// インク切れの瞬間
@@ -989,8 +987,8 @@ var stamp_ctx;
 				//次のシーンをセット
 				if(nNextEvent == 0)
 				{
-					//nextSceen = new StampSelect();
-					nextSceen = new SceenTitle();
+					nextSceen = new StampSelect();
+				//	nextSceen = new SceenTitle();
 				}
 				else
 				{

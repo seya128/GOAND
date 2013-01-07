@@ -7,17 +7,25 @@
 // 2.5 256 480
 // 3   213 400
 // 4   160 300
-var REDUCTION_SIZE = 2.5;
-var SCREEN_WIDTH   = 640;
-var SCREEN_HEIGHT  = 1200;
-var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
-var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
+var REDUCTION_SIZE 		= 2.5;
+var SCREEN_WIDTH   		= 640;
+var SCREEN_HEIGHT  		= 1200;
+var CANVAS_WIDTH   		= SCREEN_WIDTH  / REDUCTION_SIZE;
+var CANVAS_HEIGHT 		= SCREEN_HEIGHT / REDUCTION_SIZE;
+var STAMP_W_REDUCTION	= STAMP_W / REDUCTION_SIZE;
+var STAMP_H_REDUCTION	= STAMP_H / REDUCTION_SIZE;
+var STAMP_W_REDUCTION_W	= STAMP_W_REDUCTION / 2;
+var STAMP_H_REDUCTION_H	= STAMP_H_REDUCTION / 2;
+var BROWSER_HEIGHT		= 0;
+var BROWSER_WIDTH		= 0;
+var BROWSER_RATE		= 0;
+var BROWSER_SCREEN_H	= 0;
 
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
 // -------------------------------------
 var timerID;
-var g_YOffset = 90;
+var g_YOffset = 140;
 
 // クリア
 function DeleteSheetClick(e)
@@ -25,6 +33,40 @@ function DeleteSheetClick(e)
 	g_iSwitch = 1;
 	g_WindowsScaleRate = 0;
 }
+
+function GetBrowserWidth()
+{
+    /*if(document.documentElement && document.documentElement.clientWidth != 0)
+	{
+		return document.documentElement.clientWidth + 15;
+    }
+    else*/ if(document.body) 
+	{
+		return document.body.clientWidth + 15;
+    }
+    else if(window.innerWidth)
+	{
+		return window.innerWidth + 15;
+    }	
+    return 0;
+}
+function GetBrowserHeight() 
+{
+    /*if(document.documentElement && document.documentElement.clientHeight != 0)
+	{
+		return document.documentElement.clientHeight + 15;
+    }
+    else*/ if(document.body) 
+	{
+		return document.body.clientHeight + 15;
+    }
+    else if(window.innerHeight) 
+	{
+		return window.innerHeight + 15;
+    }	
+    return 0;
+}
+
 	
 	
 var StampSelect = function() 
@@ -40,6 +82,30 @@ var StampSelect = function()
 	var isTouch = false;
 	g_iSwitch = 0;
 
+	// ウィンドウサイズ
+    BROWSER_WIDTH   = window.innerWidth  || document.body.clientWidth  || document.documentElement.clientWidth;
+    BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
+    BROWSER_HEIGHT  += 30;
+	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
+	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE) - (STAMP_H * BROWSER_RATE);	// 画面領域
+	
+	// キャンパスサイズ
+/*
+	REDUCTION_SIZE 		= 2.5;
+	SCREEN_WIDTH   		= 640;
+	SCREEN_HEIGHT  		= BROWSER_HEIGHT;
+	CANVAS_WIDTH   		= SCREEN_WIDTH  / REDUCTION_SIZE;
+	CANVAS_HEIGHT 		= SCREEN_HEIGHT / REDUCTION_SIZE;
+	STAMP_W_REDUCTION	= STAMP_W / REDUCTION_SIZE;
+	STAMP_H_REDUCTION	= STAMP_H / REDUCTION_SIZE;
+	STAMP_W_REDUCTION_W	= STAMP_W_REDUCTION / 2;
+	STAMP_H_REDUCTION_H	= STAMP_H_REDUCTION / 2;
+	BROWSER_HEIGHT		= 0;
+	BROWSER_WIDTH		= 0;
+	BROWSER_RATE		= 0;
+	BROWSER_SCREEN_H	= 0;	
+*/	
+	
 	//
 	// スタンプシート
 	//
@@ -66,17 +132,23 @@ var StampSelect = function()
 		if (this.isLoaded) 
 		{
 	        var rate = Math.abs(ofs)/320 * 0.25 ;
-	        var w = this.img.naturalWidth  * (0.65 - rate);
-	        var h = this.img.naturalHeight * (0.65 - rate);
+			var scl  = (0.65 - rate);
+	        var w = this.img.naturalWidth  * scl;
+	        var h = this.img.naturalHeight * scl;
 	        var x = (640 - w) / 2 + ofs - rate*ofs ;
 	        var y = (800 - h) / 2 + g_YOffset;
-			// そのまま描画
-			this.CanvasSheet_2d.drawImage(this.img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 			
-//			this.CanvasSheet_2d.drawImage(this.img, 0, 0, 640, window.innerHeight, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-//document.body.clientWidth;
-//document.body.clientHeight; 
-//document.documentElement.clientHeight
+			// -------------------------------------
+			// シートの表示
+			// -------------------------------------  
+			// そのまま描画
+		//	this.CanvasSheet_2d.drawImage(this.img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+			var ScreenH = BROWSER_SCREEN_H;		// ローカルのほうが高速・・・？
+			var sh      = ScreenH / REDUCTION_SIZE;
+			this.CanvasSheet_2d.drawImage(this.img, 
+				0, 0, this.img.naturalWidth, ScreenH, 				// 画像座標 x y w h
+				0, 0, CANVAS_WIDTH,          sh);					// 表示座標 x y w h
+
 			// -------------------------------------
 			// シートに張り付けて描画
 			// -------------------------------------  
@@ -107,23 +179,40 @@ var StampSelect = function()
 	
 					// -------------------------------------
 					// 描画
-					// ------------------------------------- 
-					if(GetStampGraphicHandle_Stamp(id) == null) { continue; }
-					if(GetStampGraphicHandle_Stamp(id).m_bLoaded)
+					// -------------------------------------
+					var iDrawX = (xx/REDUCTION_SIZE)-STAMP_W_REDUCTION_W;
+					var iDrawY = (yy/REDUCTION_SIZE)-STAMP_H_REDUCTION_H;
+					var iCut   = (iDrawY + STAMP_H_REDUCTION) - sh;
+					if(iCut <= 0)
 					{
-						if(GetStampGraphicHandle_StampImage(id) == null) { continue; }
 						this.CanvasSheet_2d.globalAlpha = a;
 						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_StampImage(id), 
-							(xx/REDUCTION_SIZE)-STAMP_W/2/REDUCTION_SIZE, 
-							(yy/REDUCTION_SIZE)-STAMP_H/2/REDUCTION_SIZE, 
-							STAMP_W / REDUCTION_SIZE, 
-							STAMP_H / REDUCTION_SIZE);
+							iDrawX, 
+							iDrawY, 
+							STAMP_W_REDUCTION, 
+							STAMP_H_REDUCTION);
 						this.CanvasSheet_2d.globalAlpha = 1.0;
+					}
+					else
+					{
+						var nh = (STAMP_H_REDUCTION - iCut) / STAMP_H_REDUCTION;
+						this.CanvasSheet_2d.globalAlpha = a;
+						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_StampImage(id), 
+							0,      0,      STAMP_W, STAMP_H * nh, 									// 画像座標 x y w h
+							iDrawX, iDrawY, STAMP_W_REDUCTION, STAMP_H_REDUCTION - iCut);		// 表示座標 x y w h
+						this.CanvasSheet_2d.globalAlpha = 1.0;						
 					}
 				}
 			}
+			// あまった部分は消す
 			// 最終描画
+			//M_PRINT("[" + document.body.clientWidth + "][" + document.documentElement.clientWidth + "][" + window.innerWidth + "]");
+			//M_PRINT("[" + document.body.clientHeight + "][" + document.documentElement.clientHeight + "][" + window.innerHeight + "]");
 	        this.ctx.drawImage(this.CanvasSheet, x, y, w, h);
+			//this.ctx.drawImage(this.CanvasSheet, 
+			//	0, 0,	w, h, 		// 画像座標 x y w h
+			//	x, y,	w, h);		// 表示座標 x y w h
+			//this.ctx.drawImage(this.CanvasSheet, 0, 0, w, document.documentElement.clientHeight, x, y, w, document.documentElement.clientHeight);
 	    }
 	};
 
@@ -250,15 +339,19 @@ var StampSelect = function()
 		            addX = ofsX - ofsXold;
 		        }
 				
+				// 動き
+				MoveArrowL();
+				MoveArrowR();
+					
 				// 代入
-				if(iOldSelecterID > this.selectIx)
+				/*if(iOldSelecterID > this.selectIx)
 				{
 					PuchArrowL();
 				}
 				else if(iOldSelecterID < this.selectIx)
 				{
 					PuchArrowR();
-				}
+				}*/
 				iOldSelecterID = this.selectIx;
 				
 		        if (ofsX < -ofsMax / 2){
@@ -381,7 +474,7 @@ var StampSelect = function()
 		        		isTouch = true;
 						iForceTouch = true;
 						ofsX	= 100;
-						PuchArrowL();
+						//PuchArrowL();
 					}		    	
 					PosX = 527;
 					PosY = 215 + g_YOffset - 20;
@@ -404,7 +497,7 @@ var StampSelect = function()
 		        		isTouch = true;
 						iForceTouch = true;
 						ofsX	= -100;
-						PuchArrowR();
+						//PuchArrowR();
 					}	
 			    	
 					PosX = 112;
@@ -486,7 +579,7 @@ var StampSelect = function()
 	g_eStatus = G_STATUS.INIT;
 	var next;
 	var alpha = 0;
-
+	
 	// セーブされた描画データ
 	AllLoadStampDrawData();
     // 画像ロード[初回一回のみ]
