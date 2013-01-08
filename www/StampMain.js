@@ -119,7 +119,7 @@ StampBar.prototype.updateDispInfo = function(){
 	if(g_HaveStampImageData.length <= 0) 
 	{ 
 		this.leftDispOfs = 0;
-		this.selectedStampId = 0;
+		//this.selectedStampId = 0;
 		return;
 	}
 	if(g_HaveStampImageData.length <= 3) 
@@ -254,7 +254,8 @@ StampBar.prototype.draw = function(){
 	        this.ctx.globalAlpha = 1.0;
 			
 			// HP
-			DrawHp(this.ctx, x + 35, 149, s.ink);
+			//DrawHp(this.ctx, x + 35, 149, s.ink);
+			DrawStrNum(this.ctx, x + 114, 154, s.ink / 3, false, 0.25, 1.0, 22);
         }
         x += STAMP_W;
         ix ++;
@@ -265,23 +266,23 @@ StampBar.prototype.draw = function(){
     }
 	// 矢印を描画
 	ProcArrow();
+	MoveArrowL();
+	MoveArrowR();
 	if(g_HaveStampImageData.length <= 3)
 	{
 	}
 	else if(this.offset <= 0)
 	{
-		//DrawArrowL(this.ctx, 30,  75, nArrowSize);
-		DrawArrowR(this.ctx, 480, 71, nArrowSize);
+		DrawArrowRM(this.ctx, 468, 88);
 	}
 	else if(this.offset >= (g_HaveStampImageData.length - 3) * STAMP_W)
 	{
-		DrawArrowL(this.ctx, 20,  71, nArrowSize);
-		//DrawArrowR(this.ctx, 470, 75, nArrowSize);
+		DrawArrowLM(this.ctx, 32,  88);
 	}
 	else
 	{
-		DrawArrowL(this.ctx, 20,  71, nArrowSize);	
-		DrawArrowR(this.ctx, 480, 71, nArrowSize);
+		DrawArrowLM(this.ctx, 32,  88);	
+		DrawArrowRM(this.ctx, 468, 88);
 	}
 };
 
@@ -689,12 +690,13 @@ var StampMain = function()
 	        bTouch = true;
 			nInkStlong = 1;
 			nInkCounter = 0;
-			if(g_iSwitch == 0)
+			if(g_iSwitch == 0 && (stampBar.selectedStampId < g_HaveStampImageData.length && stampBar.selectedStampId != -1))
 			{
 				if(stampBar.InkMinus5()) { nInkStlong = nGaugeMaxStlong; }
 				drawStamp_t(pos.x, pos.y, nInkStlong);
 				//setTimeout(onTouchDown , 100);
 			}
+			else if(g_iSwitch == 0) { bTouch = false; }
 		} else { bTouch = false; }
         e.preventDefault(); //デフォルトイベント処理をしない
     };
@@ -987,8 +989,8 @@ var stamp_ctx;
 				//次のシーンをセット
 				if(nNextEvent == 0)
 				{
-					nextSceen = new StampSelect();
-				//	nextSceen = new SceenTitle();
+				//	nextSceen = new StampSelect();
+					nextSceen = new SceenTitle();
 				}
 				else
 				{

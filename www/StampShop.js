@@ -17,7 +17,7 @@ var sTouchAccelerator = 0;
 var eSwitch = 0;
 var sScaleRate = 0;
 var fBuySheetRate = 0.12;
-var fWindowSheetRate = 0.22;
+var fWindowSheetRate = 0.32;
 
 // ボタン
 var g_iButtonStartClickIndex	= -1;
@@ -69,6 +69,45 @@ function DrawFont(x, y, ctx, string, center)
 		ctx.textAlign = "left";
 	}
 	ctx.fillText(string, x, y); 
+}
+
+
+function DrawBuyImage(ctx, GPosY, id, gold)
+{
+	var popImage = GetStampGraphicImage(id);
+	
+	// スタンプ
+	if(id >= M_OFFSET_STAMP)
+	{
+		ctx.drawImage(popImage, 
+			177 - popImage.width  / 2, 
+			GPosY + 380 - popImage.height / 2, 
+			popImage.width, 
+			popImage.height);
+		// -------------------------------------
+		// 持っている数
+		// -------------------------------------	
+		DrawStrNum(ctx, 314, GPosY + 368, GetStampNum(id - M_OFFSET_STAMP), false, 0.72, sScaleRate, 55);
+		
+	}
+	// シート
+	else
+	{
+		ctx.drawImage(popImage, 
+			176 - (popImage.width  * fWindowSheetRate)/2, 
+			GPosY + 300 - (popImage.height * fWindowSheetRate)/2, 
+			popImage.width  * fWindowSheetRate, 
+			popImage.height * fWindowSheetRate);
+		// -------------------------------------
+		// 持っている数
+		// -------------------------------------	
+		DrawStrNum(ctx, 314, GPosY + 368, GetSheetNum(id), false, 0.72, sScaleRate, 55);		
+	}	
+	
+	// -------------------------------------
+	// 販売金額表示
+	// -------------------------------------	
+	DrawStrNum(ctx, 414, GPosY + 470, gold, false, 0.72, sScaleRate, 55);
 }
 
 // -------------------------------------
@@ -168,12 +207,17 @@ ShopSheet.prototype.Proc = function(ofs)
 				
 				var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 				var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y/* + YVal*/;
-		
+				/*
 				var PosX = (xx)-214/2 + x + 38;
 				var PosY = (yy)-237/2 + y + 170 + ofs;
 				var PosW = 137;
 				var PosH = 46;
-				
+				*/
+				var PosX = (xx)-214/2 + x + 49;
+				var PosY = (yy)-237/2 + y + 170 + ofs;
+				var PosW = 116;
+				var PosH = 54;
+			
 				if(PosY < 135) { continue; }
 
 				var id = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["id"];	
@@ -199,78 +243,70 @@ ShopSheet.prototype.Proc = function(ofs)
 ShopSheet.prototype.drawWindow = function()
 {
 	DrawBack(this.ctx);
-	
+	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
+	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];	
 	var GPosY = (1.0 - sScaleRate) * -64;
 
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 	this.ctx.globalAlpha = sScaleRate;
-	this.ctx.drawImage(this.BuyWindowImage, 
-		89  /*- 460 / 2*/, 
-		GPosY + 214 /*- 440 / 2*/, 
-		460, 
-		440);
-	this.ctx.drawImage(this.YesNoMessageImage, 
-		128  /*- 460 / 2*/, 
-		GPosY + 380 /*- 440 / 2*/, 
-		386, 
-		162);
-
-	var id       = gShopBuyListTable[g_iClickDataIndex]["id"];
-	var popImage = GetStampGraphicImage(id);
 	
+	// 購入メッセージ
+	this.ctx.drawImage(this.BuyWindowImage, 
+		20  /*- 460 / 2*/, 
+		GPosY + 214 /*- 440 / 2*/);
+	
+	// スタンプ
 	if(id >= 100)
 	{
-		this.ctx.drawImage(popImage, 
-			262/* - (STAMP_W * 0.7)/2*/, 
-			GPosY + 237/* - (STAMP_H * 0.7)/2*/, 
-			popImage.width, 
-			popImage.height);
+		// 交換する？
+		this.ctx.drawImage(g_StampMessageBottonHandle, 
+			20  /*- 460 / 2*/, 
+			GPosY + 520 /*- 440 / 2*/);
 	}
+	// シート
 	else
 	{
-		this.ctx.drawImage(popImage, 
-			262+58      - (popImage.width  * fWindowSheetRate)/2, 
-			GPosY + 260 - (popImage.height * fWindowSheetRate)/2, 
-			popImage.width  * fWindowSheetRate, 
-			popImage.height * fWindowSheetRate);
+		// 交換する？
+		this.ctx.drawImage(g_SheetMessageHandle, 
+			20  /*- 460 / 2*/, 
+			GPosY + 520 /*- 440 / 2*/);		
 	}
 	
+	// 交換する？
+	this.ctx.drawImage(this.YesNoMessageImage, 
+		20  /*- 460 / 2*/, 
+		GPosY + 520 /*- 440 / 2*/);
+
+	// -------------------------------------
+	// 持っている数,販売金額表示,スタンプかシートを表示
+	// -------------------------------------
+	DrawBuyImage(this.ctx, GPosY, id, gold);
+	
 	var PosYesX = 33;
-	var PosYesY = GPosY + 565;
+	var PosYesY = GPosY + 690;
 	var PosYesW = 281;
 	var PosYesH = 184;
 	var PosNoX = 317;
-	var PosNoY = GPosY + 565;
+	var PosNoY = GPosY + 690;
 	var PosNoW = 281;
 	var PosNoH = 184;
-	this.ctx.globalAlpha = sScaleRate;// - 1.0;
 	//if(this.ctx.globalAlpha < 0) { this.ctx.globalAlpha = 0; }
 	this.ctx.drawImage(g_YesImageHandle, 
 		PosYesX  /*- 460 / 2*/, 
-		PosYesY /*- 440 / 2*/, 
-		PosYesW, 
-		PosYesH);
+		PosYesY);
 	this.ctx.drawImage(g_NoImageHandle, 
 		PosNoX  /*- 460 / 2*/, 
-		PosNoY /*- 440 / 2*/, 
-		PosNoW, 
-		PosNoH);
+		PosNoY);
 	
-	this.ctx.drawImage(this.CoinChipImage, 
-		400, GPosY + 290,
-		60, 
-		60);	
 
 //	this.ctx.fillStyle = 'rgb(255, 255, 255)';
 //	this.ctx.font = g_sFontName;
-	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
+//	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
 //	this.ctx.fillText("" + gold, 128 + 320 + 24, GPosY + 335);
 //	DrawFont(128 + 320 + 42, GPosY + 335, this.ctx, "" + gold, true);
-	DrawCoinL(this.CoinChipImage, this.ctx, 128 + 273, GPosY + 305, gold);
-	this.ctx.fillStyle = 'rgb(0, 0, 0)';
-	this.ctx.globalAlpha = 0.5;
-	
+//	DrawCoinL(this.CoinChipImage, this.ctx, 128 + 273, GPosY + 305, gold);
+
 	// 初期化
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
 	{
@@ -304,6 +340,10 @@ ShopSheet.prototype.drawWindow = function()
 	sScaleRate += 0.15;
 	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
 }
+
+
+// スタンプを購入しました
+// いっぱいですなどなど
 ShopSheet.prototype.drawOK= function()
 {
 	DrawBack(this.ctx);
@@ -311,71 +351,52 @@ ShopSheet.prototype.drawOK= function()
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 	this.ctx.globalAlpha = sScaleRate;
+	
+	// 確認ウィンドウ
 	this.ctx.drawImage(this.BuyWindowImage, 
-		89  /*- 460 / 2*/, 
-		214 /*- 440 / 2*/, 
-		460, 
-		440);
+		20  /*- 460 / 2*/, 
+		214);
+	// 購入しました
 	if(eSwitch == 2)
 	{
 		this.ctx.drawImage(this.BuyOkMessageImage, 
-			128  /*- 460 / 2*/, 
-			380 /*- 440 / 2*/, 
-			386, 
-			162);
+			30  /*- 460 / 2*/, 
+			520);
 	}
+	// お金が足りません
 	else if(eSwitch == 3)
 	{
 		this.ctx.drawImage(this.BuyNoCoinMessageImage, 
-			128  /*- 460 / 2*/, 
-			380 /*- 440 / 2*/, 
-			386, 
-			162);
-	
+			30  /*- 460 / 2*/, 
+			520);
 	}
+	// いっぱいです
 	else if(eSwitch == 4)
 	{
 		this.ctx.drawImage(this.BuyStampIppaiMessageImage, 
-			128  /*- 460 / 2*/, 
-			380 /*- 440 / 2*/, 
-			386, 
-			162);
+			30  /*- 460 / 2*/, 
+			520);
 	}
-	
-	// 値段の表示
-	this.ctx.drawImage(this.CoinChipImage, 
-		400, 290,
-		60, 
-		60);	
-	this.ctx.fillStyle = 'rgb(255, 255, 255)';
-	this.ctx.font = g_sFontName;
+	// シート持ってる
+	else if(eSwitch == 5)
+	{
+		this.ctx.drawImage(g_HaveMessageBottonHandle, 
+			30  /*- 460 / 2*/, 
+			520);
+	}
+
+	// -------------------------------------
+	// 持っている数,販売金額表示,スタンプかシートを表示
+	// -------------------------------------
+	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
 	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
-//	this.ctx.fillText("" + gold, 128 + 320 + 24, 335); 
-//	DrawFont(128 + 320 + 42, 335, this.ctx, "" + gold, true);
-	DrawCoinL(this.CoinChipImage, this.ctx, 128 + 273, 305, gold);
-	this.ctx.fillStyle = 'rgb(0, 0, 0)';
+	DrawBuyImage(this.ctx, 0, id, gold);
 	
-	var id       = gShopBuyListTable[g_iClickDataIndex]["id"];
-	var popImage = GetStampGraphicImage(id);
-	
-	if(id >= 100)
-	{
-		this.ctx.drawImage(popImage, 
-			262/* - (STAMP_W * 0.7)/2*/, 
-			237/* - (STAMP_H * 0.7)/2*/, 
-			popImage.width, 
-			popImage.height);
-	}
-	else
-	{
-		this.ctx.drawImage(popImage, 
-			262+58 - (popImage.width  * fWindowSheetRate)/2, 
-			260 - (popImage.height * fWindowSheetRate)/2, 
-			popImage.width  * fWindowSheetRate, 
-			popImage.height * fWindowSheetRate);
-	}
+	// -------------------------------------
+	// はいボタン
+	// -------------------------------------
 	var PosYesX = 180;
-	var PosYesY = 565;
+	var PosYesY = 690;
 	var PosYesW = 281;
 	var PosYesH = 184;
 
@@ -384,8 +405,6 @@ ShopSheet.prototype.drawOK= function()
 		PosYesY /*- 440 / 2*/, 
 		PosYesW, 
 		PosYesH);
-
-	this.ctx.globalAlpha = 0.5;
 
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
 	{
@@ -474,13 +493,14 @@ ShopSheet.prototype.draw = function(ofs)
 				var gold = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["gold"];
 				//this.ctx.fillText("" + gold, xx - 25 + x, yy + 35 + y); 
 			
-				if(GetIsSheetTrue(id) == false)
+				//if(GetIsSheetTrue(id) == false)
+				//{
+				//	DrawFont(xx + 3 + x + 10, yy + 35 + y, this.ctx, "うりきれ", true);	
+				//}
+				//else
 				{
-					DrawFont(xx + 3 + x + 10, yy + 35 + y, this.ctx, "×", true);	
-				}
-				else
-				{
-					DrawCoin(this.CoinChipImage, this.ctx, xx + x - 12, yy + 5 + y, gold);
+					DrawStrNum(this.ctx, xx + x - 55, yy + 46 + y, gold, false, 0.35, 1.0, 20);
+					//DrawCoin(this.CoinChipImage, this.ctx, xx + x - 12, yy + 5 + y, gold);
 					//DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "" + gold, true);
 				}
 			}
@@ -506,7 +526,7 @@ ShopSheet.prototype.draw = function(ofs)
 			}
 		}*/
 		// -------------------------------------
-		// 小物を表示[ここは領域に制限をかけてのちのち高速化]
+		// 買うボタンの押せる場所をデバック表示
 		// -------------------------------------  
 /*
 		if((eSwitch == 0))
@@ -521,10 +541,10 @@ ShopSheet.prototype.draw = function(ofs)
 					var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 					var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
 			
-					var PosX = (xx)-214/2 + x + 38;
+					var PosX = (xx)-214/2 + x + 49;
 					var PosY = (yy)-237/2 + y + 170;
-					var PosW = 137;
-					var PosH = 46;
+					var PosW = 116;
+					var PosH = 54;
 
 					this.ctx.globalAlpha = 0.5;
 					if(bTouch && 
@@ -559,7 +579,29 @@ ShopSheet.prototype.draw = function(ofs)
 			0, 
 			0, 
 			190, 
-			101);
+			101);	
+		
+		// デバッグ
+		var TitleBackYesX = 424;
+		var TitleBackYesY = 40;
+		var TitleBackYesW = 20;
+		var TitleBackYesH = 20;
+		this.ctx.globalAlpha = 0.5;
+        this.ctx.fillRect(TitleBackYesX, TitleBackYesY, TitleBackYesW, TitleBackYesH);
+		this.ctx.globalAlpha = 1.0;
+		
+		if((!bTouch) && (bOldTouch))
+		{
+			if(
+				(TitleBackYesX < sTouchMoveX)  && (TitleBackYesX + TitleBackYesW > sTouchMoveX)  &&
+				(TitleBackYesY < sTouchMoveY)  && (TitleBackYesY + TitleBackYesH > sTouchMoveY)  &&
+				(TitleBackYesX < sTouchStartX) && (TitleBackYesX + TitleBackYesW > sTouchStartX) &&
+				(TitleBackYesY < sTouchStartY) && (TitleBackYesY + TitleBackYesH > sTouchStartY))
+			{	
+				AddCoin(1000);
+				alert("コインの所持枚数をマックスにしました。");
+			}
+		}			
     }
 };
    
@@ -665,7 +707,7 @@ var StampShop = function()
 							}
 							for(var i = 0; i < gold; i ++)
 							{
-								AddCoinEffect(ctx, sheet.CoinChipImage, 415, 26, 60, 60, 1.0, i);
+								AddCoinEffect(ctx, sheet.CoinChipImage, 395, 26, 60, 60, 1.0, i);
 							}
 							bOldTouch = false; 
 							bTouch = false;
@@ -729,7 +771,7 @@ var StampShop = function()
 					g_iButtonMoveClickIndex 	= -1;
 					g_iButtonStartClickIndex 	= -1;
 					g_iClickDataIndex			= -1;
-				}	
+				}						
 			}
 	        if(g_iClickDataIndex == -1)
 			{
@@ -909,7 +951,7 @@ var StampShop = function()
 					var id   = gShopBuyListTable[g_iClickDataIndex]["id"];
 					var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
 					// 持ってるか？
-					if(GetIsSheetTrue(id) == false)      { eSwitch = 4; }
+					if(GetIsSheetTrue(id) == false)      { eSwitch = 5; }
 					// 持っているものが満タンかをチェック
 					if(GetIsBuyMax(id) == false)         { eSwitch = 4; }
 					// お金はあるかチェック
@@ -939,7 +981,7 @@ var StampShop = function()
 				this.draw_BuyWindow();
 			}
 			// 満タンまたはお金がない
-			else if(eSwitch == 3 || eSwitch == 4)
+			else if(eSwitch == 3 || eSwitch == 4 || eSwitch == 5)
 			{
 				this.draw_BuyWindow();
 			}
@@ -954,7 +996,9 @@ var StampShop = function()
 				101);		
 			ctx.font = g_sFontName;
 			//this.ctx.fillText("" + GetCoin(), 500, 70); 
-			DrawFont(540, 74, ctx, "" + GetCoin(), true);			
+			//DrawFont(540, 74, ctx, "" + GetCoin(), true);
+			DrawStrNum(ctx, 518, 74, GetCoin(), false, 0.4, 1.0, 30);
+			
 	    };
 		// --------------------------------------    
 	    // マウスイベント
@@ -1082,6 +1126,7 @@ var StampShop = function()
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);
 	*/
+/*
 	// デバッグボタン[コイン-100]
 	var iMenuDel =document.createElement('button');
 	iMenuDel.setAttribute('id', 'Coin100M');
@@ -1107,7 +1152,7 @@ var StampShop = function()
  	iMenuDel.onclick = fd; 
 	sceen.appendChild(iMenuDel);	
 //
-	
+*/	
 /*	
 	// デバッグボタン[ItemMax]
 	iMenuDel =document.createElement('button');
@@ -1203,6 +1248,8 @@ function goTitle(e)
 {
 	g_eStatus = G_STATUS.FADEOUT;
 }
+
+/*
 function Coin1P()
 {
 	AddCoin(1);
@@ -1248,4 +1295,5 @@ function ItemDel()
 	AllDeleteStampDrawData();
 	alert("スタンプとシートを全て削除しました！");
 }
+*/
 

@@ -290,18 +290,6 @@ var StampSelect = function()
 	        //タッチされていない場合の位置調整
 			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN && g_HaveStampSheetData.length != 0)
 			{
-				
-	/*			if(-ofsMax / 2 < ofsX && sheet[this.selectIx].sheetNo <= 0)
-				{
-					ofsX = -ofsMax / 2;
-					addX = 0;
-				}
-				else if(ofsMax / 2 > ofsX && sheet[this.selectIx].sheetNo + 1 >= g_HaveStampSheetData.length)
-				{
-					ofsX = ofsMax / 2;
-					addX = 0;				
-				}
-			*/	
 		        if (!isTouch)
 		    	{
 		    		// 切り替わった瞬間
@@ -449,8 +437,10 @@ var StampSelect = function()
 				101);
 			// 矢印を描画
 			ProcArrow();
-			if(bL) { DrawArrowL(ctx, 60,  450, 40); }
-			if(bR) { DrawArrowR(ctx, 580, 450, 40); }
+			if(bL) { DrawArrowL(ctx, 60,  450); }
+			if(bR) { DrawArrowR(ctx, 580, 450); }
+			// これにするボタン
+ 			ctx.drawImage(g_ClaerButtonHandle, 145, 630);
 		
 			
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
@@ -714,36 +704,46 @@ var StampSelect = function()
 
 			//メイン処理
 			case G_STATUS.MAIN:
-				//if(g_HaveStampSheetData.length == 0)
-				//{
-				//	g_eStatus = G_STATUS.FADEOUT;
-				//	next = 1;
-				//}
-				//else
+				// ----------------------------------------------
+				// キャンバスの描画
+				// ----------------------------------------------
+				mainCanvas.draw();
+				
+				// ----------------------------------------------
+				// タイトルへ戻る
+				// ----------------------------------------------
+				if((!isTouch) && bOldTouch)
 				{
-					// ----------------------------------------------
-					// タイトルへ戻る
-					// ----------------------------------------------
-					if((!isTouch) && bOldTouch)
-					{
-						var TitleBackYesX = 0;
-						var TitleBackYesY = 0;
-						var TitleBackYesW = 260;
-						var TitleBackYesH = 101;		
-						if(
-							(TitleBackYesX < sTouchMoveX)  && (TitleBackYesX + TitleBackYesW > sTouchMoveX)  &&
-							(TitleBackYesY < sTouchMoveY)  && (TitleBackYesY + TitleBackYesH > sTouchMoveY)  &&
-							(TitleBackYesX < sTouchStartX) && (TitleBackYesX + TitleBackYesW > sTouchStartX) &&
-							(TitleBackYesY < sTouchStartY) && (TitleBackYesY + TitleBackYesH > sTouchStartY))
-						{	
-							g_eStatus = G_STATUS.FADEOUT;
-							next = 1;
-						}	
+					var BackYesX = 0;
+					var BackYesY = 0;
+					var BackYesW = 260;
+					var BackYesH = 101;		
+					if(
+						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
+						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
+						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
+						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+					{	
+						g_eStatus = G_STATUS.FADEOUT;
+						next = 1;
 					}	
-	    			mainCanvas.draw();
-					DispMemory();
-					bOldTouch = isTouch;
-				}
+	    			// これにする[145, 630]
+					BackYesX = 145;
+					BackYesY = 630;
+					BackYesW = 350;
+					BackYesH = 150;				    			    			
+					if(
+						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
+						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
+						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
+						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+					{	
+						g_eStatus 	= G_STATUS.FADEOUT;
+						next		= 0;
+					}	
+					
+				}	
+				bOldTouch = isTouch;
 				break;
 			
 			//フェードアウト
@@ -761,17 +761,20 @@ var StampSelect = function()
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				
+				// メインへ
 				if(next == 0)
 				{
 					//次のシーンをセット
 					save();
 					nextSceen = new StampMain();
 				}
+				// タイトルへ
 				else if(next == 1)
 				{
 					//次のシーンをセット
 					nextSceen = new SceenTitle();
 				}
+				// シートを削除して再ロード
 				else
 				{
 					//次のシーンをセット

@@ -77,11 +77,11 @@ var gStampEnum =
 	KAMI_PIMAN:		118,			// ピーマンの神様
 	KAMI_NASU:		119,			// ナスの神様
 	KAMI_TOMATO:	120,			// トマトの神様	
-	KAMI_NINZIN:	121,			// 人参の神様
-	KAMI_TAMANEGI:	122,			// 玉ねぎの神様	
-	KAMI_SIITAKE:	123,			// シイタケの神様
-	KAMI_SAKANA:	124,			// 魚の神様
-	KAMI_NIKU:		125,			// 肉の神様
+	KAMI_NIKU:		121,			// 肉の神様
+	KAMI_SIITAKE:	122,			// シイタケの神様
+	KAMI_TAMANEGI:	123,			// 玉ねぎの神様		
+	KAMI_NINZIN:	124,			// 人参の神様
+	KAMI_SAKANA:	125,			// 魚の神様
 
 	// 真子様
 	SIN_BAMU:		126,			// バーム
@@ -209,57 +209,59 @@ function SetupShopAllData()
 	// すべて削除
 	AllDelShopData();
 	
-	// シンコ様セット
-	AddShopData(gStampEnum.SINKO_01,	1);	// シンコ様1
-	AddShopData(gStampEnum.SINKO_02,	2);	// シンコ様2
-	AddShopData(gStampEnum.SINKO_03,	3);	// シンコ様3   
-	AddShopData(gStampEnum.SIN_BAMU,	4);	// バーム
-	AddShopData(gStampEnum.SIN_CHOCO,	5);	// チョコ
-	AddShopData(gStampEnum.SIN_HEART,	4);	// ハート
-	AddShopData(gStampEnum.SIN_KAI,		3);	// 貝
-	AddShopData(gStampEnum.SIN_SIKAKU,	2);	// 四角
-	AddShopData(gStampEnum.SIN_MARU,	1);	// 丸
-	AddShopData(gStampEnum.SIN_SAMA,	2);	// シンコ様
-	AddShopData(gStampEnum.SIN_AME,		3);	// 飴
-	AddShopData(gStampEnum.SIN_HAZIKI,	4);	// はじきみたいな
-
 	// ごはん系
-	AddShopData(gStampEnum.GOHAN_01, 3);	// ごはん1
-	AddShopData(gStampEnum.GOHAN_02, 3);	// ごはん2
-	AddShopData(gStampEnum.GOHAN_03, 3);	// ごはん3
-	AddShopData(gStampEnum.NIKU,     3);	// ハンバーグ
-	AddShopData(gStampEnum.PURIN,    3);	// プリン
-	AddShopData(gStampEnum.SUPA,     3);	// スパゲティ
- 	AddShopData(gStampEnum.HATA,     3);	// お子様の旗
-	AddShopData(gStampEnum.ONIGIRI,  3);	// おにぎり
-	AddShopData(gStampEnum.HURAI,    3);	// エビフライ
-	AddShopData(gStampEnum.TAKO,     3);	// タコ
-	AddShopData(gStampEnum.KYUURI,   3);	// きゅうり
-	AddShopData(gStampEnum.REMON,    3);	// レモン
+	AddShopData(gStampEnum.GOHAN_01, 	5);	// ごはん1
+	AddShopData(gStampEnum.GOHAN_02, 	5);	// ごはん2
+	AddShopData(gStampEnum.GOHAN_03, 	5);	// ごはん3
+	AddShopData(gStampEnum.NIKU,    	3);	// ハンバーグ
+	AddShopData(gStampEnum.PURIN,    	3);	// プリン
+	AddShopData(gStampEnum.SUPA,     	3);	// スパゲティ
+ 	//AddShopData(gStampEnum.HATA,     3);	// お子様の旗
+	//AddShopData(gStampEnum.ONIGIRI,  3);	// おにぎり
+	//AddShopData(gStampEnum.HURAI,    3);	// エビフライ
+	//AddShopData(gStampEnum.TAKO,     3);	// タコ
+	//AddShopData(gStampEnum.KYUURI,   3);	// きゅうり
+	//AddShopData(gStampEnum.REMON,    3);	// レモン	
+	
+	// シンコ様セット
+	AddShopData(gStampEnum.SINKO_01,		5);	// シンコ様1
+	AddShopData(gStampEnum.SINKO_02,		5);	// シンコ様2
+	AddShopData(gStampEnum.SINKO_03,		5);	// シンコ様3   
+	AddShopData(gStampEnum.SIN_BAMU,		3);	// バーム
+	AddShopData(gStampEnum.SIN_CHOCO,		3);	// チョコ
+	//AddShopData(gStampEnum.SIN_HEART,		3);	// ハート
+	//AddShopData(gStampEnum.SIN_KAI,		3);	// 貝
+	//AddShopData(gStampEnum.SIN_SIKAKU,	3);	// 四角
+	//AddShopData(gStampEnum.SIN_MARU,		3);	// 丸
+	AddShopData(gStampEnum.SIN_SAMA,		3);	// シンコ様
+	//AddShopData(gStampEnum.SIN_AME,		3);	// 飴
+	//AddShopData(gStampEnum.SIN_HAZIKI,	3);	// はじきみたいな
+
     
 	// 空の上系
-	AddShopData(gStampEnum.SKY_01, 	3);	// 空の上1
-	AddShopData(gStampEnum.SKY_02,	3);	// 空の上2
-	AddShopData(gStampEnum.SKY_03,	3);	// 空の上3
-	AddShopData(gStampEnum.KUMO,	3);	// 雲
-	AddShopData(gStampEnum.HUUSEN,	3);	// 風船
-	AddShopData(gStampEnum.HANA,	3);	// チューリップ
-	AddShopData(gStampEnum.RINGO,	3);	// リンゴ
-	AddShopData(gStampEnum.BANANA,	3);	// バナナ
-	AddShopData(gStampEnum.HIKOUKI,	3);	// 飛行機
-	AddShopData(gStampEnum.TAMANEGI,3);	// たまねぎ
-	AddShopData(gStampEnum.EDAMAME,	3);	// 枝豆
-	AddShopData(gStampEnum.TOMATO,	3);	// トマト
+	//AddShopData(gStampEnum.SKY_01, 	5);	// 空の上1
+	//AddShopData(gStampEnum.SKY_02,	5);	// 空の上2
+	//AddShopData(gStampEnum.SKY_03,	5);	// 空の上3
+	//AddShopData(gStampEnum.KUMO,		3);	// 雲
+	//AddShopData(gStampEnum.HUUSEN,	3);	// 風船
+	//AddShopData(gStampEnum.HANA,		3);	// チューリップ
+	//AddShopData(gStampEnum.RINGO,		3);	// リンゴ
+	//AddShopData(gStampEnum.BANANA,	3);	// バナナ
+	//AddShopData(gStampEnum.HIKOUKI,	3);	// 飛行機
+	//AddShopData(gStampEnum.TAMANEGI,	3);	// たまねぎ
+	//AddShopData(gStampEnum.EDAMAME,	3);	// 枝豆
+	//AddShopData(gStampEnum.TOMATO,	3);	// トマト
          
     // 神様
-	AddShopData(gStampEnum.KAMI_PIMAN,		3);	// ピーマンの神様   
-	AddShopData(gStampEnum.KAMI_NASU,		3);	// ナスの神様
-	AddShopData(gStampEnum.KAMI_TOMATO,		3);	// トマトの神様 
-	AddShopData(gStampEnum.KAMI_NINZIN,		3);	// 人参の神様
-	AddShopData(gStampEnum.KAMI_TAMANEGI,	3);	// 玉ねぎの神様     
-	AddShopData(gStampEnum.KAMI_SIITAKE,	3);	// シイタケの神様
-	AddShopData(gStampEnum.KAMI_SAKANA,		3);	// 魚の神様
-	AddShopData(gStampEnum.KAMI_NIKU,		3);	// 肉の神様
+	AddShopData(gStampEnum.KAMI_PIMAN,			2);	// ピーマンの神様   
+	AddShopData(gStampEnum.KAMI_NASU,			2);	// ナスの神様
+	AddShopData(gStampEnum.KAMI_TOMATO,			2);	// トマトの神様 
+	//AddShopData(gStampEnum.KAMI_NIKU,			2);	// 肉の神様	
+	//AddShopData(gStampEnum.KAMI_SIITAKE,		2);	// シイタケの神様
+	//AddShopData(gStampEnum.KAMI_TAMANEGI,		2);	// 玉ねぎの神様 	
+	//AddShopData(gStampEnum.KAMI_NINZIN,		2);	// 人参の神様     
+	//AddShopData(gStampEnum.KAMI_SAKANA,		2);	// 魚の神様
+
 }
 function SetupShopTutorialData()
 {
@@ -267,14 +269,30 @@ function SetupShopTutorialData()
 	AllDelShopData();
 	// ごはん系
 	AddShopData(gStampEnum.GOHAN_01, 1);	// ごはん1
-	AddShopData(gStampEnum.NIKU,     2);	// ハンバーグ
 	AddShopData(gStampEnum.PURIN,    3);	// プリン
-	AddShopData(gStampEnum.SUPA,     4);	// スパゲティ	
-	AddShopData(gStampEnum.KAMI_PIMAN,		5);	// ピーマンの神様   
-	AddShopData(gStampEnum.KAMI_NASU,		4);	// ナスの神様
-	AddShopData(gStampEnum.KAMI_TOMATO,		3);	// トマトの神様 
 }
-
+function PresentTutorialStampData()
+{
+	// 現状のデータをすべて削除
+	DeleteHaveStampData();
+	// ハンバーグゲット
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// ミニパスタゲット
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// セーブ
+	SaveHaveStampData();
+}
+function PresentTutorialSheetData()
+{
+	// 現状のデータをすべて削除
+	DeleteHaveSheetData();
+	// お子様ランチゲット
+	AddHasSheet(gStampEnum.GOHAN_01);
+	// セーブ
+	SaveHaveSheetData();
+}
 function AddShopData(id, gold)
 {
 	var sData = {"id":id , "gold":gold };
@@ -544,6 +562,25 @@ function GetStampDrawDataA(iSheet, iIndex)  { return g_StampDrawData[iSheet].sDa
 // ------------------------------------------------------
 // ロード
 // ------------------------------------------------------
+function LoadStampSheetData(no)
+{
+	// スタンプシート
+	if(no >= M_OFFSET_STAMP)
+	{
+		no -= M_OFFSET_STAMP; 
+		no += M_MAX_SHEET;
+		g_StampGraphicHandle[no] = new GStampGraphic();
+		g_StampGraphicHandle[no].LoadImage(no);
+		g_sSheetLoadFlg.AddLoadFile(g_StampGraphicHandle[no].m_Image);		
+	}
+	else
+	{
+		g_StampGraphicHandle[no] = new GStampGraphic();
+		g_StampGraphicHandle[no].LoadImage(no);
+		g_sSheetLoadFlg.AddLoadFile(g_StampGraphicHandle[no].m_Image);		
+	}
+}
+
 function AllLoadStampGraphic()
 {
 	// ２度読み禁止
@@ -551,6 +588,8 @@ function AllLoadStampGraphic()
 	{
 		// 作成
 	    g_StampGraphicHandle = new Array();
+			
+/*		
 		// シートロード
 		for(var i = 0; i < M_MAX_SHEET; i ++)
 		{
@@ -565,6 +604,27 @@ function AllLoadStampGraphic()
 			g_StampGraphicHandle[i].LoadImage(i);
 			g_sSheetLoadFlg.AddLoadFile(g_StampGraphicHandle[i].m_Image);
 		}
+*/		
+		// ロード吟味
+		// ごはん系
+		LoadStampSheetData(gStampEnum.GOHAN_01);	// ごはん1
+		LoadStampSheetData(gStampEnum.GOHAN_02);	// ごはん2
+		LoadStampSheetData(gStampEnum.GOHAN_03);	// ごはん3
+		LoadStampSheetData(gStampEnum.NIKU);		// ハンバーグ
+		LoadStampSheetData(gStampEnum.PURIN);		// プリン
+		LoadStampSheetData(gStampEnum.SUPA);		// スパゲティ
+		// シンコ様セット
+		LoadStampSheetData(gStampEnum.SINKO_01);	// シンコ様1
+		LoadStampSheetData(gStampEnum.SINKO_02);	// シンコ様2
+		LoadStampSheetData(gStampEnum.SINKO_03);	// シンコ様3   
+		LoadStampSheetData(gStampEnum.SIN_BAMU);	// バーム
+		LoadStampSheetData(gStampEnum.SIN_CHOCO);	// チョコ
+		LoadStampSheetData(gStampEnum.SIN_SAMA);	// シンコ様
+	    // 神様
+		LoadStampSheetData(gStampEnum.KAMI_PIMAN);	// ピーマンの神様   
+		LoadStampSheetData(gStampEnum.KAMI_NASU);	// ナスの神様
+		LoadStampSheetData(gStampEnum.KAMI_TOMATO);	// トマトの神様 
+		
 		// ローディング開始
 		g_sStampLoadFlg.Loading();
 		g_sSheetLoadFlg.Loading();	
@@ -628,8 +688,8 @@ function AddCoin(coin)
 {
 	LoadCoin();
 	g_Coin += coin;
-	if(g_Coin > 99999) { g_Coin = 99999; }
-	if(g_Coin < 0)     { g_Coin = 0;     }
+	if(g_Coin > 999)    { g_Coin = 999; }
+	if(g_Coin < 0)      { g_Coin = 0;   }
 	SaveCoin();	
 }
 function GetCoin() { return g_Coin; }
@@ -682,6 +742,17 @@ function LoadCoin()
 // ------------------------------------------------------
 // スタンプ操作
 // ------------------------------------------------------
+// 何枚持っているか？
+function GetStampNum(id)
+{
+	var iNum = 0;
+	for(var i = 0; i < g_HaveStampImageData.length; i ++)
+	{
+		if(g_HaveStampImageData[i]["id"] == id) { iNum ++; }
+	}
+	return iNum;
+}
+
 // スタンプデータの追加
 function AddHasStamp(id, ink)
 {
@@ -701,37 +772,7 @@ function AllDelHasStamp()
 // スタンプデータのダミーセット
 function DummyStampDataSet()
 {
-	// 複数追加
-	AllDelHasStamp();
-	
-
-	// 全データセット
-//	for(var i = 0; i < M_MAX_STAMP; i ++)
-//	{
-//		AddHasStamp(i, 2);
-//	}
-	// [各３こづつ]
-	// シンコ
-//	AddHasStamp(gStampEnum.SIN_BAMU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-//	AddHasStamp(gStampEnum.SIN_CHOCO  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-//	AddHasStamp(gStampEnum.SIN_HEART  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	// ごはん
-	AddHasStamp(gStampEnum.NIKU  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.PURIN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.SUPA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	// 雲の上
-	//AddHasStamp(gStampEnum.KUMO  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	//AddHasStamp(gStampEnum.HUUSEN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	//AddHasStamp(gStampEnum.HANA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-
-	// 必要なもの[ぴーまん、にんじん、とまと、なす]
-	AddHasStamp(gStampEnum.KAMI_PIMAN  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	//AddHasStamp(gStampEnum.KAMI_NINZIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.KAMI_TOMATO - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	//AddHasStamp(gStampEnum.KAMI_NASU   - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-
-	// セーブ
-	SaveHaveStampData();
+	PresentTutorialStampData();
 }
 
 // 購入
@@ -786,6 +827,17 @@ function DeleteHaveStampData()
 // ------------------------------------------------------
 // シート操作
 // ------------------------------------------------------
+// 何枚持っているか？
+function GetSheetNum(id)
+{
+	var iNum = 0;
+	for(var i = 0; i < g_HaveStampSheetData.length; i ++)
+	{
+		if(g_HaveStampSheetData[i]["id"] == id) { iNum ++; }
+	}
+	return iNum;
+}
+
 // スタンプシートの追加
 function AddHasSheet(id)
 {
@@ -805,24 +857,7 @@ function AllDelHasSheet()
 // スタンプシートのダミーセット
 function DummySheetDataSet()
 {
-	// 複数追加
-	AllDelHasSheet();
-	
-	// 全セット
-/*
-	for(var i = 0; i < M_MAX_SHEET; i ++)
-	{
-		AddHasSheet(i);
-	}
-*/
-	// 必要なもの[シンコ様テーブル左]
-//	AddHasSheet(gStampEnum.SINKO_01);	// シンコ
-	AddHasSheet(gStampEnum.GOHAN_01);	// ランチ
-//	AddHasSheet(gStampEnum.SKY_01);		// 雲の上
-		
-	
-	// セーブ
-	SaveHaveSheetData();
+	PresentTutorialSheetData();
 }
 
 function GetIsSheetTrue(id)
@@ -994,10 +1029,26 @@ var g_StampMainEndImageHandle			= null;
 var g_StampMainBackImageHandle			= null;
 var g_StampMainMenuImageHandle			= null;
 var g_SheetDeleteMessageImageHandle		= null;
-
+var g_ClaerButtonHandle					= null;
+var g_TweetBottonHandle					= null;
 // 戻る
 var g_BackImageHandle					= null;
-	
+var g_ArrowLHandle						= null;
+var g_ArrowRHandle						= null;
+var g_Num0Handle						= null;
+var g_Num1Handle						= null;
+var g_Num2Handle						= null;
+var g_Num3Handle						= null;
+var g_Num4Handle						= null;
+var g_Num5Handle						= null;
+var g_Num6Handle						= null;
+var g_Num7Handle						= null;
+var g_Num8Handle						= null;
+var g_Num9Handle						= null;
+var g_NumHandleA						= new Array();
+var g_StampMessageBottonHandle			= null;
+var g_HaveMessageBottonHandle			= null;
+					
 var G_STATUS = 
 {
 	INIT:			0,
@@ -1018,16 +1069,45 @@ function LoadWindowYesNo()
 	if(g_WindowImageHandle != null) { return; }
 	g_WindowImageHandle     				= new Image();
 	g_YesNoMessageImageHandle 				= new Image();
-	g_YesImageHandle 						= new Image();	
+	g_YesImageHandle 						= new Image();
 	g_NoImageHandle							= new Image();
 	g_StampMainWindowImageHandle			= new Image();
-	g_StampMainKesuImageHandle				= new Image();	
-	g_StampMainEndImageHandle				= new Image();	
-	g_StampMainBackImageHandle				= new Image();	
+	g_StampMainKesuImageHandle				= new Image();
+	g_StampMainEndImageHandle				= new Image();
+	g_StampMainBackImageHandle				= new Image();
 	g_StampMainMenuImageHandle				= new Image();
-	g_SheetDeleteMessageImageHandle			= new Image();	
-	g_BackImageHandle						= new Image();	
-
+	g_SheetDeleteMessageImageHandle			= new Image();
+	g_BackImageHandle						= new Image();
+	g_ArrowLHandle							= new Image();
+	g_ArrowRHandle							= new Image();
+	g_Num0Handle							= new Image();
+	g_Num1Handle							= new Image();
+	g_Num2Handle							= new Image();
+	g_Num3Handle							= new Image();
+	g_Num4Handle							= new Image();
+	g_Num5Handle							= new Image();
+	g_Num6Handle							= new Image();
+	g_Num7Handle							= new Image();
+	g_Num8Handle							= new Image();
+	g_Num9Handle							= new Image();
+	g_ClaerButtonHandle						= new Image();
+	g_TweetBottonHandle						= new Image();
+	g_SheetMessageHandle					= new Image();
+	g_StampMessageBottonHandle				= new Image();
+	g_HaveMessageBottonHandle				= new Image();
+	
+	g_NumHandleA[0] = g_Num0Handle;
+	g_NumHandleA[1] = g_Num1Handle;
+	g_NumHandleA[2] = g_Num2Handle;
+	g_NumHandleA[3] = g_Num3Handle;
+	g_NumHandleA[4] = g_Num4Handle;
+	g_NumHandleA[5] = g_Num5Handle;
+	g_NumHandleA[6] = g_Num6Handle;
+	g_NumHandleA[7] = g_Num7Handle;
+	g_NumHandleA[8] = g_Num8Handle;
+	g_NumHandleA[9] = g_Num9Handle;
+	
+	
 	// ロード
 	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 	"img/00_common/g_g01_huk_e000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 	"img/00_common/g_hand_01.png");
@@ -1040,9 +1120,69 @@ function LoadWindowYesNo()
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainMenuImageHandle, 	 	"img/08_stamp/s_btn_e000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, 	"img/08_stamp/s_txt_d000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_BackImageHandle, 					"img/07_shop/003.png");
-		
+	// LR
+	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowLHandle, 					"img/08_stamp/s_hid_a.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowRHandle, 					"img/08_stamp/s_mig_a.png");	
+	// 数値	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num0Handle, 						"img/08_stamp/s_suj_00.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num1Handle, 						"img/08_stamp/s_suj_01.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num2Handle, 						"img/08_stamp/s_suj_02.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num3Handle, 						"img/08_stamp/s_suj_03.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num4Handle, 						"img/08_stamp/s_suj_04.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num5Handle, 						"img/08_stamp/s_suj_05.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num6Handle, 						"img/08_stamp/s_suj_06.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num7Handle, 						"img/08_stamp/s_suj_07.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num8Handle, 						"img/08_stamp/s_suj_08.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num9Handle, 						"img/08_stamp/s_suj_09.png");	
+	// 本当に消すボタン
+	g_sGraphicLoadFlg.AddLoadFileEx(g_ClaerButtonHandle, 				"img/08_stamp/s_btn_d000.png");		
+	g_sGraphicLoadFlg.AddLoadFileEx(g_TweetBottonHandle, 				"img/08_stamp/s_btn_f000.png");		
+	
+	// シート、スタンプ、持っている
+	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetMessageHandle, 				"img/07_shop/o_txt_f.png");		
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMessageBottonHandle, 		"img/07_shop/o_txt_e.png");		
+	g_sGraphicLoadFlg.AddLoadFileEx(g_HaveMessageBottonHandle, 			"img/07_shop/o_txt_g.png");		
+	
+	
 	// ローディング開始
 	g_sGraphicLoadFlg.Loading();
+}
+
+// 165:165
+// 数値の表示
+function DrawStrNum(ctx, x, y, num, op0Clear, size, a, space)
+{
+	var ta = ctx.globalAlpha;
+	if(num == 0) 
+	{ 
+		x += (165 * size) - space;
+		x += (165 * size) - space;
+		DrawCharNum(ctx, x, y, 0, size, a);
+		return;
+	}
+	for(var i = 100; i >= 1; i /= 10)
+	{
+		var data = parseInt(num / i);
+		if(data < 1) { if(op0Clear) { DrawCharNum(ctx, x, y, 0, size, a); } }
+		else
+		{
+			num -= (data * i);
+			DrawCharNum(ctx, x, y, data, size, a);
+			op0Clear = true;
+		}
+		x += (165 * size) - space;
+	}
+	ctx.globalAlpha = ta;
+}
+// 数値の表示
+function DrawCharNum(ctx, x, y, num, size, a)
+{
+	if(num < 0 || num > 9) { return; }
+	ctx.drawImage(g_NumHandleA[num],
+							x - (132 * size),
+							y - (132 * size),
+							(165 * size), 
+							(165 * size));
 }
 
 // メニュー
@@ -1281,65 +1421,40 @@ function MoveArrowR()
 	if(g_nArrowCounterR <= 0) { PuchArrowR(); }
 }
 
-function DrawArrowL(ctx, x, y, size)
+function DrawArrowL(ctx, x, y)
 {
- 	var a = 1.0 - (g_nArrowCounterL * 0.05);
+ 	var a = 1.0 - (g_nArrowCounterL * 0.035);
 	x -= (g_nArrowCounterL * 2);
 	ctx.globalAlpha = a;
-	ctx.fillStyle = 'rgb(255, 0, 255)';
-	ctx.beginPath();
-	ctx.moveTo(x, y);
-	var hSize = size / 2;
-	ctx.lineTo(x + size, y - hSize);
-	ctx.lineTo(x + size, y + hSize);
-	ctx.closePath();
-	ctx.fill();
+	ctx.drawImage(g_ArrowLHandle, x - 40, y - 70);
 	ctx.globalAlpha = 1.0;	
-	
-/*
-	var a;
-	if(g_nArrowCounterL > 8)
-	{
-		a = 0.60 + (-g_nArrowCounterL * 0.05);
-	}
-	else
-	{
-		a = 0.60 + (16-g_nArrowCounterL * 0.05);
-	}
-	if(g_nArrowCounterL > 8)
-	{
-		x -= (g_nArrowCounterL * 3);
-	}
-	else
-	{
-		x -= ((16-g_nArrowCounterL) * 3);
-	}
-	
-	ctx.globalAlpha = a;
-	ctx.fillStyle = 'rgb(255, 0, 255)';
-	ctx.beginPath();
-	ctx.moveTo(x, y);
-	var hSize = size / 2;
-	ctx.lineTo(x + size, y - hSize);
-	ctx.lineTo(x + size, y + hSize);
-	ctx.closePath();
-	ctx.fill();
-	ctx.globalAlpha = 1.0;	
-*/
 }
-function DrawArrowR(ctx, x, y, size)
+function DrawArrowR(ctx, x, y)
 {
- 	var a = 1.0 - (g_nArrowCounterR * 0.05);
+ 	var a = 1.0 - (g_nArrowCounterR * 0.035);
 	x += (g_nArrowCounterR * 2);
-	ctx.globalAlpha = a;	
-	ctx.fillStyle = 'rgb(255, 0, 255)';
-	ctx.beginPath();
-	ctx.moveTo(x, y);
-	var hSize = size / 2;
-	ctx.lineTo(x - size, y - hSize);
-	ctx.lineTo(x - size, y + hSize);
-	ctx.closePath();
-	ctx.fill();
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowRHandle, x - 40, y - 70);
+	ctx.globalAlpha = 1.0;	
+}
+
+var ARROW_SIZE_MX = 80 * 0.65;
+var ARROW_SIZE_MY = 140 * 0.65;
+
+function DrawArrowLM(ctx, x, y)
+{
+ 	var a = 1.0 - (g_nArrowCounterL * 0.035);
+	x -= (g_nArrowCounterL * 0.75);
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowLHandle, x - (ARROW_SIZE_MX / 2), y - (ARROW_SIZE_MY / 2), ARROW_SIZE_MX, ARROW_SIZE_MY);
+	ctx.globalAlpha = 1.0;	
+}
+function DrawArrowRM(ctx, x, y)
+{
+ 	var a = 1.0 - (g_nArrowCounterR * 0.035);
+	x += (g_nArrowCounterR * 0.75);
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowRHandle, x - (ARROW_SIZE_MX / 2), y - (ARROW_SIZE_MY / 2), ARROW_SIZE_MX, ARROW_SIZE_MY);
 	ctx.globalAlpha = 1.0;	
 }
 
