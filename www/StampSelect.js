@@ -36,6 +36,7 @@ function DeleteSheetClick(e)
 	
 var StampSelect = function() 
 {
+	//M_PRINTB("StampSelect:コンストラクタ！");
 	var bOldTouch		= false;
 	var sTouchStartX 	= -200;
 	var sTouchStartY 	= -200;
@@ -63,7 +64,6 @@ var StampSelect = function()
 	    var _this = this;
 	    this.ctx = canvas_ctx;
 	    this.img = new Image();
-	    this.isLoaded = false;
 	    this.sheetNo = no;
 	    this.sheetSrc = "";
 		this.iDrawX   = 0;
@@ -83,26 +83,24 @@ var StampSelect = function()
 	//描画
 	StampSheet.prototype.draw = function(ofs)
 	{
-		if (this.isLoaded) 
 		{
 	        var rate = Math.abs(ofs)/320 * 0.25 ;
 			var scl  = (0.65 - rate) * this.fZoomRate;
-	        var w = this.img.naturalWidth  * scl;
-	        var h = this.img.naturalHeight * scl;
+	        var w = 640  * scl;
+	        var h = 1138 * scl;
 	        var x = (640 - w) / 2 + ofs - rate*ofs ;
 	        var y = (800 - h) / 2 + g_YOffset;
 			
 			// -------------------------------------
 			// シートの表示
 			// -------------------------------------  
-			// そのまま描画
-		//	this.CanvasSheet_2d.drawImage(this.img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 			var ScreenH = BROWSER_SCREEN_H;		// ローカルのほうが高速・・・？
 			var sh      = ScreenH / REDUCTION_SIZE;
-			this.CanvasSheet_2d.drawImage(this.img, 
-				0, 0, this.img.naturalWidth, ScreenH, 				// 画像座標 x y w h
-				0, 0, CANVAS_WIDTH,          sh);					// 表示座標 x y w h
-
+			
+			SafeDrawSheetEx(this.CanvasSheet_2d, this.img, 
+				0, 0, 640, ScreenH, 
+				0, 0, CANVAS_WIDTH,          sh)
+			
 			// -------------------------------------
 			// シートに張り付けて描画
 			// -------------------------------------  
@@ -140,7 +138,7 @@ var StampSelect = function()
 					if(iCut <= 0)
 					{
 						this.CanvasSheet_2d.globalAlpha = a;
-						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_StampImage(id), 
+						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_Image(id), 
 							iDrawX, 
 							iDrawY, 
 							STAMP_W_REDUCTION, 
@@ -151,7 +149,7 @@ var StampSelect = function()
 					{
 						var nh = (STAMP_H_REDUCTION - iCut) / STAMP_H_REDUCTION;
 						this.CanvasSheet_2d.globalAlpha = a;
-						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_StampImage(id), 
+						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_Image(id), 
 							0,      0,      STAMP_W, STAMP_H * nh, 									// 画像座標 x y w h
 							iDrawX, iDrawY, STAMP_W_REDUCTION, STAMP_H_REDUCTION - iCut);			// 表示座標 x y w h
 						this.CanvasSheet_2d.globalAlpha = 1.0;						
@@ -171,8 +169,8 @@ var StampSelect = function()
 			// エッジ表示
 			this.ctx.beginPath();             											// パスのリセット
 			this.ctx.lineWidth = 2;           											// 線の太さ
-			this.ctx.strokeStyle="#000000";   											// 線の色
-			//this.ctx.strokeStyle="#ffffff";   										// 線の色
+			//this.ctx.strokeStyle="#000000";   										// 線の色
+			this.ctx.strokeStyle="#ffffff";   											// 線の色
 			this.ctx.moveTo(this.iDrawX,               this.iDrawY);					// 開始位置
 			this.ctx.lineTo(this.iDrawX + this.iDrawW, this.iDrawY);					// 次の位置
 			this.ctx.lineTo(this.iDrawX + this.iDrawW, this.iDrawY + this.iDrawH);		// 次の位置
@@ -183,22 +181,15 @@ var StampSelect = function()
 	};
 
 	//イメージセット
-	StampSheet.prototype.setImage = function(no) {
-	    var _this = this;
-	    if (no < 0)    no += g_HaveStampSheetData.length;
+	StampSheet.prototype.setImage = function(no) 
+	{
+		if (no < 0) { no += g_HaveStampSheetData.length; }
 	    this.sheetNo = no %  g_HaveStampSheetData.length;
-	    this.isLoaded = true;
-/*
-	    this.img.onload = function() {
-	        _this.isLoaded = true;
-	    };
-*/
-//	    this.sheetSrc = bgImgName[g_HaveStampSheetData[this.sheetNo]["id"]];
-		this.img = GetStampGraphicHandle_SheetImage(g_HaveStampSheetData[this.sheetNo]["id"]);
+		this.img     = GetSheetGraphicHandle_Image(g_HaveStampSheetData[this.sheetNo]["id"]);
 	};
 	   	
 	
-	var mainCanvas;
+	var mainCanvas = null;;
 	//
 	// メインキャンバス
 	//
@@ -264,6 +255,10 @@ var StampSelect = function()
 		    	sheet[3] = new StampSheet(ctx, no - 2);
 			}
 		}
+	    // 初期描画
+	    //this.draw();
+		// -- メインキャンバスのコンストラクタはここまで！ --
+		
 	    //debug
 	    this.dubugDisp = function() {
 	        document.getElementById("body").innerHTML = 
@@ -655,17 +650,18 @@ var StampSelect = function()
 	        canvas.addEventListener("mousemove",this.onTouchMove,false);
 	        canvas.addEventListener("mouseup",this.onTouchEnd,false);
 	    }
-	    // 初期描画
-	    this.draw();
+
 	};	
+	
 	g_eStatus = G_STATUS.INIT;
 	var next;
 	var alpha = 0;
 	
 	// セーブされた描画データ
 	AllLoadStampDrawData();
-    // 画像ロード[初回一回のみ]
-    AllLoadStampGraphic();
+	
+    // スタンプのロード
+    LoadStampGraphic();
 
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
@@ -694,30 +690,46 @@ var StampSelect = function()
 	}	*/
 	var select = LoadActiveSheetIndex();
 	if(g_StampDrawData.length <= select){ select = g_StampDrawData.length - 1; }
-	mainCanvas = new MainCanvas(select);
+	mainCanvas = null;
+	GSetupEffect();
 	
-
+	// 周りのみ読み込み
+	LoadPrevNextSheetGraphic(select);
+	
 	//
 	// フレーム処理
 	//
-	this.onframe = function() {
-
+	this.onframe = function() 
+	{
 		switch(g_eStatus) 
 		{
 			//初期化
 			case G_STATUS.INIT:
 				// スタンプとシートのロードが終わってる
-				if(g_sSheetLoadFlg.bLoadFlg && g_sStampLoadFlg.bLoadFlg)
+				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg)
 				{			
+					// シートのロード
+   					LoadSheetGraphic();
+					if(mainCanvas == null)
+					{
+						mainCanvas = new MainCanvas(select);
+					}
+					M_PRINTB("");
 					//各データが読み込まれるまで待つ
 					if (LoadingCounter <= 0) 
 					{
 						g_eStatus = G_STATUS.FADEIN;
-						//if(g_HaveStampSheetData.length != 0)
-						{
-							mainCanvas.draw();
-						}
+						mainCanvas.draw();
 					}
+				}
+				// テストです、ロード中
+				else
+				{
+					var strDumpdata1 = g_sSheetLoadFlg.GetDump();
+					var strDumpdata2 = g_sStampLoadFlg.GetDump();
+					M_PRINTB("ロード中です！<br>"				+
+							"[Sheet]" + strDumpdata1 + "<br>" 	+ 
+					        "[Stamp]" + strDumpdata2);	
 				}
 				break;
 
@@ -733,6 +745,17 @@ var StampSelect = function()
 
 			//メイン処理
 			case G_STATUS.MAIN:
+				// ----------------------------------------------
+				// ロード中か？
+				// ----------------------------------------------
+				if(g_sSheetLoadFlg.bLoadFlg == false)
+				{	
+					var strDumpdata1 = g_sSheetLoadFlg.GetDump();
+					M_PRINTR("ロード中です！<br>"				+
+							"[Sheet]" + strDumpdata1);
+				}
+				else { M_PRINTB(""); }
+			
 				// ----------------------------------------------
 				// キャンバスの描画
 				// ----------------------------------------------
