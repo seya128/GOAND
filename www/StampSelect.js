@@ -9,7 +9,7 @@
 // 4   160 300
 var REDUCTION_SIZE 		= 2.0;
 var SCREEN_WIDTH   		= 640;
-var SCREEN_HEIGHT  		= 1200;
+var SCREEN_HEIGHT  		= 1138;
 var CANVAS_WIDTH   		= SCREEN_WIDTH  / REDUCTION_SIZE;
 var CANVAS_HEIGHT 		= SCREEN_HEIGHT / REDUCTION_SIZE;
 var STAMP_W_REDUCTION	= STAMP_W / REDUCTION_SIZE;
@@ -70,6 +70,7 @@ var StampSelect = function()
 		this.iDrawY   = 0;
 		this.iDrawW   = 0;
 		this.iDrawH   = 0;
+		this.fZoomRate = 0.75;
 
 		// 動的キャンバス
 		this.CanvasSheet = document.createElement("canvas");
@@ -85,7 +86,7 @@ var StampSelect = function()
 		if (this.isLoaded) 
 		{
 	        var rate = Math.abs(ofs)/320 * 0.25 ;
-			var scl  = (0.65 - rate);
+			var scl  = (0.65 - rate) * this.fZoomRate;
 	        var w = this.img.naturalWidth  * scl;
 	        var h = this.img.naturalHeight * scl;
 	        var x = (640 - w) / 2 + ofs - rate*ofs ;
@@ -152,7 +153,7 @@ var StampSelect = function()
 						this.CanvasSheet_2d.globalAlpha = a;
 						this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_StampImage(id), 
 							0,      0,      STAMP_W, STAMP_H * nh, 									// 画像座標 x y w h
-							iDrawX, iDrawY, STAMP_W_REDUCTION, STAMP_H_REDUCTION - iCut);		// 表示座標 x y w h
+							iDrawX, iDrawY, STAMP_W_REDUCTION, STAMP_H_REDUCTION - iCut);			// 表示座標 x y w h
 						this.CanvasSheet_2d.globalAlpha = 1.0;						
 					}
 				}
@@ -166,6 +167,18 @@ var StampSelect = function()
 			this.iDrawY = y;
 			this.iDrawW = w;
 			this.iDrawH = (ScreenH * scl);
+			
+			// エッジ表示
+			this.ctx.beginPath();             											// パスのリセット
+			this.ctx.lineWidth = 2;           											// 線の太さ
+			this.ctx.strokeStyle="#000000";   											// 線の色
+			//this.ctx.strokeStyle="#ffffff";   										// 線の色
+			this.ctx.moveTo(this.iDrawX,               this.iDrawY);					// 開始位置
+			this.ctx.lineTo(this.iDrawX + this.iDrawW, this.iDrawY);					// 次の位置
+			this.ctx.lineTo(this.iDrawX + this.iDrawW, this.iDrawY + this.iDrawH);		// 次の位置
+			this.ctx.lineTo(this.iDrawX,               this.iDrawY + this.iDrawH);		// 次の位置
+			this.ctx.closePath();														// パスを閉じる
+			this.ctx.stroke();															// 描画			
 	    }
 	};
 
@@ -271,14 +284,14 @@ var StampSelect = function()
 		{
 	        ctx.beginPath();
 	        //グラデーション領域をセット
-	        var grad  = ctx.createLinearGradient(0,0, 0,1200);
+	        var grad  = ctx.createLinearGradient(0,0, 0,1138);
 	        //グラデーション終点のオフセットと色をセット
 	        grad.addColorStop(0,'rgb(10, 10, 50)');
 	        grad.addColorStop(0.7,'rgb(150, 150, 240)');
 	        //グラデーションをfillStyleプロパティにセット
 	        ctx.fillStyle = grad;
 	        /* 矩形を描画 */
-	        ctx.rect(0,0, 640, 1200);
+	        ctx.rect(0,0, 640, 1138);
 	        ctx.fill();
 	    };
 	    
@@ -403,19 +416,30 @@ var StampSelect = function()
 			var bR = false;
 			if(g_HaveStampSheetData.length != 0)
 			{
+				// 切り替わった瞬間
+				var nowid  = this.selectIx;
+				var previd = (this.selectIx + 4) % 5;
+				var nextid = (this.selectIx + 1) % 5;
+				sheet[previd].fZoomRate -= 0.075;
+				sheet[nextid].fZoomRate -= 0.075;
+				sheet[nowid].fZoomRate  += 0.075;
+				if(sheet[previd].fZoomRate < 0.85) { sheet[previd].fZoomRate = 0.85; }
+				if(sheet[nextid].fZoomRate < 0.85) { sheet[nextid].fZoomRate = 0.85; }
+				if(sheet[nowid].fZoomRate > 1.15)  { sheet[nowid].fZoomRate = 1.15;  }
+				
 				// 前
-				if(sheet[this.selectIx].sheetNo > 0)
+				if(sheet[nowid].sheetNo > 0)
 				{
-		        	sheet[(this.selectIx + 4) % 5].draw(ofsX - ofsMax);
+		        	sheet[previd].draw(ofsX - ofsMax);
 					bL = true;
 				}
 		        // 次
-				if(sheet[this.selectIx].sheetNo + 1 < g_HaveStampSheetData.length)
+				if(sheet[nowid].sheetNo + 1 < g_HaveStampSheetData.length)
 				{
-					sheet[(this.selectIx + 1) % 5].draw(ofsX + ofsMax);
+					sheet[nextid].draw(ofsX + ofsMax);
 					bR = true;
 				}
-				sheet[this.selectIx].draw(ofsX);
+				sheet[nowid].draw(ofsX);
 		    	
 		    	if(ofsX == 0 && iForceTouch)
 		    	{
@@ -440,7 +464,7 @@ var StampSelect = function()
 			if(bL) { DrawArrowL(ctx, 60,  450); }
 			if(bR) { DrawArrowR(ctx, 580, 450); }
 			// これにするボタン
- 			ctx.drawImage(g_ClaerButtonHandle, 145, 630);
+ 			ctx.drawImage(g_ClaerButtonHandle, 145, BROWSER_HEIGHT - 50/*630*/);
 		
 			
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
@@ -504,10 +528,12 @@ var StampSelect = function()
 						PosY = aSheet.iDrawY;
 						PosW = aSheet.iDrawW;
 						PosH = aSheet.iDrawH;
-						//ctx.globalAlpha = 0.5;
-						//ctx.fillStyle = 'rgb(255, 0, 0)';
-				        //ctx.fillRect(PosX, PosY, PosW, PosH);
-						//ctx.globalAlpha = 1.0;	
+	    				/*
+						ctx.globalAlpha = 0.5;
+						ctx.fillStyle = 'rgb(255, 0, 0)';
+				        ctx.fillRect(PosX, PosY, PosW, PosH);
+						ctx.globalAlpha = 1.0;	
+	    				*/
 
 						if(
 							(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
@@ -532,10 +558,12 @@ var StampSelect = function()
 						PosY = aSheet.iDrawY;
 						PosW = aSheet.iDrawW;
 						PosH = aSheet.iDrawH;
-						//ctx.globalAlpha = 0.5;
-						//ctx.fillStyle = 'rgb(255, 0, 0)';
-				        //ctx.fillRect(PosX, PosY, PosW, PosH);
-						//ctx.globalAlpha = 1.0;		    				
+	    				/*
+						ctx.globalAlpha = 0.5;
+						ctx.fillStyle = 'rgb(255, 0, 0)';
+				        ctx.fillRect(PosX, PosY, PosW, PosH);
+						ctx.globalAlpha = 1.0;	
+	    				*/
 						if(
 							(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
 							(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
@@ -558,11 +586,12 @@ var StampSelect = function()
 					PosY = aSheet.iDrawY;
 					PosW = aSheet.iDrawW;
 					PosH = aSheet.iDrawH;
-					//ctx.globalAlpha = 0.5;
-					//ctx.fillStyle = 'rgb(0, 255, 0)';
-			        //ctx.fillRect(PosX, PosY, PosW, PosH);
-					//ctx.globalAlpha = 1.0;	
-			    			    			
+	    			/*
+					ctx.globalAlpha = 0.5;
+					ctx.fillStyle = 'rgb(0, 255, 0)';
+			        ctx.fillRect(PosX, PosY, PosW, PosH);
+					ctx.globalAlpha = 1.0;	
+			    	*/		    			
 					if(
 						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
 						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
@@ -727,9 +756,9 @@ var StampSelect = function()
 						g_eStatus = G_STATUS.FADEOUT;
 						next = 1;
 					}	
-	    			// これにする[145, 630]
+	    			// これにする[145, BROWSER_HEIGHT - 50]
 					BackYesX = 145;
-					BackYesY = 630;
+					BackYesY = BROWSER_HEIGHT - 50;
 					BackYesW = 350;
 					BackYesH = 150;				    			    			
 					if(

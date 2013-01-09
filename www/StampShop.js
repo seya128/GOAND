@@ -245,7 +245,7 @@ ShopSheet.prototype.drawWindow = function()
 	DrawBack(this.ctx);
 	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
 	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];	
-	var GPosY = (1.0 - sScaleRate) * -64;
+	var GPosY = -84 + (1.0 - sScaleRate) * -64;
 
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
 	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
@@ -346,6 +346,7 @@ ShopSheet.prototype.drawWindow = function()
 // いっぱいですなどなど
 ShopSheet.prototype.drawOK= function()
 {
+	var GPosY = -84;
 	DrawBack(this.ctx);
 
 	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
@@ -355,34 +356,34 @@ ShopSheet.prototype.drawOK= function()
 	// 確認ウィンドウ
 	this.ctx.drawImage(this.BuyWindowImage, 
 		20  /*- 460 / 2*/, 
-		214);
+		GPosY + 214);
 	// 購入しました
 	if(eSwitch == 2)
 	{
 		this.ctx.drawImage(this.BuyOkMessageImage, 
 			30  /*- 460 / 2*/, 
-			520);
+			GPosY + 520);
 	}
 	// お金が足りません
 	else if(eSwitch == 3)
 	{
 		this.ctx.drawImage(this.BuyNoCoinMessageImage, 
 			30  /*- 460 / 2*/, 
-			520);
+			GPosY + 520);
 	}
 	// いっぱいです
 	else if(eSwitch == 4)
 	{
 		this.ctx.drawImage(this.BuyStampIppaiMessageImage, 
 			30  /*- 460 / 2*/, 
-			520);
+			GPosY + 520);
 	}
 	// シート持ってる
 	else if(eSwitch == 5)
 	{
 		this.ctx.drawImage(g_HaveMessageBottonHandle, 
 			30  /*- 460 / 2*/, 
-			520);
+			GPosY + 520);
 	}
 
 	// -------------------------------------
@@ -390,13 +391,13 @@ ShopSheet.prototype.drawOK= function()
 	// -------------------------------------
 	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
 	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
-	DrawBuyImage(this.ctx, 0, id, gold);
+	DrawBuyImage(this.ctx, GPosY, id, gold);
 	
 	// -------------------------------------
 	// はいボタン
 	// -------------------------------------
 	var PosYesX = 180;
-	var PosYesY = 690;
+	var PosYesY = GPosY + 690;
 	var PosYesW = 281;
 	var PosYesH = 184;
 
