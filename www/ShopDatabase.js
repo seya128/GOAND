@@ -15,6 +15,166 @@ var MAX_SHOP_PANEL_INTERVAL_Y 	= 0;
 var gHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
 // -------------------------------------
+// チュートリアルフラグ
+// -------------------------------------
+// 背景画像
+/*
+var gTUTORIAL_FLG = 
+{
+	// ごはん系
+	NONE:		0,
+	GOHAN_02:	1,
+	GOHAN_03:	2,
+}
+*/
+
+// チュートリアル実行中か？のみのフラグ
+var g_TutorialFlg     = false;	// 実行中
+var g_TutorialOneLook = false;	// 一度でも見たか？
+function SetTutorialFlg(flg)
+{
+	g_TutorialFlg = flg;
+}
+function GetTutorialFlg()
+{
+	return g_TutorialFlg;
+}
+
+// チュートリアル中なら解除する
+function CheckTutorial()
+{
+	if(GetTutorialFlg())
+	{
+		// 解除
+		SetTutorialFlg(0);
+		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;
+		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;	
+		g_TutorialSelectFlg 	= gTUTORIAL_SELECTFLG.NONE;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;	
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.NONE;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+		
+		// 初めてならプレゼントをもらう
+		if(g_TutorialOneLook == false)
+		{
+			AllDeleteStampDrawData();
+			PresentTutorialStampData();
+			PresentTutorialSheetData();
+			g_TutorialOneLook = true;
+		}
+		// 違ったら今までのデータを復元
+		else
+		{
+			// コインのロード処理
+			LoadCoin();
+			// シートのロード処理
+			if(LoadHaveSheetData() == true)
+			{
+			}
+			// 失敗なので新規ロード
+			else
+			{
+				DummySheetDataSet();
+				SaveActiveSheetIndex(0);
+			}	
+			// スタンプのロード処理
+			if(LoadHaveStampData() == true)
+			{
+			}
+			// 失敗なので新規ロード
+			else
+			{
+				DummyStampDataSet();
+				SaveActiveStampIndex(0);
+			}				
+		}
+	}
+}
+function StartTutorial()
+{
+	// ストレージのフラグを見てチュートリアルかをチェックする
+	//if()
+	{
+		// データをすべて削除
+		AllDelHasSheet();
+		// データをすべて削除
+		AllDelHasStamp();
+		
+		// 開始
+		SetTutorialFlg(true);
+		// ショップチュートリアルを開始
+		g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+		// スタンプセレクト開始
+		g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+		// メインチュートリアル開始
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+	}
+}
+
+// -------------------------------------
+// ショップチュートリアル
+// -------------------------------------
+var gTUTORIAL_SHOPFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	SHEET_BUY_MESSAGE:		2,	// シート買ってみよう(メッセージ)
+	SHEET_BUY_SELECT:		3,	// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
+	SHEET_BUY_SELECT_WAIT:	4,	// シート買ってみよう(購入待ち)
+	STAMP_BUY_MESSAGE:		5,	// スタンプ買ってみよう(メッセージ)
+	STAMP_BUY_SELECT:		6,	// スタンプ買ってみよう(セレクト)「プリン以外は押せない」
+	STAMP_BUY_SELECT_WAIT:	7,	// スタンプ買ってみよう(購入待ち)
+	BACK_MESSAGE:			8,	// もどる(メッセージ)
+	BACK_SELECT:			9,	// もどる(セレクト)「もどる以外は押せない」
+};
+
+var g_TutorialShopFlg     = gTUTORIAL_SHOPFLG.NONE;
+var g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.NON;
+
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_SELECTFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	SHEET_TOUCH_MESSAGE:	2,	// シートタッチしてください(メッセージ)
+	SHEET_TOUCH_NEXT:		3,	// シートタッチで進む
+};
+
+var g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.NONE;
+var g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_MAINFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
+	SHEET_TOUCH_WRITE:		3,	// シートにスタンプを押してね
+	STAMP_TOUCH_DEAD:		4,	// スタンプがなくなった
+	MENU_SELECT:			5,	// メニューセレクト
+	MENU_WAIT:				6,	// メニュー表示にて少し待つ
+	STAMP_CLEAR:			7,	// スタンプをクリア
+	STAMP_CLEAR_WINDOW:		8,	// クリア確認ウィンドウ
+	MENU_SELECT_END:		9,	// メニューセレクト	
+	MENU_SELECT_END_WAIT:	10,	// メニューセレクトにて少し待つ
+	BACK:					11,	// 戻る
+};
+
+var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
+var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
+
+
+// -------------------------------------
 // スタンプのサイズ
 // -------------------------------------
 var STAMP_W = 160;
@@ -23,12 +183,13 @@ var STAMP_H = 160;
 // -------------------------------------
 // リダクションサイズを設定する「処理を軽くするためサムネイル」
 // -------------------------------------
+/*
 var REDUCTION_SIZE = 2.0;
 var SCREEN_WIDTH   = 640;
 var SCREEN_HEIGHT  = 1200;
 var CANVAS_WIDTH   = SCREEN_WIDTH  / REDUCTION_SIZE;
 var CANVAS_HEIGHT  = SCREEN_HEIGHT / REDUCTION_SIZE;
-
+*/
 
 // 背景画像
 var gStampEnum = 
@@ -76,11 +237,11 @@ var gStampEnum =
 	KAMI_PIMAN:		118,			// ピーマンの神様
 	KAMI_NASU:		119,			// ナスの神様
 	KAMI_TOMATO:	120,			// トマトの神様	
-	KAMI_NINZIN:	121,			// 人参の神様
-	KAMI_TAMANEGI:	122,			// 玉ねぎの神様	
-	KAMI_SIITAKE:	123,			// シイタケの神様
-	KAMI_SAKANA:	124,			// 魚の神様
-	KAMI_NIKU:		125,			// 肉の神様
+	KAMI_NIKU:		121,			// 肉の神様
+	KAMI_SIITAKE:	122,			// シイタケの神様
+	KAMI_TAMANEGI:	123,			// 玉ねぎの神様		
+	KAMI_NINZIN:	124,			// 人参の神様
+	KAMI_SAKANA:	125,			// 魚の神様
 
 	// 真子様
 	SIN_BAMU:		126,			// バーム
@@ -197,84 +358,122 @@ var M_MAX_BUY_STAMP = 64;				// スタンプ
 // 000-099	シート
 // 100-		スタンプ
 // ------------------------------------------------------
-var gShopBuyListTable = 
-[
- 	// シンコ様
-    { "id":gStampEnum.SINKO_01,	"gold":11 },	// シンコ様1
-    { "id":gStampEnum.SINKO_02,	"gold":11 },	// シンコ様2
-    { "id":gStampEnum.SINKO_03,	"gold":11 },	// シンコ様3   
-	// シンコ様
-    { "id":gStampEnum.SIN_BAMU,		"gold":3    },	// バーム
-    { "id":gStampEnum.SIN_CHOCO,	"gold":3    },	// チョコ
-    { "id":gStampEnum.SIN_HEART,	"gold":3    },	// ハート
-    { "id":gStampEnum.SIN_KAI,		"gold":3    },	// 貝
-    { "id":gStampEnum.SIN_SIKAKU,	"gold":3    },	// 四角
-    { "id":gStampEnum.SIN_MARU,		"gold":3    },	// 丸
-    { "id":gStampEnum.SIN_SAMA,		"gold":3	},	// シンコ様
-    { "id":gStampEnum.SIN_AME,		"gold":3    },	// 飴
-    { "id":gStampEnum.SIN_HAZIKI,	"gold":3    },	// はじきみたいな
-
-	// ごはん系
-    { "id":gStampEnum.GOHAN_01, "gold":13 },	// ごはん1
-    { "id":gStampEnum.GOHAN_02, "gold":13 },	// ごはん2
-    { "id":gStampEnum.GOHAN_03, "gold":13 },	// ごはん3
-    // 小物
-    { "id":gStampEnum.NIKU,    "gold":5 },		// ハンバーグ
-    { "id":gStampEnum.PURIN,   "gold":5 },		// プリン
-    { "id":gStampEnum.SUPA,    "gold":5 },		// スパゲティ
-    { "id":gStampEnum.HATA,    "gold":5 },		// お子様の旗
-    { "id":gStampEnum.ONIGIRI, "gold":5 },		// おにぎり
-    { "id":gStampEnum.HURAI,   "gold":5 },		// エビフライ
-    { "id":gStampEnum.TAKO,    "gold":5 },		// タコ
-    { "id":gStampEnum.KYUURI,  "gold":5 },		// きゅうり
-    { "id":gStampEnum.REMON,   "gold":5 },		// レモン
-    
-	// 空の上系
-    { "id":gStampEnum.SKY_01, 	"gold":17 },	// 空の上1
-    { "id":gStampEnum.SKY_02,	"gold":17 },	// 空の上2
-    { "id":gStampEnum.SKY_03,	"gold":17 },	// 空の上3
-    // 小物
-    { "id":gStampEnum.KUMO,		"gold":11 },	// 雲
-    { "id":gStampEnum.HUUSEN,	"gold":11 },	// 風船
-    { "id":gStampEnum.HANA,		"gold":11 },	// チューリップ
-    { "id":gStampEnum.RINGO,	"gold":11 },	// リンゴ
-    { "id":gStampEnum.BANANA,	"gold":11 },	// バナナ
-    { "id":gStampEnum.HIKOUKI,	"gold":11 },	// 飛行機
-    { "id":gStampEnum.TAMANEGI,	"gold":11 },	// たまねぎ
-    { "id":gStampEnum.EDAMAME,	"gold":11 },	// 枝豆
-    { "id":gStampEnum.TOMATO,	"gold":11 },	// トマト
-    
-/*
-	// 水の中
-    { "id":gStampEnum.WATER_01,	"gold":30 },	// 水の中1
-    { "id":gStampEnum.WATER_02,	"gold":60 },	// 水の中2
-    { "id":gStampEnum.WATER_03,	"gold":90 },	// 水の中3
-    // 小物
-    { "id":gStampEnum.KAME,		"gold":10 },	// カメ
-    { "id":gStampEnum.ISOGIN,	"gold":15 },	// イドギンチャク
-    { "id":gStampEnum.WAKAME,	"gold":20 },	// わかめ
-    { "id":gStampEnum.KANI,		"gold":25 },	// カニ
-    { "id":gStampEnum.YADOKARI,	"gold":30 },	// ヤドカリ
-    { "id":gStampEnum.SAKANA,	"gold":35 },	// 魚
-    { "id":gStampEnum.TATU,		"gold":40 },	// タツノオトシゴ
-    { "id":gStampEnum.KAI,		"gold":45 },	// 貝
-    { "id":gStampEnum.NIMO,		"gold":50 },	// ニモ
-  */     
-    // 神様
-	{ "id":gStampEnum.KAMI_PIMAN,		"gold":2 },	// ピーマンの神様   
-    { "id":gStampEnum.KAMI_NASU,		"gold":2 },	// ナスの神様
-    { "id":gStampEnum.KAMI_TOMATO,		"gold":2 },	// トマトの神様 
-    { "id":gStampEnum.KAMI_NINZIN,		"gold":2 },	// 人参の神様
-    { "id":gStampEnum.KAMI_TAMANEGI,	"gold":2 },	// 玉ねぎの神様     
-    { "id":gStampEnum.KAMI_SIITAKE,		"gold":2 },	// シイタケの神様
-    { "id":gStampEnum.KAMI_SAKANA,		"gold":2 },	// 魚の神様
-    { "id":gStampEnum.KAMI_NIKU,		"gold":2 },	// 肉の神様
-];
-
-var M_MAX_BUY_LIST = gShopBuyListTable.length;
+var gShopBuyListTable = new Array();
+var M_MAX_BUY_LIST = 0;
 function GetMaxBuyScl()
 {
 	return -(MAX_SHOP_PANEL_START_Y + (MAX_SHOP_PANEL_HEIGHT * (M_MAX_BUY_LIST / 3)) - (MAX_SHOP_PANEL_HEIGHT * 3));
+}
+function SetupShopAllData()
+{
+	// すべて削除
+	AllDelShopData();
+	
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+		// ごはん系
+		AddShopData(gStampEnum.GOHAN_01, 	5);	// ごはん1
+		AddShopData(gStampEnum.GOHAN_02, 	5);	// ごはん2
+		AddShopData(gStampEnum.GOHAN_03, 	5);	// ごはん3
+		AddShopData(gStampEnum.NIKU,    	3);	// ハンバーグ
+		AddShopData(gStampEnum.PURIN,    	3);	// プリン
+		AddShopData(gStampEnum.SUPA,     	3);	// スパゲティ
+	}
+	// それ以外
+	else
+	{
+		// ごはん系
+		AddShopData(gStampEnum.GOHAN_01, 	5);	// ごはん1
+		AddShopData(gStampEnum.GOHAN_02, 	5);	// ごはん2
+		AddShopData(gStampEnum.GOHAN_03, 	5);	// ごはん3
+		AddShopData(gStampEnum.NIKU,    	3);	// ハンバーグ
+		AddShopData(gStampEnum.PURIN,    	3);	// プリン
+		AddShopData(gStampEnum.SUPA,     	3);	// スパゲティ
+	 	//AddShopData(gStampEnum.HATA,     3);	// お子様の旗
+		//AddShopData(gStampEnum.ONIGIRI,  3);	// おにぎり
+		//AddShopData(gStampEnum.HURAI,    3);	// エビフライ
+		//AddShopData(gStampEnum.TAKO,     3);	// タコ
+		//AddShopData(gStampEnum.KYUURI,   3);	// きゅうり
+		//AddShopData(gStampEnum.REMON,    3);	// レモン	
+		
+		// シンコ様セット
+		AddShopData(gStampEnum.SINKO_01,		5);	// シンコ様1
+		AddShopData(gStampEnum.SINKO_02,		5);	// シンコ様2
+		AddShopData(gStampEnum.SINKO_03,		5);	// シンコ様3   
+		AddShopData(gStampEnum.SIN_BAMU,		3);	// バーム
+		AddShopData(gStampEnum.SIN_CHOCO,		3);	// チョコ
+		//AddShopData(gStampEnum.SIN_HEART,		3);	// ハート
+		//AddShopData(gStampEnum.SIN_KAI,		3);	// 貝
+		//AddShopData(gStampEnum.SIN_SIKAKU,	3);	// 四角
+		//AddShopData(gStampEnum.SIN_MARU,		3);	// 丸
+		AddShopData(gStampEnum.SIN_SAMA,		3);	// シンコ様
+		//AddShopData(gStampEnum.SIN_AME,		3);	// 飴
+		//AddShopData(gStampEnum.SIN_HAZIKI,	3);	// はじきみたいな
+
+	    
+		// 空の上系
+		//AddShopData(gStampEnum.SKY_01, 	5);	// 空の上1
+		//AddShopData(gStampEnum.SKY_02,	5);	// 空の上2
+		//AddShopData(gStampEnum.SKY_03,	5);	// 空の上3
+		//AddShopData(gStampEnum.KUMO,		3);	// 雲
+		//AddShopData(gStampEnum.HUUSEN,	3);	// 風船
+		//AddShopData(gStampEnum.HANA,		3);	// チューリップ
+		//AddShopData(gStampEnum.RINGO,		3);	// リンゴ
+		//AddShopData(gStampEnum.BANANA,	3);	// バナナ
+		//AddShopData(gStampEnum.HIKOUKI,	3);	// 飛行機
+		//AddShopData(gStampEnum.TAMANEGI,	3);	// たまねぎ
+		//AddShopData(gStampEnum.EDAMAME,	3);	// 枝豆
+		//AddShopData(gStampEnum.TOMATO,	3);	// トマト
+	         
+	    // 神様
+		AddShopData(gStampEnum.KAMI_PIMAN,			2);	// ピーマンの神様   
+		AddShopData(gStampEnum.KAMI_NASU,			2);	// ナスの神様
+		AddShopData(gStampEnum.KAMI_TOMATO,			2);	// トマトの神様 
+		//AddShopData(gStampEnum.KAMI_NIKU,			2);	// 肉の神様	
+		//AddShopData(gStampEnum.KAMI_SIITAKE,		2);	// シイタケの神様
+		//AddShopData(gStampEnum.KAMI_TAMANEGI,		2);	// 玉ねぎの神様 	
+		//AddShopData(gStampEnum.KAMI_NINZIN,		2);	// 人参の神様     
+		//AddShopData(gStampEnum.KAMI_SAKANA,		2);	// 魚の神様
+	}
+}
+function PresentTutorialStampData()
+{
+	// 現状のデータをすべて削除
+	DeleteHaveStampData();
+	// ハンバーグゲット
+//	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// ミニパスタゲット
+//	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// セーブ
+	SaveHaveStampData();
+	
+	// お金ゲット
+	SetCoin(30);
+}
+function PresentTutorialSheetData()
+{
+	// 現状のデータをすべて削除
+	DeleteHaveSheetData();
+	// お子様ランチゲット
+	AddHasSheet(gStampEnum.GOHAN_01);
+	// セーブ
+	SaveHaveSheetData();
+}
+function AddShopData(id, gold)
+{
+	var sData = {"id":id , "gold":gold };
+	M_MAX_BUY_LIST = gShopBuyListTable.length
+	gShopBuyListTable[M_MAX_BUY_LIST] = sData;
+	M_MAX_BUY_LIST ++;
+}
+
+// スタンプシートの全て削除
+function AllDelShopData()
+{ 
+	gShopBuyListTable.splice(0);
 }
 
 // ------------------------------------------------------
@@ -282,6 +481,7 @@ function GetMaxBuyScl()
 // ------------------------------------------------------
 var g_StampGraphicNum    = (M_MAX_SHEET + M_MAX_STAMP);
 var g_StampGraphicHandle = null;
+var g_SheetGraphicHandle = null;
 var g_StampDrawData		 = null;
 
 // ------------------------------------------------------
@@ -298,41 +498,20 @@ var g_saveDataKeyStampDrawDara 		= "DrawStampData";			// 描画されたシー�
 // ------------------------------------------------------
 // データの取得
 // ------------------------------------------------------
-function GetStampGraphicHandleImage(no)
+function GetSheetGraphicHandle_Image(no)
 {
-	return g_StampGraphicHandle[no].m_Image;
-}
-function GetStampGraphicHandle_Sheet(no)
-{
-	return g_StampGraphicHandle[no];
-}
-function GetStampGraphicHandle_SheetImage(no)
-{
-	return g_StampGraphicHandle[no].m_Image;
-}
-function GetStampGraphicHandle_Stamp(no)
-{
-	return g_StampGraphicHandle[no + M_MAX_SHEET];
-}
-function GetStampGraphicHandle_StampImage(no)
-{
-	return g_StampGraphicHandle[no + M_MAX_SHEET].m_Image;	
+	return g_SheetGraphicHandle[no].m_Image;
 }
 
-function GetStampGraphicHandle(no)
+function GetStampGraphicHandle_Image(no)
 {
-	if(no >= M_OFFSET_STAMP) { return g_StampGraphicHandle[(no - M_OFFSET_STAMP) + M_MAX_SHEET]; }
-	return g_StampGraphicHandle[no];
+	return g_StampGraphicHandle[no].m_Image;	
 }
-function GetStampGraphicIndex(no)
+
+function GetStampSheetGraphicImage(no)
 {
-	if(no >= M_OFFSET_STAMP) { return (M_OFFSET_STAMP - no) + M_MAX_SHEET; }
-	return no;
-}
-function GetStampGraphicImage(no)
-{
-	if(no >= M_OFFSET_STAMP) { return g_StampGraphicHandle[(no - M_OFFSET_STAMP) + M_MAX_SHEET].m_Image; }
-	return g_StampGraphicHandle[no].m_Image;
+	if(no >= M_OFFSET_STAMP) { return g_StampGraphicHandle[no - M_OFFSET_STAMP].m_Image; }
+	return g_SheetGraphicHandle[no].m_Image;
 }
 
 // -------------------------------------
@@ -341,7 +520,6 @@ function GetStampGraphicImage(no)
 function GStampGraphic()
 {
 	this.m_ImageNo 	= -1;
-    this.m_bLoaded  = false;			// ロードフラグ
     this.m_Image	= new Image();	// イメージクラス
 }
 // -------------------------------------
@@ -351,25 +529,17 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 {
 	// 自分のポインタ
     var _this  = this;
-	var iIndex = eStampEnum;//GetStampGraphicIndex(eStampEnum);
-    // ロード
-    this.m_bLoaded = false;
-	// ロードが終わっていたらフラグを立てる
-    this.m_Image.onload = function(){ _this.m_bLoaded = true; }
+	var iIndex = eStampEnum;
 	
-	// スタンプ
-	if(eStampEnum >= M_MAX_SHEET)
+	if(M_MAX_SHEET <= iIndex)
 	{
-    	this.m_Image.src	= gStampImgFileName[iIndex - M_MAX_SHEET];
+    	this.m_Image.src = gStampImgFileName[iIndex - M_MAX_SHEET];
 	}
-	// シート
 	else
 	{
-    	this.m_Image.src	= gStampBgFileName[iIndex];
+    	this.m_Image.src = gStampBgFileName[iIndex];
 	}
-	
-	// 代入
-    this.m_ImageNo = iIndex;
+    this.m_ImageNo   = iIndex;
 };
 
 // ------------------------------------------------------
@@ -378,7 +548,7 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 // ------------------------------------------------------
 
 // スタンプの最大回数
-var STAMP_LIFE_MAX = 3 * 15;	// 45
+var STAMP_LIFE_MAX = 3 * 30;	// 45
 var g_HaveStampImageData = 
 [
     {"id":0, "ink":STAMP_LIFE_MAX},	// ダミー
@@ -394,6 +564,150 @@ var g_HaveStampSheetData =
 function GetHaveStampDataNum() { return g_HaveStampImageData.length; }
 function GetHaveSheetDataNum() { return g_HaveStampSheetData.length; }
 
+
+// グラフィックロード
+var g_sGraphicLoadFlg			= new LoadingObject("g_sGraphicLoadFlg");
+var g_sStampLoadFlg				= new LoadingObject("g_sStampLoadFlg");
+var g_sSheetLoadFlg				= new LoadingObject("g_sSheetLoadFlg");
+var g_sShopLoadFlg				= new LoadingObject("g_sShopLoadFlg");
+var g_sTutorialLoadFlg			= new LoadingObject("g_sTutorialLoadFlg");
+
+function GetFileName(file_url)
+{
+	file_url = file_url.substring(file_url.lastIndexOf("/")+1,file_url.length)
+	//拡張子も取り除く場合は次の行のコメントアウトをはずしてください
+	//file_url = file_url.substring(0,file_url.indexOf("."));
+	return file_url;
+}
+
+// スタンプ描画データクラス
+function CallBackStatus(sObject) 
+{
+}
+
+// スタンプ描画データクラス
+function LoadingObject(name) 
+{
+	this.strName  = name;
+	this.bLoadFlg = false;
+	this.aImage   = [];
+	this.aLoad    = [];
+	this.iLength  = 0;
+
+    this.AddLoadFile = function(img)
+	{
+		this.aLoad[this.iLength]  			= false;
+		this.aImage[this.iLength] 			= img;
+		this.aImage[this.iLength].Unique	= GetFileName(this.aImage[this.iLength].src);
+		this.bLoadFlg 						= false;
+	//	var _this = this;
+	//	img.onload = function() 
+	//	{ 
+	//		_this.aLoad[this.iLength] = true;
+	//	} 
+		
+		this.iLength ++;
+    };	
+    this.AddLoadFileEx = function(img, name)
+	{
+		img.src = name;
+		this.aLoad[this.iLength]  			= false;
+		this.aImage[this.iLength] 			= img;
+		this.aImage[this.iLength].Unique	= name;
+		this.bLoadFlg 						= false;
+		
+	//	var _this = this;
+	//	img.onload = function() 
+	//	{ 
+	//		_this.aLoad[this.iLength] = true;
+	//	} 
+		
+		this.iLength ++;
+    };	
+	this.Delete = function()
+	{
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+			this.aLoad[i]  	= false;
+			this.aImage[i] 	= null;
+	    }		
+		this.bLoadFlg = false;
+		this.iLength  = 0;
+	}
+	
+	this.CallBackStatus = function()
+	{
+	    var iCount = 0;
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+			if(this.aImage[i].complete) { this.aLoad[i] = true; iCount ++; }
+	    	//if(this.aLoad[i]) { /*this.aLoad[i] = true;*/ iCount ++; }
+	    }
+		// ロード完了
+		if(iCount == this.iLength) { this.bLoadFlg = true; return; }
+		// 待つ
+		setTimeout(this.strName + ".CallBackStatus()", 200);
+	}
+	
+	this.Loading = function()
+	{
+		// ロード完了している
+		if(this.bLoadFlg) { return; }
+		this.CallBackStatus();
+	}
+	
+	this.GetCompleteUnique = function(no)
+	{
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+	    	if(no == this.aImage[i].Unique) 
+			{ 
+				if(this.aLoad[i]) { return true; }
+				return false;
+			}
+	    }			
+		return false;
+	}	
+	this.GetDump = function()
+	{
+	    var iCount = 0;
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+	    	if(this.aLoad[i]) { iCount ++; }
+	    }	
+		var strLoad = "--- ロード数 --- [" + iCount + "/" + this.iLength + "]<br>";
+		
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+	    	if(!this.aLoad[i])
+			{
+				strLoad = strLoad + "[Loading]:" +  this.aImage[i].Unique + "<br>";
+			}
+			else
+			{
+				strLoad = strLoad + "[Complete]:" + this.aImage[i].Unique + "<br>";				
+			}
+	    }		
+		
+		
+		return strLoad;
+	}
+}
+
+function SafeDrawSheet(ctx, img, x, y, w, h)
+{
+	if(g_sSheetLoadFlg.GetCompleteUnique(img.Unique) == false) { return false; }
+	ctx.drawImage(img, x, y, w, h);
+	return true;
+}
+// 画像xywh
+// 座標xywh
+function SafeDrawSheetEx(ctx, img, cx, cy, cw, ch, sx, sy, sw, sh)
+{
+	if(g_sSheetLoadFlg.GetCompleteUnique(img.Unique) == false) { return false; }
+	ctx.drawImage(img, cx, cy, cw, ch, sx, sy, sw, sh);
+	return true;
+}
 
 // -------------------------------------
 // データのロード
@@ -412,27 +726,43 @@ StampDrawData.prototype.GetSaveKey = function(nSheetNo) { return g_saveDataKeySt
 // ロード
 StampDrawData.prototype.Load = function()
 {
-	this.sDataInfo = new Array();
-	var key  = this.GetSaveKey(this.nSheetIndex);
-	var data = localStorage.getItem(key);
-	if (!data) 
+	// チュートリアル実行中
+	if(GetTutorialFlg())
 	{
-		console.log("データがないので作成します: " + key);
-		this.sDataNum = 0;
-		return;
+		this.sDataInfo = new Array();
+		this.sDataNum  = 0;
 	}
-	
-	this.sDataInfo 	= JSON.parse(data);
-	this.sDataNum	= Math.floor(this.sDataInfo.length / 4);
-	console.log("ロード: " + key);
+	else
+	{
+		this.sDataInfo = new Array();
+		var key  = this.GetSaveKey(this.nSheetIndex);
+		var data = localStorage.getItem(key);
+		if (!data) 
+		{
+			console.log("データがないので作成します: " + key);
+			this.sDataNum = 0;
+			return;
+		}
+		
+		this.sDataInfo 	= JSON.parse(data);
+		this.sDataNum	= Math.floor(this.sDataInfo.length / 4);
+		console.log("ロード: " + key)
+	}
 };
 
 // セーブ
 StampDrawData.prototype.Save = function() 
 {
-	var key = this.GetSaveKey(this.nSheetIndex);
-	localStorage.setItem(key, JSON.stringify(this.sDataInfo));
-	console.log("セーブ: " + key);
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+	}
+	else
+	{	
+		var key = this.GetSaveKey(this.nSheetIndex);
+		localStorage.setItem(key, JSON.stringify(this.sDataInfo));
+		console.log("セーブ: " + key);
+	}
 };
 
 
@@ -484,34 +814,148 @@ function GetStampDrawDataA(iSheet, iIndex)  { return g_StampDrawData[iSheet].sDa
 // ------------------------------------------------------
 // ロード
 // ------------------------------------------------------
-function AllLoadStampGraphic()
+function LoadStampSheetData(no)
+{
+	// スタンプ
+	if(no >= M_OFFSET_STAMP)
+	{
+		no -= M_OFFSET_STAMP; 
+		if(g_StampGraphicHandle[no] == null)
+		{
+			g_StampGraphicHandle[no] = new GStampGraphic();
+			g_StampGraphicHandle[no].LoadImage(no + M_MAX_SHEET);
+			g_sStampLoadFlg.AddLoadFile(g_StampGraphicHandle[no].m_Image);		
+		}
+	}
+	// シート
+	else
+	{
+		if(g_SheetGraphicHandle[no] == null)
+		{
+			g_SheetGraphicHandle[no] = new GStampGraphic();
+			g_SheetGraphicHandle[no].LoadImage(no);
+			g_sSheetLoadFlg.AddLoadFile(g_SheetGraphicHandle[no].m_Image);	
+		}
+	}
+}
+
+function LoadSheetGraphic()
+{
+	// ２度読み禁止
+	if(g_SheetGraphicHandle == null)
+	{
+	    g_SheetGraphicHandle = new Array();
+	}		
+
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+		// シート
+		LoadStampSheetData(gStampEnum.GOHAN_01);	// ごはん1
+		LoadStampSheetData(gStampEnum.GOHAN_02);	// ごはん2
+		LoadStampSheetData(gStampEnum.GOHAN_03);	// ごはん3
+	}
+	// それ以外
+	else
+	{
+		// シート
+		LoadStampSheetData(gStampEnum.GOHAN_01);	// ごはん1
+		LoadStampSheetData(gStampEnum.GOHAN_02);	// ごはん2
+		LoadStampSheetData(gStampEnum.GOHAN_03);	// ごはん3
+		LoadStampSheetData(gStampEnum.SINKO_01);	// シンコ様1
+		LoadStampSheetData(gStampEnum.SINKO_02);	// シンコ様2
+		LoadStampSheetData(gStampEnum.SINKO_03);	// シンコ様3   
+	}
+	// ローディング開始
+	g_sSheetLoadFlg.Loading();	
+}
+
+function LoadStampGraphic()
 {
 	// ２度読み禁止
 	if(g_StampGraphicHandle == null)
 	{
 		// 作成
 	    g_StampGraphicHandle = new Array();
-		// シートロード
-		for(var i = 0; i < M_MAX_SHEET; i ++)
-		{
-			g_StampGraphicHandle[i] = new GStampGraphic();
-			g_StampGraphicHandle[i].LoadImage(i);
+	}
+			
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+		// スタンプ
+		LoadStampSheetData(gStampEnum.NIKU);		// ハンバーグ
+		LoadStampSheetData(gStampEnum.PURIN);		// プリン
+		LoadStampSheetData(gStampEnum.SUPA);		// スパゲティ
+	}
+	// それ以外
+	else
+	{
+		// スタンプ
+		LoadStampSheetData(gStampEnum.NIKU);		// ハンバーグ
+		LoadStampSheetData(gStampEnum.PURIN);		// プリン
+		LoadStampSheetData(gStampEnum.SUPA);		// スパゲティ
+		LoadStampSheetData(gStampEnum.SIN_BAMU);	// バーム
+		LoadStampSheetData(gStampEnum.SIN_CHOCO);	// チョコ
+		LoadStampSheetData(gStampEnum.SIN_SAMA);	// シンコ様		
+		LoadStampSheetData(gStampEnum.KAMI_PIMAN);	// ピーマンの神様   
+		LoadStampSheetData(gStampEnum.KAMI_NASU);	// ナスの神様
+		LoadStampSheetData(gStampEnum.KAMI_TOMATO);	// トマトの神様 
+	}
+	// ローディング開始
+	g_sStampLoadFlg.Loading();
+}
+
+// 周りのみ読み込み
+function LoadPrevNextSheetGraphic(select)
+{
+	// ２度読み禁止
+	if(g_SheetGraphicHandle == null)
+	{
+	    g_SheetGraphicHandle = new Array();
+	}	
+	if(select >= 0 && g_HaveStampSheetData.length > 0)
+	{
+		var nowid = g_HaveStampSheetData[select]["id"];
+		LoadStampSheetData(nowid);
+
+		if(select > 0) 
+		{ 
+			var previd = g_HaveStampSheetData[select - 1]["id"];		
+			LoadStampSheetData(previd); 
 		}
-		// スタンプロード
-		for(var i = M_MAX_SHEET; i < g_StampGraphicNum; i ++)
+		if(select + 1 < g_HaveStampSheetData.length)
 		{
-			g_StampGraphicHandle[i] = new GStampGraphic();
-			g_StampGraphicHandle[i].LoadImage(i);
+			var nextid = g_HaveStampSheetData[select + 1]["id"];		
+			LoadStampSheetData(nextid); 
 		}
 	}
+	// ローディング開始
+	g_sSheetLoadFlg.Loading();	
 }
+// 周りのみ読み込み
+function LoadSelectSheetGraphic(select)
+{
+	// ２度読み禁止
+	if(g_SheetGraphicHandle == null)
+	{
+	    g_SheetGraphicHandle = new Array();
+	}	
+	if(select >= 0 && g_HaveStampSheetData.length > 0)
+	{
+		var nowid = g_HaveStampSheetData[select]["id"];
+		LoadStampSheetData(nowid);
+	}
+	// ローディング開始
+	g_sSheetLoadFlg.Loading();	
+}
+
+
 // ------------------------------------------------------
 // 描画データのロード
 // ------------------------------------------------------
 function AllLoadStampDrawData()
 {
-	// ２度読み禁止
-	//if(g_StampDrawData == null)
+	// 一応毎回ロードする
 	{
 		var iSheetNum = GetHaveSheetDataNum();
 		g_StampDrawData = new Array(); 
@@ -563,8 +1007,8 @@ function AddCoin(coin)
 {
 	LoadCoin();
 	g_Coin += coin;
-	if(g_Coin > 99999) { g_Coin = 99999; }
-	if(g_Coin < 0)     { g_Coin = 0;     }
+	if(g_Coin > 999)    { g_Coin = 999; }
+	if(g_Coin < 0)      { g_Coin = 0;   }
 	SaveCoin();	
 }
 function GetCoin() { return g_Coin; }
@@ -594,18 +1038,24 @@ function GetIsBuyMax(id)
 // 全セーブ
 function SaveCoin() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyCoin, JSON.stringify(g_Coin));
 	console.log("Save" + g_saveDataKeyCoin);
 }
 // 全削除
 function DeleteCoin() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.removeItem(g_saveDataKeyCoin);
 	SetCoin(g_DefaultCoin);
 }
 // ロード
 function LoadCoin() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return true; }
 	var data = localStorage.getItem(g_saveDataKeyCoin);
 	if (!data) { return false; }
 	
@@ -617,6 +1067,17 @@ function LoadCoin()
 // ------------------------------------------------------
 // スタンプ操作
 // ------------------------------------------------------
+// 何枚持っているか？
+function GetStampNum(id)
+{
+	var iNum = 0;
+	for(var i = 0; i < g_HaveStampImageData.length; i ++)
+	{
+		if(g_HaveStampImageData[i]["id"] == id) { iNum ++; }
+	}
+	return iNum;
+}
+
 // スタンプデータの追加
 function AddHasStamp(id, ink)
 {
@@ -636,37 +1097,9 @@ function AllDelHasStamp()
 // スタンプデータのダミーセット
 function DummyStampDataSet()
 {
-	// 複数追加
-	AllDelHasStamp();
-	
-
-	// 全データセット
-//	for(var i = 0; i < M_MAX_STAMP; i ++)
-//	{
-//		AddHasStamp(i, 2);
-//	}
-	// [各３こづつ]
-	// シンコ
-	AddHasStamp(gStampEnum.SIN_BAMU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.SIN_CHOCO  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.SIN_HEART  	- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	// ごはん
-	AddHasStamp(gStampEnum.NIKU  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.PURIN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.SUPA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	// 雲の上
-	AddHasStamp(gStampEnum.KUMO  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.HUUSEN  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.HANA  		- M_OFFSET_STAMP, STAMP_LIFE_MAX);
-
-	// 必要なもの[ぴーまん、にんじん、とまと、なす]
-	AddHasStamp(gStampEnum.KAMI_PIMAN  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.KAMI_NINZIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.KAMI_TOMATO - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-	AddHasStamp(gStampEnum.KAMI_NASU   - M_OFFSET_STAMP, STAMP_LIFE_MAX);
-
-	// セーブ
-	SaveHaveStampData();
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
+	PresentTutorialStampData();
 }
 
 // 購入
@@ -678,7 +1111,8 @@ function BuySaveStampData(id, coin)
 	// 追加
 	AddHasStamp(id, STAMP_LIFE_MAX);
 	// コイン
-	g_Coin += coin;
+	AddCoin(coin);
+	//g_Coin += coin;
 	// アクティブなスタンプにする
 	SaveHaveStampData(g_HaveStampImageData.length - 1);
 	// セーブ
@@ -697,6 +1131,8 @@ function DelSaveStampData(index)
 // スタンプデータ
 function LoadHaveStampData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return true; }
 	var data = localStorage.getItem(g_saveDataKeyHaveStampData);
 	if (!data) { return false; }
 	
@@ -706,12 +1142,16 @@ function LoadHaveStampData()
 // 全セーブ
 function SaveHaveStampData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyHaveStampData, JSON.stringify(g_HaveStampImageData));
 	console.log("Save" + g_saveDataKeyHaveStampData);
 }
 // 全削除
 function DeleteHaveStampData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.removeItem(g_saveDataKeyHaveStampData);
 	AllDelHasStamp();
 	SaveHaveStampData();
@@ -720,6 +1160,17 @@ function DeleteHaveStampData()
 // ------------------------------------------------------
 // シート操作
 // ------------------------------------------------------
+// 何枚持っているか？
+function GetSheetNum(id)
+{
+	var iNum = 0;
+	for(var i = 0; i < g_HaveStampSheetData.length; i ++)
+	{
+		if(g_HaveStampSheetData[i]["id"] == id) { iNum ++; }
+	}
+	return iNum;
+}
+
 // スタンプシートの追加
 function AddHasSheet(id)
 {
@@ -739,24 +1190,9 @@ function AllDelHasSheet()
 // スタンプシートのダミーセット
 function DummySheetDataSet()
 {
-	// 複数追加
-	AllDelHasSheet();
-	
-	// 全セット
-/*
-	for(var i = 0; i < M_MAX_SHEET; i ++)
-	{
-		AddHasSheet(i);
-	}
-*/
-	// 必要なもの[シンコ様テーブル左]
-	AddHasSheet(gStampEnum.SINKO_01);	// シンコ
-	AddHasSheet(gStampEnum.GOHAN_01);	// ランチ
-	AddHasSheet(gStampEnum.SKY_01);		// 雲の上
-		
-	
-	// セーブ
-	SaveHaveSheetData();
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
+	PresentTutorialSheetData();
 }
 
 function GetIsSheetTrue(id)
@@ -782,12 +1218,13 @@ function BuySaveSheetData(id, coin)
 	// アクティブなシートにする
 	SaveActiveSheetIndex(g_HaveStampSheetData.length - 1);
 	// コイン
-	g_Coin += coin;
+	AddCoin(coin);
+	//g_Coin += coin;
 	// セーブ
 	SaveHaveSheetData();	
 	return true;
 }
-// 削除し、一番近いシートをアクティブにする
+// 削除し、一番近いシートをアクティブにする[デバッグ用]
 function DelSaveSheetData(index)
 {
 	// 配列から消す
@@ -822,6 +1259,8 @@ function DelSaveSheetData(index)
 // スタンプシート
 function LoadHaveSheetData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return true; }
 	var data = localStorage.getItem(g_saveDataKeyHaveSheetData);
 	if (!data) { return false; }
 	
@@ -831,12 +1270,16 @@ function LoadHaveSheetData()
 
 function SaveHaveSheetData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyHaveSheetData, JSON.stringify(g_HaveStampSheetData));
 	console.log("Save" + g_saveDataKeyHaveSheetData);
 }
 
 function DeleteHaveSheetData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.removeItem(g_saveDataKeyHaveSheetData);
 	AllDelHasSheet();
 	SaveHaveSheetData() 
@@ -845,12 +1288,16 @@ function DeleteHaveSheetData()
 // アクティブシートのロード
 function LoadActiveSheetIndex() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return 0; }
 	var sheet = localStorage.getItem(g_saveDataKeyActiveSheetIndex);
 	if (!sheet)    sheet = 0;
-	return sheet;
+	return parseInt(sheet);
 }
 function SaveActiveSheetIndex(sheetno) 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyActiveSheetIndex, sheetno);
 	console.log("Save" + g_saveDataKeyActiveSheetIndex);
 }
@@ -858,12 +1305,16 @@ function SaveActiveSheetIndex(sheetno)
 // アクティブシートのロード
 function LoadActiveStampIndex() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return 0; }
 	var stamp = localStorage.getItem(g_saveDataKeyActiveStampIndex);
 	if (!stamp) { stamp = 0; }
-	return stamp;
+	return parseInt(stamp);
 }
 function SaveActiveStampIndex(sheetno) 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyActiveStampIndex, sheetno);
 	console.log("Save" + g_saveDataKeyActiveStampIndex);
 }
@@ -904,6 +1355,19 @@ function DispMemory()
 	//document.getElementById("memory").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";/* + sActiveSheetNo;*/
 	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
+function M_PRINT(sData)
+{
+	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
+}
+function M_PRINTB(sData)
+{
+	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
+}
+function M_PRINTR(sData)
+{
+	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+}
+
 
 var g_WindowImageHandle 			= null;
 var g_YesImageHandle 				= null;
@@ -913,6 +1377,7 @@ var g_WindowsScaleRate				= 1.0;
 var g_iSwitch = 0;
 var g_eStatus = 0;
 
+
 // スタンプメイン画面
 var g_StampMainWindowImageHandle		= null;
 var g_StampMainKesuImageHandle			= null;
@@ -920,22 +1385,27 @@ var g_StampMainEndImageHandle			= null;
 var g_StampMainBackImageHandle			= null;
 var g_StampMainMenuImageHandle			= null;
 var g_SheetDeleteMessageImageHandle		= null;
-/*
-var g_bOldTouch					= false;
-var g_sTouchStartX 				= -200;
-var g_sTouchStartY 				= -200;
-var g_sTouchMoveX 				= -200;
-var g_sTouchMoveY 				= -200;	
-
-function ClearTouch()
-{
-	g_bOldTouch					= false;
-	g_sTouchStartX 				= -200;
-	g_sTouchStartY 				= -200;
-	g_sTouchMoveX 				= -200;
-	g_sTouchMoveY 				= -200;		
-}
-*/
+var g_ClaerButtonHandle					= null;
+var g_TweetBottonHandle					= null;
+// 戻る
+var g_BackImageHandle					= null;
+var g_ArrowLHandle						= null;
+var g_ArrowRHandle						= null;
+var g_Num0Handle						= null;
+var g_Num1Handle						= null;
+var g_Num2Handle						= null;
+var g_Num3Handle						= null;
+var g_Num4Handle						= null;
+var g_Num5Handle						= null;
+var g_Num6Handle						= null;
+var g_Num7Handle						= null;
+var g_Num8Handle						= null;
+var g_Num9Handle						= null;
+var g_NumHandleA						= new Array();
+var g_StampMessageBottonHandle			= null;
+var g_HaveMessageBottonHandle			= null;
+var g_DocumentArrowHandle				= null;
+var g_DocumentArrowDHandle				= null;
 	
 var G_STATUS = 
 {
@@ -950,49 +1420,131 @@ var G_STATUS =
 	SELECTED_END:	7,
 };
 
+
 function LoadWindowYesNo()
 {
-	// ウィンドウ
-	g_WindowImageHandle     	= new Image();
-    g_WindowImageHandle.src = "img/00_common/g_g01_huk_e000.png";
-	// メッセージ
-	g_YesNoMessageImageHandle 	= new Image();
-    g_YesNoMessageImageHandle.src = "img/00_common/g_hand_01.png";
-	// はい
-	g_YesImageHandle 			= new Image();
-    g_YesImageHandle.src = "img/07_shop/k_btn_a.png";
-	// いいえ
-	g_NoImageHandle				= new Image();
-    g_NoImageHandle.src = "img/07_shop/k_btn_b.png";
-	// スタンプメイン
-	g_StampMainWindowImageHandle		= new Image();
-    g_StampMainWindowImageHandle.src 	= "img/08_stamp/s_wak_a000.png";	
-	g_StampMainKesuImageHandle			= new Image();
-    g_StampMainKesuImageHandle.src 		= "img/08_stamp/s_btn_a000.png";	
-	g_StampMainEndImageHandle			= new Image();
-    g_StampMainEndImageHandle.src 		= "img/08_stamp/s_btn_b000.png";	
-	g_StampMainBackImageHandle			= new Image();
-    g_StampMainBackImageHandle.src 		= "img/08_stamp/s_btn_c000.png";	
-	// メニュー
-	g_StampMainMenuImageHandle			= new Image();
-    g_StampMainMenuImageHandle.src 		= "img/08_stamp/s_btn_e000.png";		
-	// 本当に消す？
+	// ２度ロードはしない
+	if(g_WindowImageHandle != null) { return; }
+	g_WindowImageHandle     				= new Image();
+	g_YesNoMessageImageHandle 				= new Image();
+	g_YesImageHandle 						= new Image();
+	g_NoImageHandle							= new Image();
+	g_StampMainWindowImageHandle			= new Image();
+	g_StampMainKesuImageHandle				= new Image();
+	g_StampMainEndImageHandle				= new Image();
+	g_StampMainBackImageHandle				= new Image();
+	g_StampMainMenuImageHandle				= new Image();
 	g_SheetDeleteMessageImageHandle			= new Image();
-    g_SheetDeleteMessageImageHandle.src 	= "img/08_stamp/s_txt_d000.png";		
-}
-function DeleteWindowYesNo()
-{
-	g_WindowImageHandle 			= null;
-	g_YesImageHandle 				= null;
-	g_NoImageHandle  				= null;
-	g_YesNoMessageImageHandle		= null;	
-	g_StampMainWindowImageHandle	= null;
-	g_StampMainKesuImageHandle		= null;
-	g_StampMainEndImageHandle		= null;
-	g_StampMainBackImageHandle		= null;
-	g_StampMainMenuImageHandle		= null;
+	g_BackImageHandle						= new Image();
+	g_ArrowLHandle							= new Image();
+	g_ArrowRHandle							= new Image();
+	g_Num0Handle							= new Image();
+	g_Num1Handle							= new Image();
+	g_Num2Handle							= new Image();
+	g_Num3Handle							= new Image();
+	g_Num4Handle							= new Image();
+	g_Num5Handle							= new Image();
+	g_Num6Handle							= new Image();
+	g_Num7Handle							= new Image();
+	g_Num8Handle							= new Image();
+	g_Num9Handle							= new Image();
+	g_ClaerButtonHandle						= new Image();
+	g_TweetBottonHandle						= new Image();
+	g_SheetMessageHandle					= new Image();
+	g_StampMessageBottonHandle				= new Image();
+	g_HaveMessageBottonHandle				= new Image();
+	g_DocumentArrowHandle					= new Image();
+	g_DocumentArrowDHandle					= new Image();
+	g_NumHandleA[0] = g_Num0Handle;
+	g_NumHandleA[1] = g_Num1Handle;
+	g_NumHandleA[2] = g_Num2Handle;
+	g_NumHandleA[3] = g_Num3Handle;
+	g_NumHandleA[4] = g_Num4Handle;
+	g_NumHandleA[5] = g_Num5Handle;
+	g_NumHandleA[6] = g_Num6Handle;
+	g_NumHandleA[7] = g_Num7Handle;
+	g_NumHandleA[8] = g_Num8Handle;
+	g_NumHandleA[9] = g_Num9Handle;
+	
+	
+	// ロード
+	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 	"img/00_common/g_g01_huk_e000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 	"img/00_common/g_hand_01.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 	"img/07_shop/k_btn_a.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 	"img/07_shop/k_btn_b.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainWindowImageHandle, 	 	"img/08_stamp/s_wak_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainKesuImageHandle,	 	 	"img/08_stamp/s_btn_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainEndImageHandle, 		 	"img/08_stamp/s_btn_b000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainBackImageHandle, 	 	"img/08_stamp/s_btn_c000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainMenuImageHandle, 	 	"img/08_stamp/s_btn_e000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, 	"img/08_stamp/s_txt_d000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_BackImageHandle, 					"img/07_shop/003.png");
+	// LR
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowHandle, 				"img/07_shop/test/a_obj_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowDHandle, 			"img/07_shop/test/a_obj_b000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowLHandle, 					"img/08_stamp/s_hid_a.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowRHandle, 					"img/08_stamp/s_mig_a.png");	
+	// 数値	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num0Handle, 						"img/08_stamp/s_suj_00.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num1Handle, 						"img/08_stamp/s_suj_01.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num2Handle, 						"img/08_stamp/s_suj_02.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num3Handle, 						"img/08_stamp/s_suj_03.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num4Handle, 						"img/08_stamp/s_suj_04.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num5Handle, 						"img/08_stamp/s_suj_05.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num6Handle, 						"img/08_stamp/s_suj_06.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num7Handle, 						"img/08_stamp/s_suj_07.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num8Handle, 						"img/08_stamp/s_suj_08.png");	
+	g_sGraphicLoadFlg.AddLoadFileEx(g_Num9Handle, 						"img/08_stamp/s_suj_09.png");	
+	// 本当に消すボタン
+	g_sGraphicLoadFlg.AddLoadFileEx(g_ClaerButtonHandle, 				"img/08_stamp/s_btn_d000.png");		
+	g_sGraphicLoadFlg.AddLoadFileEx(g_TweetBottonHandle, 				"img/08_stamp/s_btn_f000.png");		
+	
+	// シート、スタンプ、持っている
+	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetMessageHandle, 				"img/07_shop/o_txt_f.png");		
+	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMessageBottonHandle, 		"img/07_shop/o_txt_e.png");		
+	g_sGraphicLoadFlg.AddLoadFileEx(g_HaveMessageBottonHandle, 			"img/07_shop/o_txt_g.png");		
+	
+	
+	// ローディング開始
+	g_sGraphicLoadFlg.Loading();
 }
 
+// 165:165
+// 数値の表示
+function DrawStrNum(ctx, x, y, num, op0Clear, size, a, space)
+{
+	var ta = ctx.globalAlpha;
+	if(num == 0) 
+	{ 
+		x += (165 * size) - space;
+		x += (165 * size) - space;
+		DrawCharNum(ctx, x, y, 0, size, a);
+		return;
+	}
+	for(var i = 100; i >= 1; i /= 10)
+	{
+		var data = parseInt(num / i);
+		if(data < 1) { if(op0Clear) { DrawCharNum(ctx, x, y, 0, size, a); } }
+		else
+		{
+			num -= (data * i);
+			DrawCharNum(ctx, x, y, data, size, a);
+			op0Clear = true;
+		}
+		x += (165 * size) - space;
+	}
+	ctx.globalAlpha = ta;
+}
+// 数値の表示
+function DrawCharNum(ctx, x, y, num, size, a)
+{
+	if(num < 0 || num > 9) { return; }
+	ctx.drawImage(g_NumHandleA[num],
+							x - (132 * size),
+							y - (132 * size),
+							(165 * size), 
+							(165 * size));
+}
 
 // メニュー
 function DrawMenu(ctx, bTrigger, sTouchStartX, sTouchStartY,
@@ -1202,6 +1754,80 @@ function DrawBack(ctx)
 	ctx.fillRect(0, 0, 640, 1200);
 	ctx.globalAlpha = 1.0;
 }
+/*
+function DrawBack_Tutorial(ctx)
+{
+	ctx.globalAlpha = 0.6;
+	ctx.fillStyle = 'rgb(0, 0, 0)';
+	ctx.fillRect(0, 0, 640, 1200);
+	ctx.globalAlpha = 1.0;
+}
+*/
+var g_nWakuCounter = 0;
+function DrawWaku(ctx, x, y, w, h, blink)
+{
+	if(blink) 
+	{ 
+		g_nWakuCounter ++;
+	}
+	else { g_nWakuCounter = 0; }
+	
+	var val = Math.abs(g_nWakuCounter - 5);
+	var a = 1.0 * (1.0 - (val * 0.12));
+	if(a > 1.0) { a = 1.0; }
+	if(a < 0.6) { a = 0.6; }
+	ctx.globalAlpha = a;
+	ctx.lineWidth   = 3;
+	ctx.strokeStyle="#ff0000";
+	ctx.strokeRect(x + val, y + val, w-(val*2), h-(val*2))
+	ctx.globalAlpha = 1.0;
+}
+
+function DrawDocumentArrow(ctx, x, y, angle)
+{
+	// 矢印を動かす
+	var val = Math.abs(g_nWakuCounter - 5);
+	g_nWakuCounter --;
+	if(g_nWakuCounter < 0) { g_nWakuCounter = 10; }
+	
+	// 回転あり矢印
+	if(angle != 0)
+	{
+		ctx.save();
+		ctx.translate(x, y + val);							// x, y
+		ctx.rotate(angle * Math.PI / 180);  				// 回転
+		ctx.drawImage(g_DocumentArrowHandle, 0, 0);
+		ctx.restore();
+	}
+	// 矢印
+	else
+	{
+		ctx.drawImage(g_DocumentArrowHandle, x, y + val);	
+	}
+}
+function DrawDocumentArrowD(ctx, x, y, angle)
+{
+	// 矢印を動かす
+	var val = Math.abs(g_nWakuCounter - 5);
+	g_nWakuCounter --;
+	if(g_nWakuCounter < 0) { g_nWakuCounter = 10; }
+	
+	// 回転あり矢印
+	if(angle != 0)
+	{
+		ctx.save();
+		ctx.translate(x, y + val);							// x, y
+		ctx.rotate(angle * Math.PI / 180);  				// 回転
+		ctx.drawImage(g_DocumentArrowHandle, 0, 0);
+		ctx.restore();
+	}
+	// 矢印
+	else
+	{
+		ctx.drawImage(g_DocumentArrowDHandle, x, y + val);	
+	}
+}
+
 
 var g_nArrowCounterL = 0;
 var g_nArrowCounterR = 0;
@@ -1215,45 +1841,63 @@ function ProcArrow()
 }
 function PuchArrowL()
 {
-	g_nArrowCounterL = 10;
+	g_nArrowCounterL = 16;
 }
 function PuchArrowR()
 {
-	g_nArrowCounterR = 10;
+	g_nArrowCounterR = 16;
 }
-function DrawArrowL(ctx, x, y, size)
+function MoveArrowL()
 {
-	ctx.globalAlpha = 0.60 + (-g_nArrowCounterL * 0.05);
-	ctx.fillStyle = 'rgb(255, 0, 255)';
-	ctx.beginPath();
-	x -= (g_nArrowCounterL * 3);
-	ctx.moveTo(x, y);
-	var hSize = size / 2;
-	ctx.lineTo(x + size, y - hSize);
-	ctx.lineTo(x + size, y + hSize);
-	ctx.closePath();
-	ctx.fill();
+	if(g_nArrowCounterL <= 0) { PuchArrowL(); }
+}
+function MoveArrowR()
+{
+	if(g_nArrowCounterR <= 0) { PuchArrowR(); }
+}
+
+function DrawArrowL(ctx, x, y)
+{
+ 	var a = 1.0 - (g_nArrowCounterL * 0.035);
+	x -= (g_nArrowCounterL * 2);
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowLHandle, x - 40, y - 70);
 	ctx.globalAlpha = 1.0;	
 }
-function DrawArrowR(ctx, x, y, size)
+function DrawArrowR(ctx, x, y)
 {
-	ctx.globalAlpha = 0.60 + (-g_nArrowCounterR * 0.05);
-	ctx.fillStyle = 'rgb(255, 0, 255)';
-	ctx.beginPath();
-	x += (g_nArrowCounterR * 3);
-	ctx.moveTo(x, y);
-	var hSize = size / 2;
-	ctx.lineTo(x - size, y - hSize);
-	ctx.lineTo(x - size, y + hSize);
-	ctx.closePath();
-	ctx.fill();
+ 	var a = 1.0 - (g_nArrowCounterR * 0.035);
+	x += (g_nArrowCounterR * 2);
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowRHandle, x - 40, y - 70);
+	ctx.globalAlpha = 1.0;	
+}
+
+var ARROW_SIZE_MX = 80 * 0.65;
+var ARROW_SIZE_MY = 140 * 0.65;
+
+function DrawArrowLM(ctx, x, y)
+{
+ 	var a = 1.0 - (g_nArrowCounterL * 0.035);
+	x -= (g_nArrowCounterL * 0.75);
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowLHandle, x - (ARROW_SIZE_MX / 2), y - (ARROW_SIZE_MY / 2), ARROW_SIZE_MX, ARROW_SIZE_MY);
+	ctx.globalAlpha = 1.0;	
+}
+function DrawArrowRM(ctx, x, y)
+{
+ 	var a = 1.0 - (g_nArrowCounterR * 0.035);
+	x += (g_nArrowCounterR * 0.75);
+	ctx.globalAlpha = a;
+	ctx.drawImage(g_ArrowRHandle, x - (ARROW_SIZE_MX / 2), y - (ARROW_SIZE_MY / 2), ARROW_SIZE_MX, ARROW_SIZE_MY);
 	ctx.globalAlpha = 1.0;	
 }
 
 var G_EFFECT_STATUS = 
 {
-	SCALE_ZOOM:	0,
+	SCALE_ZOOM:			0,
 	SCALE_FADE_ZOOM:	1,
+	COIN_EFFECT:		2
 };
 var G_EFFECT_WORK = 
 {
@@ -1283,6 +1927,10 @@ function GEffectData()
 	this.nVal2			= 0;
 	this.nVal3			= 0;
 	this.nVal4			= 0;
+	this.nCrsW			= 640;
+	this.nCrsH			= 1200;
+	this.nCrsFlg		= true;	
+	this.iAttr			= 0;
 }
 
 // データ追加
@@ -1308,7 +1956,34 @@ GEffectData.prototype.SetScaleZoomEffect = function(ctx, image, x, y, w, h, a)
 	this.nCrsW			= 640;
 	this.nCrsH			= 1200;
 	this.nCrsFlg		= true;	
+	this.iAttr			= 0;
 };
+// データ追加
+GEffectData.prototype.SetCoinEffect = function(ctx, image, x, y, w, h, a)
+{
+	this.sCtx			= ctx;	
+	this.sImage			= image;	
+	this.nMaxTime  		= 5;
+	this.nNowTime  		= 0;
+	this.nCount 		= 0;
+	this.nX 			= x;
+	this.nY 			= y;
+	this.nW 			= w;
+	this.nH 			= h;
+	this.nA 			= a;
+	this.nWA 			= a;
+	this.nStatus		= G_EFFECT_STATUS.COIN_EFFECT;
+	this.nWork			= G_EFFECT_WORK.A;
+	this.nVal1			= 0;
+	this.nVal2			= 0;
+	this.nVal3			= 0;
+	this.nVal4			= 0;
+	this.nCrsW			= 0;
+	this.nCrsH			= 0;
+	this.nCrsFlg		= false;	
+	this.iAttr			= 0;
+};
+
 // データ追加
 GEffectData.prototype.Exec = function()
 {
@@ -1394,7 +2069,7 @@ GEffectData.prototype.Exec = function()
 		}
 		*/
 	}
-	else
+	else if(this.nStatus == G_EFFECT_STATUS.SCALE_FADE_ZOOM)
 	{
 		if(this.nWork == G_EFFECT_WORK.A)
 		{
@@ -1468,6 +2143,39 @@ GEffectData.prototype.Exec = function()
 			}		
 		}
 	}
+	else
+	{
+		if(this.nWork == G_EFFECT_WORK.A)
+		{	
+			if(this.iAttr > 0) { this.iAttr --; return; }
+			if(this.nNowTime == 0)
+			{
+				if(this.EndCallBack != null) { this.EndCallBack(this); }
+			}			
+			if(this.nNowTime < this.nMaxTime)
+			{	
+				this.nNowTime ++;
+				this.nCount += 1;
+	
+				// 描画
+				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				this.nA -= 0.1;
+
+		        this.sCtx.globalAlpha = this.nA;
+		        this.sCtx.drawImage(this.sImage, 
+									 this.nX - (vTargetW / 2) + this.nW / 2, 
+		 							 this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount, vTargetW, vTargetH);
+		        this.sCtx.globalAlpha = 1.0;
+			}
+			else
+			{
+				this.bEnd = true;
+				return false;
+				
+			}
+		}	
+	}
 	return true;
 };
 
@@ -1490,6 +2198,13 @@ function GExecEffect()
 	}
 }
 
+function ByeCoin(_This)
+{
+	AddCoin(-1);
+}
+
+
+
 // エフェクトの追加
 function AddScaleZoomEffect(ctx, image, x, y, w, h, a)
 {
@@ -1498,18 +2213,28 @@ function AddScaleZoomEffect(ctx, image, x, y, w, h, a)
 	g_sEffectObject[no].SetScaleZoomEffect(ctx, image, x, y, w, h, a);
 	return g_sEffectObject[no];
 }
+function AddCoinEffect(ctx, image, x, y, w, h, a, attr)
+{
+	var no = g_sEffectObject.length;
+	g_sEffectObject[no] = new GEffectData();
+	g_sEffectObject[no].SetCoinEffect(ctx, image, x, y, w, h, a);
+	g_sEffectObject[no].iAttr = (attr * 3);
+	g_sEffectObject[no].EndCallBack	= ByeCoin;
+	return g_sEffectObject[no];
+}
+
 
 // 耐久値の表示
-var nMinHpWakuW  = 2;
-var nMaxHpWakuW  = 90 + 2
-var nHpSizeWakuH = 2;
+var nMinHpWakuW  = 0;
+var nMaxHpWakuW  = 90 + 0
+var nHpSizeWakuH = 3;
 var nHpSizeNAKAH = nHpSizeWakuH/* - 1*/;
 function DrawHp(ctx, x, y, hp)
 {
 	// STAMP_LIFE_MAX = 90
 	// 
 	//
-	hp *= 2;
+	hp *= 1;
 	
 	// 枠
 	ctx.globalAlpha = 1.0;	
