@@ -15,6 +15,166 @@ var MAX_SHOP_PANEL_INTERVAL_Y 	= 0;
 var gHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
 // -------------------------------------
+// チュートリアルフラグ
+// -------------------------------------
+// 背景画像
+/*
+var gTUTORIAL_FLG = 
+{
+	// ごはん系
+	NONE:		0,
+	GOHAN_02:	1,
+	GOHAN_03:	2,
+}
+*/
+
+// チュートリアル実行中か？のみのフラグ
+var g_TutorialFlg     = false;	// 実行中
+var g_TutorialOneLook = false;	// 一度でも見たか？
+function SetTutorialFlg(flg)
+{
+	g_TutorialFlg = flg;
+}
+function GetTutorialFlg()
+{
+	return g_TutorialFlg;
+}
+
+// チュートリアル中なら解除する
+function CheckTutorial()
+{
+	if(GetTutorialFlg())
+	{
+		// 解除
+		SetTutorialFlg(0);
+		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;
+		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;	
+		g_TutorialSelectFlg 	= gTUTORIAL_SELECTFLG.NONE;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;	
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.NONE;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+		
+		// 初めてならプレゼントをもらう
+		if(g_TutorialOneLook == false)
+		{
+			AllDeleteStampDrawData();
+			PresentTutorialStampData();
+			PresentTutorialSheetData();
+			g_TutorialOneLook = true;
+		}
+		// 違ったら今までのデータを復元
+		else
+		{
+			// コインのロード処理
+			LoadCoin();
+			// シートのロード処理
+			if(LoadHaveSheetData() == true)
+			{
+			}
+			// 失敗なので新規ロード
+			else
+			{
+				DummySheetDataSet();
+				SaveActiveSheetIndex(0);
+			}	
+			// スタンプのロード処理
+			if(LoadHaveStampData() == true)
+			{
+			}
+			// 失敗なので新規ロード
+			else
+			{
+				DummyStampDataSet();
+				SaveActiveStampIndex(0);
+			}				
+		}
+	}
+}
+function StartTutorial()
+{
+	// ストレージのフラグを見てチュートリアルかをチェックする
+	//if()
+	{
+		// データをすべて削除
+		AllDelHasSheet();
+		// データをすべて削除
+		AllDelHasStamp();
+		
+		// 開始
+		SetTutorialFlg(true);
+		// ショップチュートリアルを開始
+		g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+		// スタンプセレクト開始
+		g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+		// メインチュートリアル開始
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+	}
+}
+
+// -------------------------------------
+// ショップチュートリアル
+// -------------------------------------
+var gTUTORIAL_SHOPFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	SHEET_BUY_MESSAGE:		2,	// シート買ってみよう(メッセージ)
+	SHEET_BUY_SELECT:		3,	// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
+	SHEET_BUY_SELECT_WAIT:	4,	// シート買ってみよう(購入待ち)
+	STAMP_BUY_MESSAGE:		5,	// スタンプ買ってみよう(メッセージ)
+	STAMP_BUY_SELECT:		6,	// スタンプ買ってみよう(セレクト)「プリン以外は押せない」
+	STAMP_BUY_SELECT_WAIT:	7,	// スタンプ買ってみよう(購入待ち)
+	BACK_MESSAGE:			8,	// もどる(メッセージ)
+	BACK_SELECT:			9,	// もどる(セレクト)「もどる以外は押せない」
+};
+
+var g_TutorialShopFlg     = gTUTORIAL_SHOPFLG.NONE;
+var g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.NON;
+
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_SELECTFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	SHEET_TOUCH_MESSAGE:	2,	// シートタッチしてください(メッセージ)
+	SHEET_TOUCH_NEXT:		3,	// シートタッチで進む
+};
+
+var g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.NONE;
+var g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_MAINFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
+	SHEET_TOUCH_WRITE:		3,	// シートにスタンプを押してね
+	STAMP_TOUCH_DEAD:		4,	// スタンプがなくなった
+	MENU_SELECT:			5,	// メニューセレクト
+	MENU_WAIT:				6,	// メニュー表示にて少し待つ
+	STAMP_CLEAR:			7,	// スタンプをクリア
+	STAMP_CLEAR_WINDOW:		8,	// クリア確認ウィンドウ
+	MENU_SELECT_END:		9,	// メニューセレクト	
+	MENU_SELECT_END_WAIT:	10,	// メニューセレクトにて少し待つ
+	BACK:					11,	// 戻る
+};
+
+var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
+var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
+
+
+// -------------------------------------
 // スタンプのサイズ
 // -------------------------------------
 var STAMP_W = 160;
@@ -209,80 +369,89 @@ function SetupShopAllData()
 	// すべて削除
 	AllDelShopData();
 	
-	// ごはん系
-	AddShopData(gStampEnum.GOHAN_01, 	5);	// ごはん1
-	AddShopData(gStampEnum.GOHAN_02, 	5);	// ごはん2
-	AddShopData(gStampEnum.GOHAN_03, 	5);	// ごはん3
-	AddShopData(gStampEnum.NIKU,    	3);	// ハンバーグ
-	AddShopData(gStampEnum.PURIN,    	3);	// プリン
-	AddShopData(gStampEnum.SUPA,     	3);	// スパゲティ
- 	//AddShopData(gStampEnum.HATA,     3);	// お子様の旗
-	//AddShopData(gStampEnum.ONIGIRI,  3);	// おにぎり
-	//AddShopData(gStampEnum.HURAI,    3);	// エビフライ
-	//AddShopData(gStampEnum.TAKO,     3);	// タコ
-	//AddShopData(gStampEnum.KYUURI,   3);	// きゅうり
-	//AddShopData(gStampEnum.REMON,    3);	// レモン	
-	
-	// シンコ様セット
-	AddShopData(gStampEnum.SINKO_01,		5);	// シンコ様1
-	AddShopData(gStampEnum.SINKO_02,		5);	// シンコ様2
-	AddShopData(gStampEnum.SINKO_03,		5);	// シンコ様3   
-	AddShopData(gStampEnum.SIN_BAMU,		3);	// バーム
-	AddShopData(gStampEnum.SIN_CHOCO,		3);	// チョコ
-	//AddShopData(gStampEnum.SIN_HEART,		3);	// ハート
-	//AddShopData(gStampEnum.SIN_KAI,		3);	// 貝
-	//AddShopData(gStampEnum.SIN_SIKAKU,	3);	// 四角
-	//AddShopData(gStampEnum.SIN_MARU,		3);	// 丸
-	AddShopData(gStampEnum.SIN_SAMA,		3);	// シンコ様
-	//AddShopData(gStampEnum.SIN_AME,		3);	// 飴
-	//AddShopData(gStampEnum.SIN_HAZIKI,	3);	// はじきみたいな
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+		// ごはん系
+		AddShopData(gStampEnum.GOHAN_01, 	5);	// ごはん1
+		AddShopData(gStampEnum.GOHAN_02, 	5);	// ごはん2
+		AddShopData(gStampEnum.GOHAN_03, 	5);	// ごはん3
+		AddShopData(gStampEnum.NIKU,    	3);	// ハンバーグ
+		AddShopData(gStampEnum.PURIN,    	3);	// プリン
+		AddShopData(gStampEnum.SUPA,     	3);	// スパゲティ
+	}
+	// それ以外
+	else
+	{
+		// ごはん系
+		AddShopData(gStampEnum.GOHAN_01, 	5);	// ごはん1
+		AddShopData(gStampEnum.GOHAN_02, 	5);	// ごはん2
+		AddShopData(gStampEnum.GOHAN_03, 	5);	// ごはん3
+		AddShopData(gStampEnum.NIKU,    	3);	// ハンバーグ
+		AddShopData(gStampEnum.PURIN,    	3);	// プリン
+		AddShopData(gStampEnum.SUPA,     	3);	// スパゲティ
+	 	//AddShopData(gStampEnum.HATA,     3);	// お子様の旗
+		//AddShopData(gStampEnum.ONIGIRI,  3);	// おにぎり
+		//AddShopData(gStampEnum.HURAI,    3);	// エビフライ
+		//AddShopData(gStampEnum.TAKO,     3);	// タコ
+		//AddShopData(gStampEnum.KYUURI,   3);	// きゅうり
+		//AddShopData(gStampEnum.REMON,    3);	// レモン	
+		
+		// シンコ様セット
+		AddShopData(gStampEnum.SINKO_01,		5);	// シンコ様1
+		AddShopData(gStampEnum.SINKO_02,		5);	// シンコ様2
+		AddShopData(gStampEnum.SINKO_03,		5);	// シンコ様3   
+		AddShopData(gStampEnum.SIN_BAMU,		3);	// バーム
+		AddShopData(gStampEnum.SIN_CHOCO,		3);	// チョコ
+		//AddShopData(gStampEnum.SIN_HEART,		3);	// ハート
+		//AddShopData(gStampEnum.SIN_KAI,		3);	// 貝
+		//AddShopData(gStampEnum.SIN_SIKAKU,	3);	// 四角
+		//AddShopData(gStampEnum.SIN_MARU,		3);	// 丸
+		AddShopData(gStampEnum.SIN_SAMA,		3);	// シンコ様
+		//AddShopData(gStampEnum.SIN_AME,		3);	// 飴
+		//AddShopData(gStampEnum.SIN_HAZIKI,	3);	// はじきみたいな
 
-    
-	// 空の上系
-	//AddShopData(gStampEnum.SKY_01, 	5);	// 空の上1
-	//AddShopData(gStampEnum.SKY_02,	5);	// 空の上2
-	//AddShopData(gStampEnum.SKY_03,	5);	// 空の上3
-	//AddShopData(gStampEnum.KUMO,		3);	// 雲
-	//AddShopData(gStampEnum.HUUSEN,	3);	// 風船
-	//AddShopData(gStampEnum.HANA,		3);	// チューリップ
-	//AddShopData(gStampEnum.RINGO,		3);	// リンゴ
-	//AddShopData(gStampEnum.BANANA,	3);	// バナナ
-	//AddShopData(gStampEnum.HIKOUKI,	3);	// 飛行機
-	//AddShopData(gStampEnum.TAMANEGI,	3);	// たまねぎ
-	//AddShopData(gStampEnum.EDAMAME,	3);	// 枝豆
-	//AddShopData(gStampEnum.TOMATO,	3);	// トマト
-         
-    // 神様
-	AddShopData(gStampEnum.KAMI_PIMAN,			2);	// ピーマンの神様   
-	AddShopData(gStampEnum.KAMI_NASU,			2);	// ナスの神様
-	AddShopData(gStampEnum.KAMI_TOMATO,			2);	// トマトの神様 
-	//AddShopData(gStampEnum.KAMI_NIKU,			2);	// 肉の神様	
-	//AddShopData(gStampEnum.KAMI_SIITAKE,		2);	// シイタケの神様
-	//AddShopData(gStampEnum.KAMI_TAMANEGI,		2);	// 玉ねぎの神様 	
-	//AddShopData(gStampEnum.KAMI_NINZIN,		2);	// 人参の神様     
-	//AddShopData(gStampEnum.KAMI_SAKANA,		2);	// 魚の神様
-
-}
-function SetupShopTutorialData()
-{
-	// すべて削除
-	AllDelShopData();
-	// ごはん系
-	AddShopData(gStampEnum.GOHAN_01, 1);	// ごはん1
-	AddShopData(gStampEnum.PURIN,    3);	// プリン
+	    
+		// 空の上系
+		//AddShopData(gStampEnum.SKY_01, 	5);	// 空の上1
+		//AddShopData(gStampEnum.SKY_02,	5);	// 空の上2
+		//AddShopData(gStampEnum.SKY_03,	5);	// 空の上3
+		//AddShopData(gStampEnum.KUMO,		3);	// 雲
+		//AddShopData(gStampEnum.HUUSEN,	3);	// 風船
+		//AddShopData(gStampEnum.HANA,		3);	// チューリップ
+		//AddShopData(gStampEnum.RINGO,		3);	// リンゴ
+		//AddShopData(gStampEnum.BANANA,	3);	// バナナ
+		//AddShopData(gStampEnum.HIKOUKI,	3);	// 飛行機
+		//AddShopData(gStampEnum.TAMANEGI,	3);	// たまねぎ
+		//AddShopData(gStampEnum.EDAMAME,	3);	// 枝豆
+		//AddShopData(gStampEnum.TOMATO,	3);	// トマト
+	         
+	    // 神様
+		AddShopData(gStampEnum.KAMI_PIMAN,			2);	// ピーマンの神様   
+		AddShopData(gStampEnum.KAMI_NASU,			2);	// ナスの神様
+		AddShopData(gStampEnum.KAMI_TOMATO,			2);	// トマトの神様 
+		//AddShopData(gStampEnum.KAMI_NIKU,			2);	// 肉の神様	
+		//AddShopData(gStampEnum.KAMI_SIITAKE,		2);	// シイタケの神様
+		//AddShopData(gStampEnum.KAMI_TAMANEGI,		2);	// 玉ねぎの神様 	
+		//AddShopData(gStampEnum.KAMI_NINZIN,		2);	// 人参の神様     
+		//AddShopData(gStampEnum.KAMI_SAKANA,		2);	// 魚の神様
+	}
 }
 function PresentTutorialStampData()
 {
 	// 現状のデータをすべて削除
 	DeleteHaveStampData();
 	// ハンバーグゲット
-	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+//	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// プリンゲット
 	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
 	// ミニパスタゲット
-	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+//	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// セーブ
 	SaveHaveStampData();
+	
+	// お金ゲット
+	SetCoin(30);
 }
 function PresentTutorialSheetData()
 {
@@ -401,7 +570,7 @@ var g_sGraphicLoadFlg			= new LoadingObject("g_sGraphicLoadFlg");
 var g_sStampLoadFlg				= new LoadingObject("g_sStampLoadFlg");
 var g_sSheetLoadFlg				= new LoadingObject("g_sSheetLoadFlg");
 var g_sShopLoadFlg				= new LoadingObject("g_sShopLoadFlg");
-
+var g_sTutorialLoadFlg			= new LoadingObject("g_sTutorialLoadFlg");
 
 function GetFileName(file_url)
 {
@@ -455,6 +624,16 @@ function LoadingObject(name)
 		
 		this.iLength ++;
     };	
+	this.Delete = function()
+	{
+	    for(var i = 0; i < this.iLength; i ++)
+		{
+			this.aLoad[i]  	= false;
+			this.aImage[i] 	= null;
+	    }		
+		this.bLoadFlg = false;
+		this.iLength  = 0;
+	}
 	
 	this.CallBackStatus = function()
 	{
@@ -547,27 +726,43 @@ StampDrawData.prototype.GetSaveKey = function(nSheetNo) { return g_saveDataKeySt
 // ロード
 StampDrawData.prototype.Load = function()
 {
-	this.sDataInfo = new Array();
-	var key  = this.GetSaveKey(this.nSheetIndex);
-	var data = localStorage.getItem(key);
-	if (!data) 
+	// チュートリアル実行中
+	if(GetTutorialFlg())
 	{
-		console.log("データがないので作成します: " + key);
-		this.sDataNum = 0;
-		return;
+		this.sDataInfo = new Array();
+		this.sDataNum  = 0;
 	}
-	
-	this.sDataInfo 	= JSON.parse(data);
-	this.sDataNum	= Math.floor(this.sDataInfo.length / 4);
-	console.log("ロード: " + key);
+	else
+	{
+		this.sDataInfo = new Array();
+		var key  = this.GetSaveKey(this.nSheetIndex);
+		var data = localStorage.getItem(key);
+		if (!data) 
+		{
+			console.log("データがないので作成します: " + key);
+			this.sDataNum = 0;
+			return;
+		}
+		
+		this.sDataInfo 	= JSON.parse(data);
+		this.sDataNum	= Math.floor(this.sDataInfo.length / 4);
+		console.log("ロード: " + key)
+	}
 };
 
 // セーブ
 StampDrawData.prototype.Save = function() 
 {
-	var key = this.GetSaveKey(this.nSheetIndex);
-	localStorage.setItem(key, JSON.stringify(this.sDataInfo));
-	console.log("セーブ: " + key);
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+	}
+	else
+	{	
+		var key = this.GetSaveKey(this.nSheetIndex);
+		localStorage.setItem(key, JSON.stringify(this.sDataInfo));
+		console.log("セーブ: " + key);
+	}
 };
 
 
@@ -651,13 +846,26 @@ function LoadSheetGraphic()
 	{
 	    g_SheetGraphicHandle = new Array();
 	}		
-	// シート
-	LoadStampSheetData(gStampEnum.GOHAN_01);	// ごはん1
-	LoadStampSheetData(gStampEnum.GOHAN_02);	// ごはん2
-	LoadStampSheetData(gStampEnum.GOHAN_03);	// ごはん3
-	LoadStampSheetData(gStampEnum.SINKO_01);	// シンコ様1
-	LoadStampSheetData(gStampEnum.SINKO_02);	// シンコ様2
-	LoadStampSheetData(gStampEnum.SINKO_03);	// シンコ様3   
+
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+		// シート
+		LoadStampSheetData(gStampEnum.GOHAN_01);	// ごはん1
+		LoadStampSheetData(gStampEnum.GOHAN_02);	// ごはん2
+		LoadStampSheetData(gStampEnum.GOHAN_03);	// ごはん3
+	}
+	// それ以外
+	else
+	{
+		// シート
+		LoadStampSheetData(gStampEnum.GOHAN_01);	// ごはん1
+		LoadStampSheetData(gStampEnum.GOHAN_02);	// ごはん2
+		LoadStampSheetData(gStampEnum.GOHAN_03);	// ごはん3
+		LoadStampSheetData(gStampEnum.SINKO_01);	// シンコ様1
+		LoadStampSheetData(gStampEnum.SINKO_02);	// シンコ様2
+		LoadStampSheetData(gStampEnum.SINKO_03);	// シンコ様3   
+	}
 	// ローディング開始
 	g_sSheetLoadFlg.Loading();	
 }
@@ -671,17 +879,28 @@ function LoadStampGraphic()
 	    g_StampGraphicHandle = new Array();
 	}
 			
-	// スタンプ
-	LoadStampSheetData(gStampEnum.NIKU);		// ハンバーグ
-	LoadStampSheetData(gStampEnum.PURIN);		// プリン
-	LoadStampSheetData(gStampEnum.SUPA);		// スパゲティ
-	LoadStampSheetData(gStampEnum.SIN_BAMU);	// バーム
-	LoadStampSheetData(gStampEnum.SIN_CHOCO);	// チョコ
-	LoadStampSheetData(gStampEnum.SIN_SAMA);	// シンコ様		
-	LoadStampSheetData(gStampEnum.KAMI_PIMAN);	// ピーマンの神様   
-	LoadStampSheetData(gStampEnum.KAMI_NASU);	// ナスの神様
-	LoadStampSheetData(gStampEnum.KAMI_TOMATO);	// トマトの神様 
-	
+	// チュートリアル実行中
+	if(GetTutorialFlg())
+	{
+		// スタンプ
+		LoadStampSheetData(gStampEnum.NIKU);		// ハンバーグ
+		LoadStampSheetData(gStampEnum.PURIN);		// プリン
+		LoadStampSheetData(gStampEnum.SUPA);		// スパゲティ
+	}
+	// それ以外
+	else
+	{
+		// スタンプ
+		LoadStampSheetData(gStampEnum.NIKU);		// ハンバーグ
+		LoadStampSheetData(gStampEnum.PURIN);		// プリン
+		LoadStampSheetData(gStampEnum.SUPA);		// スパゲティ
+		LoadStampSheetData(gStampEnum.SIN_BAMU);	// バーム
+		LoadStampSheetData(gStampEnum.SIN_CHOCO);	// チョコ
+		LoadStampSheetData(gStampEnum.SIN_SAMA);	// シンコ様		
+		LoadStampSheetData(gStampEnum.KAMI_PIMAN);	// ピーマンの神様   
+		LoadStampSheetData(gStampEnum.KAMI_NASU);	// ナスの神様
+		LoadStampSheetData(gStampEnum.KAMI_TOMATO);	// トマトの神様 
+	}
 	// ローディング開始
 	g_sStampLoadFlg.Loading();
 }
@@ -694,18 +913,21 @@ function LoadPrevNextSheetGraphic(select)
 	{
 	    g_SheetGraphicHandle = new Array();
 	}	
-	var nowid = g_HaveStampSheetData[select]["id"];
-	LoadStampSheetData(nowid);
-
-	if(select > 0) 
-	{ 
-		var previd = g_HaveStampSheetData[select - 1]["id"];		
-		LoadStampSheetData(previd); 
-	}
-	if(select + 1 < g_HaveStampSheetData.length)
+	if(select >= 0 && g_HaveStampSheetData.length > 0)
 	{
-		var nextid = g_HaveStampSheetData[select + 1]["id"];		
-		LoadStampSheetData(nextid); 
+		var nowid = g_HaveStampSheetData[select]["id"];
+		LoadStampSheetData(nowid);
+
+		if(select > 0) 
+		{ 
+			var previd = g_HaveStampSheetData[select - 1]["id"];		
+			LoadStampSheetData(previd); 
+		}
+		if(select + 1 < g_HaveStampSheetData.length)
+		{
+			var nextid = g_HaveStampSheetData[select + 1]["id"];		
+			LoadStampSheetData(nextid); 
+		}
 	}
 	// ローディング開始
 	g_sSheetLoadFlg.Loading();	
@@ -718,8 +940,11 @@ function LoadSelectSheetGraphic(select)
 	{
 	    g_SheetGraphicHandle = new Array();
 	}	
-	var nowid = g_HaveStampSheetData[select]["id"];
-	LoadStampSheetData(nowid);
+	if(select >= 0 && g_HaveStampSheetData.length > 0)
+	{
+		var nowid = g_HaveStampSheetData[select]["id"];
+		LoadStampSheetData(nowid);
+	}
 	// ローディング開始
 	g_sSheetLoadFlg.Loading();	
 }
@@ -730,8 +955,7 @@ function LoadSelectSheetGraphic(select)
 // ------------------------------------------------------
 function AllLoadStampDrawData()
 {
-	// ２度読み禁止
-	//if(g_StampDrawData == null)
+	// 一応毎回ロードする
 	{
 		var iSheetNum = GetHaveSheetDataNum();
 		g_StampDrawData = new Array(); 
@@ -814,18 +1038,24 @@ function GetIsBuyMax(id)
 // 全セーブ
 function SaveCoin() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyCoin, JSON.stringify(g_Coin));
 	console.log("Save" + g_saveDataKeyCoin);
 }
 // 全削除
 function DeleteCoin() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.removeItem(g_saveDataKeyCoin);
 	SetCoin(g_DefaultCoin);
 }
 // ロード
 function LoadCoin() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return true; }
 	var data = localStorage.getItem(g_saveDataKeyCoin);
 	if (!data) { return false; }
 	
@@ -867,6 +1097,8 @@ function AllDelHasStamp()
 // スタンプデータのダミーセット
 function DummyStampDataSet()
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	PresentTutorialStampData();
 }
 
@@ -899,6 +1131,8 @@ function DelSaveStampData(index)
 // スタンプデータ
 function LoadHaveStampData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return true; }
 	var data = localStorage.getItem(g_saveDataKeyHaveStampData);
 	if (!data) { return false; }
 	
@@ -908,12 +1142,16 @@ function LoadHaveStampData()
 // 全セーブ
 function SaveHaveStampData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyHaveStampData, JSON.stringify(g_HaveStampImageData));
 	console.log("Save" + g_saveDataKeyHaveStampData);
 }
 // 全削除
 function DeleteHaveStampData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.removeItem(g_saveDataKeyHaveStampData);
 	AllDelHasStamp();
 	SaveHaveStampData();
@@ -952,6 +1190,8 @@ function AllDelHasSheet()
 // スタンプシートのダミーセット
 function DummySheetDataSet()
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	PresentTutorialSheetData();
 }
 
@@ -984,7 +1224,7 @@ function BuySaveSheetData(id, coin)
 	SaveHaveSheetData();	
 	return true;
 }
-// 削除し、一番近いシートをアクティブにする
+// 削除し、一番近いシートをアクティブにする[デバッグ用]
 function DelSaveSheetData(index)
 {
 	// 配列から消す
@@ -1019,6 +1259,8 @@ function DelSaveSheetData(index)
 // スタンプシート
 function LoadHaveSheetData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return true; }
 	var data = localStorage.getItem(g_saveDataKeyHaveSheetData);
 	if (!data) { return false; }
 	
@@ -1028,12 +1270,16 @@ function LoadHaveSheetData()
 
 function SaveHaveSheetData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyHaveSheetData, JSON.stringify(g_HaveStampSheetData));
 	console.log("Save" + g_saveDataKeyHaveSheetData);
 }
 
 function DeleteHaveSheetData() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.removeItem(g_saveDataKeyHaveSheetData);
 	AllDelHasSheet();
 	SaveHaveSheetData() 
@@ -1042,12 +1288,16 @@ function DeleteHaveSheetData()
 // アクティブシートのロード
 function LoadActiveSheetIndex() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return 0; }
 	var sheet = localStorage.getItem(g_saveDataKeyActiveSheetIndex);
 	if (!sheet)    sheet = 0;
 	return parseInt(sheet);
 }
 function SaveActiveSheetIndex(sheetno) 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyActiveSheetIndex, sheetno);
 	console.log("Save" + g_saveDataKeyActiveSheetIndex);
 }
@@ -1055,12 +1305,16 @@ function SaveActiveSheetIndex(sheetno)
 // アクティブシートのロード
 function LoadActiveStampIndex() 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return 0; }
 	var stamp = localStorage.getItem(g_saveDataKeyActiveStampIndex);
 	if (!stamp) { stamp = 0; }
 	return parseInt(stamp);
 }
 function SaveActiveStampIndex(sheetno) 
 {
+	// チュートリアル実行中
+	if(GetTutorialFlg()) { return; }
 	localStorage.setItem(g_saveDataKeyActiveStampIndex, sheetno);
 	console.log("Save" + g_saveDataKeyActiveStampIndex);
 }
@@ -1150,7 +1404,9 @@ var g_Num9Handle						= null;
 var g_NumHandleA						= new Array();
 var g_StampMessageBottonHandle			= null;
 var g_HaveMessageBottonHandle			= null;
-					
+var g_DocumentArrowHandle				= null;
+var g_DocumentArrowDHandle				= null;
+	
 var G_STATUS = 
 {
 	INIT:			0,
@@ -1197,7 +1453,8 @@ function LoadWindowYesNo()
 	g_SheetMessageHandle					= new Image();
 	g_StampMessageBottonHandle				= new Image();
 	g_HaveMessageBottonHandle				= new Image();
-	
+	g_DocumentArrowHandle					= new Image();
+	g_DocumentArrowDHandle					= new Image();
 	g_NumHandleA[0] = g_Num0Handle;
 	g_NumHandleA[1] = g_Num1Handle;
 	g_NumHandleA[2] = g_Num2Handle;
@@ -1223,6 +1480,8 @@ function LoadWindowYesNo()
 	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, 	"img/08_stamp/s_txt_d000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_BackImageHandle, 					"img/07_shop/003.png");
 	// LR
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowHandle, 				"img/07_shop/test/a_obj_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowDHandle, 			"img/07_shop/test/a_obj_b000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowLHandle, 					"img/08_stamp/s_hid_a.png");	
 	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowRHandle, 					"img/08_stamp/s_mig_a.png");	
 	// 数値	
@@ -1495,6 +1754,80 @@ function DrawBack(ctx)
 	ctx.fillRect(0, 0, 640, 1200);
 	ctx.globalAlpha = 1.0;
 }
+/*
+function DrawBack_Tutorial(ctx)
+{
+	ctx.globalAlpha = 0.6;
+	ctx.fillStyle = 'rgb(0, 0, 0)';
+	ctx.fillRect(0, 0, 640, 1200);
+	ctx.globalAlpha = 1.0;
+}
+*/
+var g_nWakuCounter = 0;
+function DrawWaku(ctx, x, y, w, h, blink)
+{
+	if(blink) 
+	{ 
+		g_nWakuCounter ++;
+	}
+	else { g_nWakuCounter = 0; }
+	
+	var val = Math.abs(g_nWakuCounter - 5);
+	var a = 1.0 * (1.0 - (val * 0.12));
+	if(a > 1.0) { a = 1.0; }
+	if(a < 0.6) { a = 0.6; }
+	ctx.globalAlpha = a;
+	ctx.lineWidth   = 3;
+	ctx.strokeStyle="#ff0000";
+	ctx.strokeRect(x + val, y + val, w-(val*2), h-(val*2))
+	ctx.globalAlpha = 1.0;
+}
+
+function DrawDocumentArrow(ctx, x, y, angle)
+{
+	// 矢印を動かす
+	var val = Math.abs(g_nWakuCounter - 5);
+	g_nWakuCounter --;
+	if(g_nWakuCounter < 0) { g_nWakuCounter = 10; }
+	
+	// 回転あり矢印
+	if(angle != 0)
+	{
+		ctx.save();
+		ctx.translate(x, y + val);							// x, y
+		ctx.rotate(angle * Math.PI / 180);  				// 回転
+		ctx.drawImage(g_DocumentArrowHandle, 0, 0);
+		ctx.restore();
+	}
+	// 矢印
+	else
+	{
+		ctx.drawImage(g_DocumentArrowHandle, x, y + val);	
+	}
+}
+function DrawDocumentArrowD(ctx, x, y, angle)
+{
+	// 矢印を動かす
+	var val = Math.abs(g_nWakuCounter - 5);
+	g_nWakuCounter --;
+	if(g_nWakuCounter < 0) { g_nWakuCounter = 10; }
+	
+	// 回転あり矢印
+	if(angle != 0)
+	{
+		ctx.save();
+		ctx.translate(x, y + val);							// x, y
+		ctx.rotate(angle * Math.PI / 180);  				// 回転
+		ctx.drawImage(g_DocumentArrowHandle, 0, 0);
+		ctx.restore();
+	}
+	// 矢印
+	else
+	{
+		ctx.drawImage(g_DocumentArrowDHandle, x, y + val);	
+	}
+}
+
 
 var g_nArrowCounterL = 0;
 var g_nArrowCounterR = 0;

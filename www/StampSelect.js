@@ -37,6 +37,7 @@ function DeleteSheetClick(e)
 var StampSelect = function() 
 {
 	//M_PRINTB("StampSelect:コンストラクタ！");
+	var sSheetSelectMessage = null;
 	var bOldTouch		= false;
 	var sTouchStartX 	= -200;
 	var sTouchStartY 	= -200;
@@ -47,6 +48,7 @@ var StampSelect = function()
 	var iForceTouch     = false;
 	var isTouch = false;
 	g_iSwitch = 0;
+	var iWaitCounter 	= 0;
 
 	// ウィンドウサイズ
     BROWSER_WIDTH   = window.innerWidth  || document.body.clientWidth  || document.documentElement.clientWidth;
@@ -207,54 +209,50 @@ var StampSelect = function()
 	    var canvas = document.getElementById("canvas");
 		var ctx    = canvas.getContext("2d");
 		var sheet = new Array();
+		
 	    //スタンプシート準備
 		if(g_HaveStampSheetData.length - 1 <= no) { no = g_HaveStampSheetData.length - 1; }
-		if(g_HaveStampSheetData.length != 0)
+
+		// 正面
+	    sheet[0] = new StampSheet(ctx, no);
+		// 次
+		if(no + 1 >= g_HaveStampSheetData.length)
 		{
-			// 正面
-		    sheet[0] = new StampSheet(ctx, no);
-			// 次
-		   // sheet[1] = new StampSheet(ctx, no + 1);
-		    //sheet[2] = new StampSheet(ctx, no + 2);
-			
-			// 次
-			if(no + 1 >= g_HaveStampSheetData.length)
-			{
-				sheet[1] = new StampSheet(ctx, g_HaveStampSheetData.length - 1);
-			}
-			else
-			{
-		    	sheet[1] = new StampSheet(ctx, no + 1);
-			}
-			// 次次
-			if(no + 2 >= g_HaveStampSheetData.length)
-			{
-				sheet[2] = new StampSheet(ctx, g_HaveStampSheetData.length - 1);
-			}
-			else
-			{
-		    	sheet[2] = new StampSheet(ctx, no + 2);
-			}
-			
-			// 前
-			if(no - 1 < 0)
-			{
-				sheet[4] = new StampSheet(ctx, 0);
-			}
-			else
-			{
-		    	sheet[4] = new StampSheet(ctx, no - 1);
-			}
-			// 前前
-			if(no - 2 < 0)
-			{
-				sheet[3] = new StampSheet(ctx, 0);
-			}
-			else
-			{
-		    	sheet[3] = new StampSheet(ctx, no - 2);
-			}
+			sheet[1] = new StampSheet(ctx, g_HaveStampSheetData.length - 1);
 		}
+		else
+		{
+	    	sheet[1] = new StampSheet(ctx, no + 1);
+		}
+		// 次次
+		if(no + 2 >= g_HaveStampSheetData.length)
+		{
+			sheet[2] = new StampSheet(ctx, g_HaveStampSheetData.length - 1);
+		}
+		else
+		{
+	    	sheet[2] = new StampSheet(ctx, no + 2);
+		}
+		
+		// 前
+		if(no - 1 < 0)
+		{
+			sheet[4] = new StampSheet(ctx, 0);
+		}
+		else
+		{
+	    	sheet[4] = new StampSheet(ctx, no - 1);
+		}
+		// 前前
+		if(no - 2 < 0)
+		{
+			sheet[3] = new StampSheet(ctx, 0);
+		}
+		else
+		{
+	    	sheet[3] = new StampSheet(ctx, no - 2);
+		}
+
 	    // 初期描画
 	    //this.draw();
 		// -- メインキャンバスのコンストラクタはここまで！ --
@@ -296,7 +294,7 @@ var StampSelect = function()
 	        var ofsMax    = 376;
 
 	        //タッチされていない場合の位置調整
-			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN && g_HaveStampSheetData.length != 0)
+			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN)
 			{
 		        if (!isTouch)
 		    	{
@@ -409,51 +407,64 @@ var StampSelect = function()
 			this.clear();		
 			var bL = false;
 			var bR = false;
-			if(g_HaveStampSheetData.length != 0)
+
+			// 戻るボタン
+			if(g_TutorialSelectFlg != gTUTORIAL_SELECTFLG.NONE)
 			{
-				// 切り替わった瞬間
-				var nowid  = this.selectIx;
-				var previd = (this.selectIx + 4) % 5;
-				var nextid = (this.selectIx + 1) % 5;
-				sheet[previd].fZoomRate -= 0.075;
-				sheet[nextid].fZoomRate -= 0.075;
-				sheet[nowid].fZoomRate  += 0.075;
-				if(sheet[previd].fZoomRate < 0.85) { sheet[previd].fZoomRate = 0.85; }
-				if(sheet[nextid].fZoomRate < 0.85) { sheet[nextid].fZoomRate = 0.85; }
-				if(sheet[nowid].fZoomRate > 1.15)  { sheet[nowid].fZoomRate = 1.15;  }
-				
-				// 前
-				if(sheet[nowid].sheetNo > 0)
-				{
-		        	sheet[previd].draw(ofsX - ofsMax);
-					bL = true;
-				}
-		        // 次
-				if(sheet[nowid].sheetNo + 1 < g_HaveStampSheetData.length)
-				{
-					sheet[nextid].draw(ofsX + ofsMax);
-					bR = true;
-				}
-				sheet[nowid].draw(ofsX);
-		    	
-		    	if(ofsX == 0 && iForceTouch)
-		    	{
-		        	isTouch = false;
-		    		iForceTouch = false;
-		    		bOldTouch = false;
-		    	}
-				else if(iForceTouch)
-				{
-		        	isTouch = false;
-					bOldTouch = false;
-				}
+		      	ctx.drawImage(g_BackImageHandle, 			
+			      	0, 
+					0, 
+					190, 
+					101);
+				DrawBack(ctx);
 			}
-			// 合成して描画
-	      	ctx.drawImage(g_BackImageHandle, 			
-		      	0, 
-				0, 
-				190, 
-				101);
+			
+			// 切り替わった瞬間
+			var nowid  = this.selectIx;
+			var previd = (this.selectIx + 4) % 5;
+			var nextid = (this.selectIx + 1) % 5;
+			sheet[previd].fZoomRate -= 0.075;
+			sheet[nextid].fZoomRate -= 0.075;
+			sheet[nowid].fZoomRate  += 0.075;
+			if(sheet[previd].fZoomRate < 0.85) { sheet[previd].fZoomRate = 0.85; }
+			if(sheet[nextid].fZoomRate < 0.85) { sheet[nextid].fZoomRate = 0.85; }
+			if(sheet[nowid].fZoomRate > 1.15)  { sheet[nowid].fZoomRate = 1.15;  }
+			
+			// 前
+			if(sheet[nowid].sheetNo > 0)
+			{
+	        	sheet[previd].draw(ofsX - ofsMax);
+				bL = true;
+			}
+	        // 次
+			if(sheet[nowid].sheetNo + 1 < g_HaveStampSheetData.length)
+			{
+				sheet[nextid].draw(ofsX + ofsMax);
+				bR = true;
+			}
+			sheet[nowid].draw(ofsX);
+	    	
+	    	if(ofsX == 0 && iForceTouch)
+	    	{
+	        	isTouch = false;
+	    		iForceTouch = false;
+	    		bOldTouch = false;
+	    	}
+			else if(iForceTouch)
+			{
+	        	isTouch = false;
+				bOldTouch = false;
+			}
+
+			// 戻るボタン
+			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.NONE)
+			{
+		      	ctx.drawImage(g_BackImageHandle, 			
+			      	0, 
+					0, 
+					190, 
+					101);
+			}
 			// 矢印を描画
 			ProcArrow();
 			if(bL) { DrawArrowL(ctx, 60,  450); }
@@ -463,11 +474,54 @@ var StampSelect = function()
 		
 			
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
+	
+			// ２秒待つ 
+			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.INIT_WAIT)
+			{
+				iWaitCounter ++;
+				// 50*40=2秒
+				if(iWaitCounter > 10)
+				{
+					g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE;
+				}
+			}
+			// シート買ってみよう(メッセージ)
+			/*
+			else if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE)
+			{
+				// 全体を黒くする
+				DrawBack(ctx);
+				// メッセージファイル
+				ctx.drawImage(sSheetSelectMessage, 320 - (540 / 2), 280 - (225 / 2));				
+				// 何かオス
+				if((!isTouch) && bOldTouch) { g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT; }
+			}
+			*/
+			// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
+			else if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT || g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE)
+			{	
+				// 全体を黒くする
+				//DrawBack(ctx);
+				// メッセージファイル
+				ctx.drawImage(sSheetSelectMessage, 320 - (540 / 2), 280 - (225 / 2));				
+				// 何かオス
+				if((!isTouch) && bOldTouch) { g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT; }
+    			// 正面決定
+				var aSheet = sheet[this.selectIx];
+				var PosYesX = aSheet.iDrawX - 12;
+				var PosYesY = aSheet.iDrawY - 12;
+				var PosYesW = aSheet.iDrawW + 24;
+				var PosYesH = aSheet.iDrawH + 24;				
+				//DrawWaku(ctx, PosYesX, PosYesY, PosYesW, PosYesH, true);
+				DrawDocumentArrow(ctx, PosYesX + 200, PosYesY + 50);
+				// 変更
+				g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT;
+			}
 			
-
 			// ------------------------------------------------
 			// シートが０の時の描画
 			// ------------------------------------------------
+/*
 			if(g_HaveStampSheetData.length == 0)
 			{
 				// ウィンドウの描画
@@ -486,7 +540,8 @@ var StampSelect = function()
 			// ------------------------------------------------
 			// メニューが出てる時の描画
 			// ------------------------------------------------
-			else if(g_iSwitch == 1)
+			else */
+	/*		if(g_iSwitch == 1)
 			{
 				// ウィンドウの描画
 				g_WindowsScaleRate += 0.15;
@@ -503,7 +558,9 @@ var StampSelect = function()
 			// ------------------------------------------------
 			// タッチトリガー
 			// ------------------------------------------------
-	    	else if((!isTouch) && bOldTouch && iForceTouch == false)
+	    	else
+	*/
+			if((!isTouch) && bOldTouch && iForceTouch == false)
 	    	{
 	    		
 	    		// 移動地がでかい
@@ -576,28 +633,41 @@ var StampSelect = function()
 	    			
 	    			
 	    			// 正面決定
-    				var aSheet = sheet[this.selectIx];
-					PosX = aSheet.iDrawX;
-					PosY = aSheet.iDrawY;
-					PosW = aSheet.iDrawW;
-					PosH = aSheet.iDrawH;
-	    			/*
-					ctx.globalAlpha = 0.5;
-					ctx.fillStyle = 'rgb(0, 255, 0)';
-			        ctx.fillRect(PosX, PosY, PosW, PosH);
-					ctx.globalAlpha = 1.0;	
-			    	*/		    			
-					if(
-						(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
-						(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
-						(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
-						(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
-					{	
-						g_eStatus 	= G_STATUS.FADEOUT;
-						next		= 0;
-					}	
+	    			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.NONE ||
+	    			   g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT)
+	    			{
+    					var aSheet = sheet[this.selectIx];
+						PosX = aSheet.iDrawX;
+						PosY = aSheet.iDrawY;
+						PosW = aSheet.iDrawW;
+						PosH = aSheet.iDrawH;
+		    			/*
+						ctx.globalAlpha = 0.5;
+						ctx.fillStyle = 'rgb(0, 255, 0)';
+				        ctx.fillRect(PosX, PosY, PosW, PosH);
+						ctx.globalAlpha = 1.0;	
+				    	*/		    			
+						if(
+							(PosX < sTouchMoveX)  && (PosX + PosW > sTouchMoveX)  &&
+							(PosY < sTouchMoveY)  && (PosY + PosH > sTouchMoveY)  &&
+							(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
+							(PosY < sTouchStartY) && (PosY + PosH > sTouchStartY))
+						{	
+							g_eStatus 	= G_STATUS.FADEOUT;
+							next		= 0;
+						}	
+	    			}
 	    		}
 	    	}
+			// 遅延
+			if(g_TutorialNextSelectFlg != gTUTORIAL_SELECTFLG.NON)
+			{
+				if(g_TutorialSelectFlg != g_TutorialNextSelectFlg)
+				{
+					g_TutorialSelectFlg = g_TutorialNextSelectFlg;
+				}
+				g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+			}
 	    };
   
 	    //マウスイベント
@@ -663,31 +733,38 @@ var StampSelect = function()
     // スタンプのロード
     LoadStampGraphic();
 
+	// デバッグ
+	SetTutorialFlg(true);
+	// スタンプセレクト開始
+	g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+	g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+	// メインチュートリアル開始
+	g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+	g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+	
+	// チュートリアルならプラスα
+	if(g_TutorialFlg)
+	{
+		sSheetSelectMessage = new Image();
+	    sSheetSelectMessage.src = "img/07_shop/test/a_txt_a009.png";
+		g_sTutorialLoadFlg.AddLoadFile(sSheetSelectMessage);
+	}	
+	g_sTutorialLoadFlg.Loading();
+	
+	// スクリーンの作成
 	var rootSceen = document.getElementById("sceen");
 	var sceen = document.createElement("div");
 	rootSceen.appendChild(sceen);
 	sceen.style.opacity = alpha;
 	
+	// キャンバスの作成
 	var im =document.createElement('canvas');
 	im.setAttribute('id', 'canvas');
  	im.width = 640;   
 	im.height = 1200;  
 	sceen.appendChild(im);	
-/*	
-	if(g_HaveStampSheetData.length != 0)
-	{
-		var iMenuDel = document.createElement('button');
-		iMenuDel.setAttribute('id', 'menu_del');
-		iMenuDel.style.position = "absolute";  
-		iMenuDel.innerHTML = '削除'
-	 	iMenuDel.style.top = "50px";
-	 	iMenuDel.style.left = "450px";
-	 	iMenuDel.style.width = "60px";   
-		iMenuDel.style.height = "60px";  
-		var fd = new Function("DeleteSheetClick();");
-	 	iMenuDel.onclick = fd; 
-		sceen.appendChild(iMenuDel);
-	}	*/
+
+	// セレクト
 	var select = LoadActiveSheetIndex();
 	if(g_StampDrawData.length <= select){ select = g_StampDrawData.length - 1; }
 	mainCanvas = null;
@@ -695,6 +772,13 @@ var StampSelect = function()
 	
 	// 周りのみ読み込み
 	LoadPrevNextSheetGraphic(select);
+	
+	// 全くなければ終了
+	if(g_HaveStampSheetData.length <= 0)
+	{
+		g_eStatus = G_STATUS.END;
+		next = 1;
+	}
 	
 	//
 	// フレーム処理
@@ -706,7 +790,7 @@ var StampSelect = function()
 			//初期化
 			case G_STATUS.INIT:
 				// スタンプとシートのロードが終わってる
-				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg)
+				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg && g_sTutorialLoadFlg.bLoadFlg)
 				{			
 					// シートのロード
    					LoadSheetGraphic();
@@ -725,9 +809,11 @@ var StampSelect = function()
 				// テストです、ロード中
 				else
 				{
+					var strDumpdatax = g_sTutorialLoadFlg.GetDump();
 					var strDumpdata1 = g_sSheetLoadFlg.GetDump();
 					var strDumpdata2 = g_sStampLoadFlg.GetDump();
 					M_PRINTB("ロード中です！<br>"				+
+							"[Tutor]" + strDumpdatax + "<br>" 	+ 
 							"[Sheet]" + strDumpdata1 + "<br>" 	+ 
 					        "[Stamp]" + strDumpdata2);	
 				}
@@ -766,34 +852,40 @@ var StampSelect = function()
 				// ----------------------------------------------
 				if((!isTouch) && bOldTouch)
 				{
-					var BackYesX = 0;
-					var BackYesY = 0;
-					var BackYesW = 260;
-					var BackYesH = 101;		
-					if(
-						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
-						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
-						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
-						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
-					{	
-						g_eStatus = G_STATUS.FADEOUT;
-						next = 1;
-					}	
+					if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.NONE)
+					{
+						var BackYesX = 0;
+						var BackYesY = 0;
+						var BackYesW = 260;
+						var BackYesH = 101;		
+						if(
+							(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
+							(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
+							(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
+							(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+						{	
+							g_eStatus = G_STATUS.FADEOUT;
+							next = 1;
+						}	
+					}
 	    			// これにする[145, BROWSER_HEIGHT - 50]
-					BackYesX = 145;
-					BackYesY = BROWSER_HEIGHT - 50;
-					BackYesW = 350;
-					BackYesH = 150;				    			    			
-					if(
-						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
-						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
-						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
-						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
-					{	
-						g_eStatus 	= G_STATUS.FADEOUT;
-						next		= 0;
-					}	
-					
+	    			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.NONE ||
+	    			   g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT)
+	    			{
+						BackYesX = 145;
+						BackYesY = BROWSER_HEIGHT - 50;
+						BackYesW = 350;
+						BackYesH = 150;				    			    			
+						if(
+							(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
+							(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
+							(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
+							(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+						{	
+							g_eStatus 	= G_STATUS.FADEOUT;
+							next		= 0;
+						}	
+	    			}
 				}	
 				bOldTouch = isTouch;
 				break;
@@ -812,12 +904,14 @@ var StampSelect = function()
 			case G_STATUS.END:
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
-				
+				// 解放
+				g_sTutorialLoadFlg.Delete();				
 				// メインへ
 				if(next == 0)
 				{
-					//次のシーンをセット
-					save();
+					// 選択されているシートをアクティブにする
+					SaveActiveSheetIndex(mainCanvas.getSelectSheet().sheetNo);
+					// メインへ移動
 					nextSceen = new StampMain();
 				}
 				// タイトルへ
@@ -836,11 +930,6 @@ var StampSelect = function()
 				break;
 		}
 	};
-	//セーブ
-	function save() 
-	{
-		SaveActiveSheetIndex(mainCanvas.getSelectSheet().sheetNo);
-	}	
 };
 
 

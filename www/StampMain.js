@@ -42,6 +42,41 @@ var SBarsTouchStartY 	= -200;
 var SBarsTouchMoveX 	= -200;
 var SBarsTouchMoveY 	= -200;	
 	
+// 描画禁止
+function GetDrawOkFlg()
+{
+/*
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
+	SHEET_TOUCH_WRITE:		3,	// シートにスタンプを押してね
+	STAMP_TOUCH_DEAD:		4,	// スタンプがなくなった
+	MENU_SELECT:			5,	// メニューセレクト
+	MENU_WAIT:				6,	// メニュー表示にて少し待つ
+	STAMP_CLEAR:			7,	// スタンプをクリア
+	STAMP_CLEAR_WINDOW:		8,	// クリア確認ウィンドウ
+	MENU_SELECT_END:		9,	// メニューセレクト	
+	MENU_SELECT_END_WAIT:	10,	// メニューセレクトにて少し待つ
+	BACK:					11,	// 戻る
+*/
+	// OK
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.NONE) { return true; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.NON)  { return true; }
+	
+	// だめ
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.INIT_WAIT) 				{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT) 		{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.STAMP_TOUCH_DEAD) 		{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT) 				{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_WAIT)			 	{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.STAMP_CLEAR) 				{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.STAMP_CLEAR_WINDOW) 		{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT_END) 			{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT_END_WAIT) 	{ return false; }
+	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.BACK) 					{ return false; }		
+}
+
 //
 // スタンプバー
 //
@@ -573,10 +608,26 @@ var StampMain = function()
 	var canvas_ctx;
 	var nInkStlong      = 0;
 	var nInkCounter      = 0;
-
 	var canvas_img = new Image();
 	var canvas_load_ix = 0;
 
+	// スタンプをタッチして選んでね
+	var sStampTouchSelectMessage = null;
+	// シートにスタンプを押してね
+	var sSheetTouchSelectMessage = null;
+	// スタンプは１５回押すと亡くなる
+	var sStampTouch15Message = null;
+	// メニューを押してね
+	var sMenuTouchMessage = null;
+	// 次はスタンプを消してみよう
+	var sStampClearMessage = null;
+	// 最後に初めの画面にもどるには
+	var sMenuEndMessage1 = null;
+	var sMenuEndMessage2 = null;
+	// 終わるを押してね
+	var sBackMessage = null;
+	
+	
 	//背景描画
 	function canvas_Draw() 
 	{
@@ -643,7 +694,7 @@ var StampMain = function()
 	        bTouch = true;
 			nInkStlong = 1;
 			nInkCounter = 0;
-			if(g_iSwitch == 0 && (stampBar.selectedStampId < g_HaveStampImageData.length && stampBar.selectedStampId != -1))
+			if(g_iSwitch == 0 && (stampBar.selectedStampId < g_HaveStampImageData.length && stampBar.selectedStampId != -1) && GetDrawOkFlg())
 			{
 				if(stampBar.InkMinus5()) { nInkStlong = nGaugeMaxStlong; }
 				drawStamp_t(pos.x, pos.y, nInkStlong);
@@ -682,7 +733,7 @@ var StampMain = function()
 	            var pos	= getTouchPos(e);
 				sTouchMoveX = pos.x;
 				sTouchMoveY = pos.y;
-				if(g_iSwitch == 0)
+				if(g_iSwitch == 0 && GetDrawOkFlg())
 				{
 					drawStamp_t(sTouchMoveX, sTouchMoveY, nInkStlong);
 				}
@@ -696,11 +747,13 @@ var StampMain = function()
 		{
 			if(bTouch)
 			{
-				if(g_iSwitch == 0)
+				if(g_iSwitch == 0 && GetDrawOkFlg())
 				{
 					drawStamp(sTouchMoveX, sTouchMoveY, nInkStlong);
 					//canvas_ctx.drawImage(stamp_canvas, 0, 0, 640, 1200);
-					save();
+					
+					// スタンプ座標を登録して自動セーブ
+					SaveHaveStampData();
 				}
 				bTouch = false;
 			}
@@ -731,9 +784,7 @@ var StampMain = function()
 	        //playAudioSE_Stamp();
 		}
 	}
-	//セーブ
-	function save()  { SaveHaveStampData(); }
-	
+
 	// タッチイベントの初期化
 	//ClearTouch();
 	
@@ -825,7 +876,68 @@ var StampMain = function()
 	GSetupEffect();
 	// シートを必ずロード
 	LoadSelectSheetGraphic(g_iEditSheetIndex);
+	
+	// チュートリアルならプラスα
+	if(g_TutorialFlg)
+	{
+		// スタンプをタッチして選んでね
+		sStampTouchSelectMessage = new Image();
+	    sStampTouchSelectMessage.src = "img/07_shop/test/a_txt_a010.png";
+		g_sTutorialLoadFlg.AddLoadFile(sStampTouchSelectMessage);
+		// シートにスタンプを押してね
+		sSheetTouchSelectMessage = new Image();
+	    sSheetTouchSelectMessage.src = "img/07_shop/test/a_txt_a011.png";
+		g_sTutorialLoadFlg.AddLoadFile(sSheetTouchSelectMessage);
+		// スタンプは１５回押すと亡くなる
+		sStampTouch15Message = new Image();
+	    sStampTouch15Message.src = "img/07_shop/test/a_txt_a012.png";
+		g_sTutorialLoadFlg.AddLoadFile(sStampTouch15Message);
+		// メニューを押してね
+		sMenuTouchMessage = new Image();
+	    sMenuTouchMessage.src = "img/07_shop/test/a_txt_a013_02.png";
+		g_sTutorialLoadFlg.AddLoadFile(sMenuTouchMessage);
+		// 次はスタンプを消してみよう
+		sStampClearMessage = new Image();
+	    sStampClearMessage.src = "img/07_shop/test/a_txt_a015.png";
+		g_sTutorialLoadFlg.AddLoadFile(sStampClearMessage);			
+		// 最後に初めの画面にもどるには
+		sMenuEndMessage1 = new Image();
+	    sMenuEndMessage1.src = "img/07_shop/test/a_txt_a017.png";
+		g_sTutorialLoadFlg.AddLoadFile(sMenuEndMessage1);	
+		sMenuEndMessage2 = new Image();
+	    sMenuEndMessage2.src = "img/07_shop/test/a_txt_a017_02.png";
+		g_sTutorialLoadFlg.AddLoadFile(sMenuEndMessage2);	
+		// 終わるを押してね
+		sBackMessage = new Image();
+	    sBackMessage.src = "img/07_shop/test/a_txt_a018.png";		
+		g_sTutorialLoadFlg.AddLoadFile(sBackMessage);	
+	}	
+	g_sTutorialLoadFlg.Loading();
+/*
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_MAINFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
+	SHEET_TOUCH_WRITE:		3,	// シートにスタンプを押してね
+	STAMP_TOUCH_DEAD:		4,	// スタンプがなくなった
+	MENU_SELECT:			5,	// メニューセレクト
+	MENU_WAIT:				6,	// メニュー表示にて少し待つ
+	STAMP_CLEAR:			7,	// スタンプをクリア
+	STAMP_CLEAR_WINDOW:		8,	// クリア確認ウィンドウ
+	MENU_SELECT_END:		9,	// メニューセレクト	
+	MENU_SELECT_END_WAIT:	10,	// メニューセレクトにて少し待つ
+	BACK:					11,	// 戻る
+};
 
+var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
+var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
+
+*/
 	//
 	// フレーム処理
 	//
@@ -836,7 +948,7 @@ var StampMain = function()
 			//初期化
 			case G_STATUS.INIT:
 				// スタンプとシートのロードが終わってる
-				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg)
+				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg && g_sTutorialLoadFlg.bLoadFlg)
 				{
 					//各データが読み込まれるまで待つ
 					if (LoadingCounter <= 0) 
@@ -946,7 +1058,12 @@ var stamp_ctx;
 			case G_STATUS.END:
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
+				// 解放
+				g_sTutorialLoadFlg.Delete();			
 				canvas_img = null;
+			
+				// チュートリアル終了チェック
+				CheckTutorial();
 				//次のシーンをセット
 				if(nNextEvent == 0)
 				{
