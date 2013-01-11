@@ -124,7 +124,7 @@ var SceenTitle = function() {
 	
 	//ショップ
 	var shop = new DivSprite(286,238);
-	shop.x=320; shop.y=722; shop.z=2;
+	shop.x=320; shop.y=722; shop.z=1;
 	shop.src = "img/01_title/t_btn_d000.png";
 	shop.animScale = [1,10, 1,10, 1,10, 1.1,2, 1,2];
 	shop.onclick = function(){

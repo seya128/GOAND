@@ -22,9 +22,14 @@ body {
 }
 
 
+#ad {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+}
 
 
-
+/*
 
 #bg {
     position: fixed;
@@ -264,3 +269,4 @@ body {
     left:   0px;
 }
 
+*/
