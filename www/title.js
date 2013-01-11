@@ -134,6 +134,9 @@ var SceenTitle = function() {
 	sceen.appendChild(shop.div);
 	animSprites.push(shop);
 	
+	// ウィンドウなどの画像の読み込み
+	LoadWindowYesNo();
+	
 	// コインのロード処理
 	LoadCoin();
 	// シートのロード処理
@@ -170,9 +173,14 @@ var SceenTitle = function() {
 
 			//初期化
 			case STATUS.INIT:
-				//各データが読み込まれるまで待つ
-				if (LoadingCounter <= 0) {
-					st = STATUS.FADEIN;
+						
+				// 外部グラフィックが読み込み終わっていると[true]
+				if(g_sGraphicLoadFlg.bLoadFlg)
+				{			
+					//各データが読み込まれるまで待つ
+					if (LoadingCounter <= 0) {
+						st = STATUS.FADEIN;
+					}
 				}
 				break;
 
