@@ -46,7 +46,7 @@ var gTUTORIAL_STATUS =
 	STAMP:		3,		// スタンプ
 	END:		4		// スタンプが終わったあと
 };
-var g_TutorialStatus = gTUTORIAL_STATUS.GOHAN;
+var g_TutorialStatus = gTUTORIAL_STATUS.NONE;
 function SetTutorialStatus(flg)
 {
 	g_TutorialStatus = flg;
