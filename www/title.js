@@ -74,6 +74,7 @@ var SceenTitle = function() {
 				SaveActiveSheetIndex(0);	// アクティブシートの初期化
 				DummySheetDataSet();
 				DummyStampDataSet();
+				DeleteTutorialLookFlg();	// チュートリアルを見てないことにする
 			}
 		}
 	};
@@ -150,6 +151,7 @@ var SceenTitle = function() {
 	tutorial.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
 	tutorial.onclick = function(){
 		event.preventDefault();
+		g_TutorialStatus=gTUTORIAL_STATUS.GOHAN;
 	};
 	sceen.appendChild(tutorial.div);
 	animSprites.push(tutorial);
@@ -186,15 +188,7 @@ var SceenTitle = function() {
 	//
 	// チュートリアル関連初期化
 	//
-	var TUTORIALMODE = {
-		NONE:		0,			//まだチュートリアルモードに入っていない
-		GOHAN:		1,			//ごはんモードのチュートリアル
-		SHOP:		2,			//ショップモードのチュートリアル
-		STAMP:		3,			//スタンプモードのチュートリアル
-	};
-	
-	var isTutorialEnd = false;		//true:チュートリアルを一度終えている
-	var modeTutorial = TUTORIALMODE.NONE;
+	var isTutorialEnd = GetTutorialLookFlg();		//true:チュートリアルを一度終えている
 	
 	//チュートリアルステータス
 	var TUTORIALST = {
@@ -296,6 +290,18 @@ var SceenTitle = function() {
 			//メイン処理
 			case STATUS.MAIN:
 				if (next != NEXT.NONEXT) {
+					//デバッグコマンドチェック
+					if (debugCount == 9) {
+						switch (next) {
+							case NEXT.GOHAN:	g_TutorialStatus=gTUTORIAL_STATUS.END; isTutorialEnd=true; break;
+							case NEXT.STAMP:	g_TutorialStatus=gTUTORIAL_STATUS.STAMP; break;
+							case NEXT.SHOP:		g_TutorialStatus=gTUTORIAL_STATUS.SHOP; break;
+						}
+						debugCount = 0;
+						next = NEXT.NONEXT;
+						break;
+					}
+					
 /*					//チュートリアルモードでない場合
 					if (modeTutorial == TUTOTIALMODE.NONE) {
 						//チュートリアルが終わっていなければチュートリアルモードへ
@@ -325,6 +331,9 @@ var SceenTitle = function() {
 
 			//終了
 			case STATUS.END:
+				//チュートリアル見たフラグ保存
+				SaveTutorialLookFlg(isTutorialEnd);
+				
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
@@ -346,7 +355,7 @@ var SceenTitle = function() {
 		
 		if (st != STATUS.END) {
 			//チュートリアル処理
-			if (modeTutorial != TUTORIALMODE.NONE) {
+			if (g_TutorialStatus!=gTUTORIAL_STATUS.NONE && g_TutorialStatus!=gTUTORIAL_STATUS.END) {
 				switch (tutorialSt) {
 					//初期化
 					case TUTORIALST.INIT:
@@ -356,10 +365,10 @@ var SceenTitle = function() {
 						tutorialSt = TUTORIALST.IN;
 						tutorialAlpha = 0;
 						//該当ボタンのZ座標を黒マスクの手前に
-						switch (modeTutorial) {
-							case TUTORIALMODE.GOHAN:	gohan.z = 11;	break;
-							case TUTORIALMODE.SHOP:		shop.z = 11;	break;
-							case TUTORIALMODE.STAMP:	stamp.z = 11;	break;
+						switch (g_TutorialStatus) {
+							case gTUTORIAL_STATUS.GOHAN:	gohan.z = 11;	break;
+							case gTUTORIAL_STATUS.SHOP:		shop.z = 11;	break;
+							case gTUTORIAL_STATUS.STAMP:	stamp.z = 11;	break;
 						}
 						break;
 					//イン
@@ -379,7 +388,10 @@ var SceenTitle = function() {
 */			}
 			
 			//アニメーション処理
-			animSprites.forEach(function(s){ s.animExec(); });
+			if (debugCount != 9) {
+				//デバッグコマンド有効状態になるとアニメーションしない
+				animSprites.forEach(function(s){ s.animExec(); });
+			}
 		}
 		
 	};
