@@ -394,7 +394,11 @@ function GetTutorialFlg()
 {
 	return g_TutorialFlg;
 }
-
+// チュートリアル終了
+function EndTutorial()
+{
+	CheckTutorial();
+}
 // チュートリアル中なら解除する
 function CheckTutorial()
 {
@@ -1509,8 +1513,8 @@ function LoadWindowYesNo()
 	// ロード
 	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 	"img/00_common/g_g01_huk_e000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 	"img/00_common/g_hand_01.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 	"img/07_shop/k_btn_a.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 	"img/07_shop/k_btn_b.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 	"img/00_common/k_btn_a.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 	"img/00_common/k_btn_b.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainWindowImageHandle, 	 	"img/08_stamp/s_wak_a000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainKesuImageHandle,	 	 	"img/08_stamp/s_btn_a000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainEndImageHandle, 		 	"img/08_stamp/s_btn_b000.png");
@@ -1519,8 +1523,8 @@ function LoadWindowYesNo()
 	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, 	"img/08_stamp/s_txt_d000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_BackImageHandle, 					"img/07_shop/003.png");
 	// LR
-	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowHandle, 				"img/07_shop/test/a_obj_a000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowDHandle, 			"img/07_shop/test/a_obj_b000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowHandle, 				"img/10_asobikata/a_obj_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowDHandle, 			"img/10_asobikata/a_obj_b000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowLHandle, 					"img/08_stamp/s_hid_a.png");	
 	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowRHandle, 					"img/08_stamp/s_mig_a.png");	
 	// 数値	

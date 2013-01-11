@@ -1001,41 +1001,41 @@ var StampMain = function()
 		SetTutorialStatus(gTUTORIAL_STATUS.STAMP);
 		// スタンプをタッチして選んでね
 		sStampTouchSelectMessage = new Image();
-	    sStampTouchSelectMessage.src = "img/07_shop/test/a_txt_a010.png";
+	    sStampTouchSelectMessage.src = "img/10_asobikata/a_txt_a010.png";
 		g_sTutorialLoadFlg.AddLoadFile(sStampTouchSelectMessage);
 		// シートにスタンプを押してね
 		sSheetTouchSelectMessage = new Image();
-	    sSheetTouchSelectMessage.src = "img/07_shop/test/a_txt_a011.png";
+	    sSheetTouchSelectMessage.src = "img/10_asobikata/a_txt_a011.png";
 		g_sTutorialLoadFlg.AddLoadFile(sSheetTouchSelectMessage);
 		// スタンプは１５回押すと亡くなる
 		sStampTouch15Message = new Image();
-	    sStampTouch15Message.src = "img/07_shop/test/a_txt_a012.png";
+	    sStampTouch15Message.src = "img/10_asobikata/a_txt_a012.png";
 		g_sTutorialLoadFlg.AddLoadFile(sStampTouch15Message);
 		// メニューを押してね
 		sMenuTouchMessage = new Image();
-	    sMenuTouchMessage.src = "img/07_shop/test/a_txt_a013_02.png";
+	    sMenuTouchMessage.src = "img/10_asobikata/a_txt_a013_02.png";
 		g_sTutorialLoadFlg.AddLoadFile(sMenuTouchMessage);
 		// 次はスタンプを消してみよう
 		sStampClearMessage = new Image();
-	    sStampClearMessage.src = "img/07_shop/test/a_txt_a015.png";
+	    sStampClearMessage.src = "img/10_asobikata/a_txt_a015.png";
 		g_sTutorialLoadFlg.AddLoadFile(sStampClearMessage);			
 		// 最後に初めの画面にもどるには
 		sMenuClear01Message1 = new Image();
-	    sMenuClear01Message1.src = "img/07_shop/test/a_txt_a016.png";
+	    sMenuClear01Message1.src = "img/10_asobikata/a_txt_a016.png";
 		g_sTutorialLoadFlg.AddLoadFile(sMenuClear01Message1);	
 		sMenuClear02Message1 = new Image();
-	    sMenuClear02Message1.src = "img/07_shop/test/a_txt_a016_02.png";
+	    sMenuClear02Message1.src = "img/10_asobikata/a_txt_a016_02.png";
 		g_sTutorialLoadFlg.AddLoadFile(sMenuClear02Message1);	
 		// 最後に初めの画面にもどるには
 		sMenuEndMessage1 = new Image();
-	    sMenuEndMessage1.src = "img/07_shop/test/a_txt_a017.png";
+	    sMenuEndMessage1.src = "img/10_asobikata/a_txt_a017.png";
 		g_sTutorialLoadFlg.AddLoadFile(sMenuEndMessage1);	
 		sMenuEndMessage2 = new Image();
-	    sMenuEndMessage2.src = "img/07_shop/test/a_txt_a017_02.png";
+	    sMenuEndMessage2.src = "img/10_asobikata/a_txt_a017_02.png";
 		g_sTutorialLoadFlg.AddLoadFile(sMenuEndMessage2);	
 		// 終わるを押してね
 		sBackMessage = new Image();
-	    sBackMessage.src = "img/07_shop/test/a_txt_a018.png";		
+	    sBackMessage.src = "img/10_asobikata/a_txt_a018.png";		
 		g_sTutorialLoadFlg.AddLoadFile(sBackMessage);	
 	}	
 	g_sTutorialLoadFlg.Loading();

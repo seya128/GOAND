@@ -739,7 +739,7 @@ var StampSelect = function()
 	if(g_TutorialFlg)
 	{
 		sSheetSelectMessage = new Image();
-	    sSheetSelectMessage.src = "img/07_shop/test/a_txt_a009.png";
+	    sSheetSelectMessage.src = "img/10_asobikata/a_txt_a009.png";
 		g_sTutorialLoadFlg.AddLoadFile(sSheetSelectMessage);
 	}	
 	g_sTutorialLoadFlg.Loading();

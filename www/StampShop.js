@@ -309,9 +309,11 @@ ShopSheet.prototype.drawWindow = function()
 
 	// -------------------------------------
 	// 矢印とプロック
-	// -------------------------------------  
-	DrawDocumentArrow(this.ctx, 33 + 137 - 56, PosYesY - 63, 0);
-
+	// ------------------------------------- 
+	if(g_TutorialFlg)
+	{
+		DrawDocumentArrow(this.ctx, 33 + 137 - 56, PosYesY - 63, 0);
+	}
 	// 初期化
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
 	{
@@ -415,8 +417,10 @@ ShopSheet.prototype.drawOK= function()
 	// -------------------------------------
 	// 矢印とプロック
 	// -------------------------------------  
-	DrawDocumentArrow(this.ctx, 180 + 137 - 56, PosYesY - 63, 0);
-	
+	if(g_TutorialFlg)
+	{
+		DrawDocumentArrow(this.ctx, 180 + 137 - 56, PosYesY - 63, 0);
+	}
 
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
 	{
@@ -1375,13 +1379,13 @@ var StampShop = function()
 	if(g_TutorialFlg)
 	{
 		sSheetBuyMessage = new Image();
-	    sSheetBuyMessage.src = "img/07_shop/test/a_txt_a005.png";
+	    sSheetBuyMessage.src = "img/10_asobikata/a_txt_a005.png";
 		g_sTutorialLoadFlg.AddLoadFile(sSheetBuyMessage);
 		sStampBuyMessage = new Image();
-	    sStampBuyMessage.src = "img/07_shop/test/a_txt_a006.png";
+	    sStampBuyMessage.src = "img/10_asobikata/a_txt_a006.png";
 		g_sTutorialLoadFlg.AddLoadFile(sStampBuyMessage);
 		sBackMessage = new Image();
-	    sBackMessage.src = "img/07_shop/test/a_txt_a007.png";
+	    sBackMessage.src = "img/10_asobikata/a_txt_a007.png";
 		g_sTutorialLoadFlg.AddLoadFile(sBackMessage);
 	}	
 	g_sTutorialLoadFlg.Loading();
