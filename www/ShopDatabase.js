@@ -1,6 +1,14 @@
 // ショップで扱うデータベース
 
 // -------------------------------------
+// ブラウザサイズ
+// -------------------------------------
+var BROWSER_HEIGHT		= 0;
+var BROWSER_WIDTH		= 0;
+var BROWSER_RATE		= 0;
+var BROWSER_SCREEN_H	= 0;
+
+// -------------------------------------
 // お店データ[3*3]
 // -------------------------------------
 var MAX_SHOP_DISP_WIDTH  		= 3;
@@ -14,165 +22,54 @@ var MAX_SHOP_PANEL_START_Y 		= 340;
 var MAX_SHOP_PANEL_INTERVAL_Y 	= 0;
 var gHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
+
+// ------------------------------------------------------
+// セーブキー
+// ------------------------------------------------------
+var g_saveDataKeyHaveStampData    	= "HaveStampData";			// スタンプデータ
+var g_saveDataKeyHaveSheetData    	= "HaveSheetData";			// シートデータ
+var g_saveDataKeyActiveSheetIndex 	= "ActiveSheetIndex";		// アクティブなシート番号
+var g_saveDataKeyActiveStampIndex 	= "ActiveStampIndex";		// アクティブなシート番号
+var g_saveDataKeyCoin 				= "HaveCoin";				// コインの数
+var g_saveDataKeyStampDrawDara 		= "DrawStampData";			// 描画されたシートごとのスタンプ
+var g_saveTutorialKey				= "SaveTutorialKey";
+
 // -------------------------------------
 // チュートリアルフラグ
 // -------------------------------------
-// 背景画像
-/*
-var gTUTORIAL_FLG = 
+// なし→ごはん→ショップ→スタンプ
+var gTUTORIAL_STATUS = 
 {
-	// ごはん系
-	NONE:		0,
-	GOHAN_02:	1,
-	GOHAN_03:	2,
-}
-*/
-
-// チュートリアル実行中か？のみのフラグ
-var g_TutorialFlg     = false;	// 実行中
-var g_TutorialOneLook = false;	// 一度でも見たか？
-function SetTutorialFlg(flg)
-{
-	g_TutorialFlg = flg;
-}
-function GetTutorialFlg()
-{
-	return g_TutorialFlg;
-}
-
-// チュートリアル中なら解除する
-function CheckTutorial()
-{
-	if(GetTutorialFlg())
-	{
-		// 解除
-		SetTutorialFlg(0);
-		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;
-		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;	
-		g_TutorialSelectFlg 	= gTUTORIAL_SELECTFLG.NONE;
-		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;	
-		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.NONE;
-		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
-		
-		// 初めてならプレゼントをもらう
-		if(g_TutorialOneLook == false)
-		{
-			AllDeleteStampDrawData();
-			PresentTutorialStampData();
-			PresentTutorialSheetData();
-			g_TutorialOneLook = true;
-		}
-		// 違ったら今までのデータを復元
-		else
-		{
-			// コインのロード処理
-			LoadCoin();
-			// シートのロード処理
-			if(LoadHaveSheetData() == true)
-			{
-			}
-			// 失敗なので新規ロード
-			else
-			{
-				DummySheetDataSet();
-				SaveActiveSheetIndex(0);
-			}	
-			// スタンプのロード処理
-			if(LoadHaveStampData() == true)
-			{
-			}
-			// 失敗なので新規ロード
-			else
-			{
-				DummyStampDataSet();
-				SaveActiveStampIndex(0);
-			}				
-		}
-	}
-}
-function StartTutorial()
-{
-	// ストレージのフラグを見てチュートリアルかをチェックする
-	//if()
-	{
-		// データをすべて削除
-		AllDelHasSheet();
-		// データをすべて削除
-		AllDelHasStamp();
-		
-		// 開始
-		SetTutorialFlg(true);
-		// ショップチュートリアルを開始
-		g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
-		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
-		// スタンプセレクト開始
-		g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
-		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
-		// メインチュートリアル開始
-		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
-		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
-	}
-}
-
-// -------------------------------------
-// ショップチュートリアル
-// -------------------------------------
-var gTUTORIAL_SHOPFLG = 
-{
-	NON:					-1,	// なし
-	NONE:					0,	// 何も
-	INIT_WAIT:				1,	// 初めのウェイト(2秒)
-	SHEET_BUY_MESSAGE:		2,	// シート買ってみよう(メッセージ)
-	SHEET_BUY_SELECT:		3,	// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
-	SHEET_BUY_SELECT_WAIT:	4,	// シート買ってみよう(購入待ち)
-	STAMP_BUY_MESSAGE:		5,	// スタンプ買ってみよう(メッセージ)
-	STAMP_BUY_SELECT:		6,	// スタンプ買ってみよう(セレクト)「プリン以外は押せない」
-	STAMP_BUY_SELECT_WAIT:	7,	// スタンプ買ってみよう(購入待ち)
-	BACK_MESSAGE:			8,	// もどる(メッセージ)
-	BACK_SELECT:			9,	// もどる(セレクト)「もどる以外は押せない」
+	NONE:		0,		// なし
+	GOHAN:		1,		// ごはん
+	SHOP:		2,		// ショップ
+	STAMP:		3,		// スタンプ
+	END:		4		// スタンプが終わったあと
 };
-
-var g_TutorialShopFlg     = gTUTORIAL_SHOPFLG.NONE;
-var g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.NON;
-
-// -------------------------------------
-// スタンプセレクト画面のチュートリアル
-// -------------------------------------
-var gTUTORIAL_SELECTFLG = 
+var g_TutorialStatus = gTUTORIAL_STATUS.NONE;
+function SetTutorialStatus(flg)
 {
-	NON:					-1,	// なし
-	NONE:					0,	// 何も
-	INIT_WAIT:				1,	// 初めのウェイト(2秒)
-	SHEET_TOUCH_MESSAGE:	2,	// シートタッチしてください(メッセージ)
-	SHEET_TOUCH_NEXT:		3,	// シートタッチで進む
-};
+	g_TutorialStatus = flg;
+}
 
-var g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.NONE;
-var g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
-
-// -------------------------------------
-// スタンプセレクト画面のチュートリアル
-// -------------------------------------
-var gTUTORIAL_MAINFLG = 
+// チュートリアルを見てないかフラグの取得
+function GetTutorialLookFlg() 
 {
-	NON:					-1,	// なし
-	NONE:					0,	// 何も
-	INIT_WAIT:				1,	// 初めのウェイト(2秒)
-	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
-	SHEET_TOUCH_WRITE:		3,	// シートにスタンプを押してね
-	STAMP_TOUCH_DEAD:		4,	// スタンプがなくなった
-	MENU_SELECT:			5,	// メニューセレクト
-	MENU_WAIT:				6,	// メニュー表示にて少し待つ
-	STAMP_CLEAR:			7,	// スタンプをクリア
-	STAMP_CLEAR_WINDOW:		8,	// クリア確認ウィンドウ
-	MENU_SELECT_END:		9,	// メニューセレクト	
-	MENU_SELECT_END_WAIT:	10,	// メニューセレクトにて少し待つ
-	BACK:					11,	// 戻る
-};
+	var data = localStorage.getItem(g_saveTutorialKey);
+	if (!data) { return false; }
+	return JSON.parse(data);
+}
 
-var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
-var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
+function SaveTutorialLookFlg(flg) 
+{
+	localStorage.setItem(g_saveTutorialKey, JSON.stringify(flg));
+	console.log("Save" + g_saveTutorialKey);
+}
 
+function DeleteTutorialLookFlg() 
+{
+	localStorage.removeItem(g_saveTutorialKey);
+}
 
 // -------------------------------------
 // スタンプのサイズ
@@ -484,16 +381,158 @@ var g_StampGraphicHandle = null;
 var g_SheetGraphicHandle = null;
 var g_StampDrawData		 = null;
 
-// ------------------------------------------------------
-// セーブキー
-// ------------------------------------------------------
-var g_saveDataKeyHaveStampData    	= "HaveStampData";			// スタンプデータ
-var g_saveDataKeyHaveSheetData    	= "HaveSheetData";			// シートデータ
-var g_saveDataKeyActiveSheetIndex 	= "ActiveSheetIndex";		// アクティブなシート番号
-var g_saveDataKeyActiveStampIndex 	= "ActiveStampIndex";		// アクティブなシート番号
-var g_saveDataKeyCoin 				= "HaveCoin";				// コインの数
-var g_saveDataKeyStampDrawDara 		= "DrawStampData";			// 描画されたシートごとのスタンプ
 
+// ----------------------------------------------------
+// チュートリアル[ショップとスタンプのみ有効]
+// ----------------------------------------------------
+var g_TutorialFlg     = false
+function SetTutorialFlg(flg)
+{
+	g_TutorialFlg = flg;
+}
+function GetTutorialFlg()
+{
+	return g_TutorialFlg;
+}
+
+// チュートリアル中なら解除する
+function CheckTutorial()
+{
+	if(GetTutorialFlg())
+	{
+		// 解除
+		SetTutorialStatus(gTUTORIAL_STATUS.END);
+		SetTutorialFlg(0);
+		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;
+		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;	
+		g_TutorialSelectFlg 	= gTUTORIAL_SELECTFLG.NONE;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;	
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.NONE;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+		
+		// 初めてならプレゼントをもらう
+		if(GetTutorialLookFlg() == false)
+		{
+			AllDeleteStampDrawData();
+			PresentTutorialStampData();
+			PresentTutorialSheetData();
+			g_TutorialOneLook = true;
+		}
+		// 違ったら今までのデータを復元
+		else
+		{
+			// コインのロード処理
+			LoadCoin();
+			// シートのロード処理
+			if(LoadHaveSheetData() == true)
+			{
+			}
+			// 失敗なので新規ロード
+			else
+			{
+				DummySheetDataSet();
+				SaveActiveSheetIndex(0);
+			}	
+			// スタンプのロード処理
+			if(LoadHaveStampData() == true)
+			{
+			}
+			// 失敗なので新規ロード
+			else
+			{
+				DummyStampDataSet();
+				SaveActiveStampIndex(0);
+			}				
+		}
+	}
+}
+function StartTutorial()
+{
+	// ストレージのフラグを見てチュートリアルかをチェックする
+	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
+	{
+		// ショップから
+		g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
+		// データをすべて削除
+		AllDelHasSheet();
+		// データをすべて削除
+		AllDelHasStamp();
+		
+		// 開始
+		SetTutorialFlg(true);
+		// ショップチュートリアルを開始
+		g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+		// スタンプセレクト開始
+		g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+		// メインチュートリアル開始
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+	}
+}
+
+// -------------------------------------
+// ショップチュートリアル
+// -------------------------------------
+var gTUTORIAL_SHOPFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	SHEET_BUY_MESSAGE:		2,	// シート買ってみよう(メッセージ)
+	SHEET_BUY_SELECT:		3,	// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
+	SHEET_BUY_SELECT_WAIT:	4,	// シート買ってみよう(購入待ち)
+	STAMP_BUY_MESSAGE:		5,	// スタンプ買ってみよう(メッセージ)
+	STAMP_BUY_SELECT:		6,	// スタンプ買ってみよう(セレクト)「プリン以外は押せない」
+	STAMP_BUY_SELECT_WAIT:	7,	// スタンプ買ってみよう(購入待ち)
+	BACK_MESSAGE:			8,	// もどる(メッセージ)
+	BACK_SELECT:			9,	// もどる(セレクト)「もどる以外は押せない」
+};
+
+var g_TutorialShopFlg     = gTUTORIAL_SHOPFLG.NONE;
+var g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.NON;
+
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_SELECTFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	SHEET_TOUCH_MESSAGE:	2,	// シートタッチしてください(メッセージ)
+	SHEET_TOUCH_NEXT:		3,	// シートタッチで進む
+};
+
+var g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.NONE;
+var g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+
+// -------------------------------------
+// スタンプセレクト画面のチュートリアル
+// -------------------------------------
+var gTUTORIAL_MAINFLG = 
+{
+	NON:					-1,	// なし
+	NONE:					0,	// 何も
+	INIT_WAIT:				1,	// 初めのウェイト(2秒)
+	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
+	SHEET_TOUCH_WRITE_MES:	3,	// スタンプをタッチして選んでね
+	SHEET_TOUCH_WRITE:		4,	// シートにスタンプを押してね
+	STAMP_TOUCH_DEAD:		5,	// スタンプがなくなった
+	STAMP_TOUCH_DEAD_2:		6,	// スタンプがなくなった
+	STAMP_TOUCH_DEAD_WAIT:	7,	// スタンプがなくなった
+	MENU_SELECT:			8,	// メニューセレクト
+	MENU_WAIT:				9,	// メニュー表示にて少し待つ
+	STAMP_CLEAR:			10,	// スタンプをクリア
+	STAMP_CLEAR_WINDOW:		11,	// クリア確認ウィンドウ
+	MENU_SELECT_END:		12,	// メニューセレクト	
+	//MENU_SELECT_END:		13,	// メニューセレクトにて少し待つ
+	BACK:					14,	// 戻る
+};
+
+var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
+var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 
 // ------------------------------------------------------
 // データの取得
@@ -1931,6 +1970,7 @@ function GEffectData()
 	this.nCrsH			= 1200;
 	this.nCrsFlg		= true;	
 	this.iAttr			= 0;
+	this.bWait			= false;
 }
 
 // データ追加
@@ -1957,6 +1997,7 @@ GEffectData.prototype.SetScaleZoomEffect = function(ctx, image, x, y, w, h, a)
 	this.nCrsH			= 1200;
 	this.nCrsFlg		= true;	
 	this.iAttr			= 0;
+	this.bWait			= false;
 };
 // データ追加
 GEffectData.prototype.SetCoinEffect = function(ctx, image, x, y, w, h, a)
@@ -1982,11 +2023,13 @@ GEffectData.prototype.SetCoinEffect = function(ctx, image, x, y, w, h, a)
 	this.nCrsH			= 0;
 	this.nCrsFlg		= false;	
 	this.iAttr			= 0;
+	this.bWait			= false;
 };
 
 // データ追加
 GEffectData.prototype.Exec = function()
 {
+	if(this.bWait) { return; }
 	if(this.nStatus == G_EFFECT_STATUS.SCALE_ZOOM)
 	{
 		if(this.nWork == G_EFFECT_WORK.A)
@@ -2221,6 +2264,13 @@ function AddCoinEffect(ctx, image, x, y, w, h, a, attr)
 	g_sEffectObject[no].iAttr = (attr * 3);
 	g_sEffectObject[no].EndCallBack	= ByeCoin;
 	return g_sEffectObject[no];
+}
+function AllWaitEffect(flg)
+{
+	for(var i = 0; i < g_sEffectObject.length; i ++)
+	{
+		g_sEffectObject[i].bWait = flg;
+	}
 }
 
 
