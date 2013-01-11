@@ -714,7 +714,10 @@ var StampMain = function()
 	var iWaitCounter   	= 0;
 	var bTutorialTouch     = false;
 	var bOldTutorialTouch  = false;
-	
+	var bTutorialStartX  = -200;
+	var bTutorialStartY  = -200;
+	var bTutorialEndX    = -200;
+	var bTutorialEndY    = -200;
 
 	// スタンプをタッチして選んでね
 	var sStampTouchSelectMessage = null;
@@ -733,6 +736,7 @@ var StampMain = function()
 	var sBackMessage = null;
 	var sMenuClear01Message1 = null;
 	var sMenuClear02Message1 = null;
+	var sModoruMessage   = null;
 	
 	// ウィンドウサイズ
     BROWSER_WIDTH   = window.innerWidth  || document.body.clientWidth  || document.documentElement.clientWidth;
@@ -798,9 +802,12 @@ var StampMain = function()
     function onTouchStart(e)
 	{
 		bTutorialTouch = true;
+		var pos = getTouchPos(e);
+	    bTutorialStartX = pos.x;
+	    bTutorialStartY = pos.y;
+		
 		if(GGetEffectNum() == 0)
 		{
-	        var pos = getTouchPos(e);
 	        sTouchStartX = pos.x;
 	        sTouchStartY = pos.y;
 	        sTouchMoveX  = pos.x;
@@ -842,11 +849,13 @@ var StampMain = function()
 */
     function onTouchMove(e) 
 	{
+		var pos = getTouchPos(e);
+	    bTutorialEndX = pos.x;
+	    bTutorialEndY = pos.y;
 		if(GGetEffectNum() == 0)
 		{
 	        if (bTouch) 
 	    	{
-	            var pos	= getTouchPos(e);
 				sTouchMoveX = pos.x;
 				sTouchMoveY = pos.y;
 				if(g_iSwitch == 0 && GetDrawOkFlg())
@@ -1037,6 +1046,9 @@ var StampMain = function()
 		sBackMessage = new Image();
 	    sBackMessage.src = "img/10_asobikata/a_txt_a018.png";		
 		g_sTutorialLoadFlg.AddLoadFile(sBackMessage);	
+		sModoruMessage = new Image();
+	    sModoruMessage.src = "img/10_asobikata/a_btn_a000.png";
+		g_sTutorialLoadFlg.AddLoadFile(sModoruMessage);
 	}	
 	g_sTutorialLoadFlg.Loading();
 /*
@@ -1064,8 +1076,8 @@ var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
 var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 
 */
-	var ArrowDocY = BROWSER_SCREEN_H - 140;
-	
+	var ArrowDocY 	= BROWSER_SCREEN_H - 140;
+	var sTuLookFlg	= GetTutorialLookFlg();
 	//
 	// フレーム処理
 	//
@@ -1223,6 +1235,37 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				{
 					if(stampBar.bOldTutorialTouch == stampBar.bTutorialTouch) { BarTri = false; }
 				}
+			
+				// ずっと主張
+				if(sTuLookFlg && g_TutorialMainFlg >= gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT)
+				{
+					// 489,11
+					var BackYesX = 489;
+					var BackYesY = 11;
+					var BackYesW = 137;
+					var BackYesH = 42;				
+					// ------------------------------------- 
+					// メッセージファイル
+					// ------------------------------------- 
+					stamp_ctx.drawImage(sModoruMessage, BackYesX, BackYesY);	
+					// 決定
+					if(CanTri && g_eStatus == G_STATUS.MAIN)
+					{		
+						if(
+							(BackYesX < bTutorialEndX)   && (BackYesX + BackYesW > bTutorialEndX)  &&
+							(BackYesY < bTutorialEndY)   && (BackYesY + BackYesH > bTutorialEndY)  &&
+							(BackYesX < bTutorialStartX) && (BackYesX + BackYesW > bTutorialStartX) &&
+							(BackYesY < bTutorialStartY) && (BackYesY + BackYesH > bTutorialStartY))
+						{	
+							g_eStatus = G_STATUS.FADEOUT;
+							nNextEvent = 0;
+						
+							// チュートリアル終了
+							EndTutorial();
+						}	
+					}
+				}				
+			
 				// ２秒待つ [---]
 				if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.INIT_WAIT)
 				{
@@ -1459,8 +1502,7 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 						// ------------------------------------- 
 						stamp_ctx.drawImage(sBackMessage, 41, 10);		
 					}					
-				}
-			
+				}			
 				// 遅延
 				if(g_TutorialNextMainFlg != gTUTORIAL_MAINFLG.NON)
 				{

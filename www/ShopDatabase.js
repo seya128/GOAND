@@ -55,6 +55,7 @@ function SetTutorialStatus(flg)
 // チュートリアルを見てないかフラグの取得
 function GetTutorialLookFlg() 
 {
+	//return true;
 	var data = localStorage.getItem(g_saveTutorialKey);
 	if (!data) { return false; }
 	return JSON.parse(data);
@@ -69,6 +70,38 @@ function SaveTutorialLookFlg(flg)
 function DeleteTutorialLookFlg() 
 {
 	localStorage.removeItem(g_saveTutorialKey);
+}
+
+function DEBUG_TUTORIAL()
+{
+	// ショップから
+	g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
+	// データをすべて削除
+	AllDelHasSheet();
+	// データをすべて削除
+	AllDelHasStamp();
+	// 現状のデータをすべて削除
+	DeleteHaveStampData();
+	// 現状のデータをすべて削除
+	DeleteHaveSheetData();
+
+	// 開始
+	SetTutorialFlg(true);
+	// ショップチュートリアルを開始
+	g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+	g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+	// スタンプセレクト開始
+	g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+	g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+	// メインチュートリアル開始
+	g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+	g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;	
+	
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// お子様ランチゲット
+	AddHasSheet(gStampEnum.GOHAN_01);
+	
 }
 
 // -------------------------------------
@@ -339,11 +372,11 @@ function PresentTutorialStampData()
 	// 現状のデータをすべて削除
 	DeleteHaveStampData();
 	// ハンバーグゲット
-//	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// プリンゲット
 	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
 	// ミニパスタゲット
-//	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// セーブ
 	SaveHaveStampData();
 	

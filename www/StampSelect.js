@@ -53,6 +53,9 @@ var StampSelect = function()
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
 	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE) - (STAMP_H * BROWSER_RATE);	// 画面領域
 	
+	var sModoruMessage   = null;
+	var sTuLookFlg		 = GetTutorialLookFlg();
+	
 	
 	//
 	// スタンプシート
@@ -670,6 +673,35 @@ var StampSelect = function()
 				}
 				g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
 			}
+			// ずっと主張
+			if(sTuLookFlg && g_TutorialFlg)
+			{
+				// 489,11
+				var BackYesX = 489;
+				var BackYesY = 11;
+				var BackYesW = 137;
+				var BackYesH = 42;				
+				// ------------------------------------- 
+				// メッセージファイル
+				// ------------------------------------- 
+				ctx.drawImage(sModoruMessage, BackYesX, BackYesY);	
+				// 決定
+				if((!isTouch) && bOldTouch && g_eStatus == G_STATUS.MAIN)
+				{		
+					if(
+						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
+						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
+						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
+						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+					{	
+						g_eStatus = G_STATUS.FADEOUT;
+						next = 1;
+					
+						// チュートリアル終了
+						EndTutorial();
+					}	
+				}
+			}	
 	    };
   
 	    //マウスイベント
@@ -735,12 +767,22 @@ var StampSelect = function()
     // スタンプのロード
     LoadStampGraphic();
 	
+	// 強制
+	//if(g_TutorialFlg == false)
+	//{
+	//	DEBUG_TUTORIAL();
+	//	AllLoadStampDrawData();
+	//}
+	
 	// チュートリアルならプラスα
 	if(g_TutorialFlg)
 	{
 		sSheetSelectMessage = new Image();
 	    sSheetSelectMessage.src = "img/10_asobikata/a_txt_a009.png";
 		g_sTutorialLoadFlg.AddLoadFile(sSheetSelectMessage);
+		sModoruMessage = new Image();
+	    sModoruMessage.src = "img/10_asobikata/a_btn_a000.png";
+		g_sTutorialLoadFlg.AddLoadFile(sModoruMessage);
 	}	
 	g_sTutorialLoadFlg.Loading();
 	
@@ -891,6 +933,7 @@ var StampSelect = function()
 						}	
 	    			}
 				}	
+
 				bOldTouch = isTouch;
 				break;
 			
