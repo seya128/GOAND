@@ -12,6 +12,7 @@ var SceenTitle = function() {
 		END:		4
 	};
 	var st = STATUS.INIT;
+	var stFrm = 0;
 	
 	var NEXT = {
 		NONEXT:		0,
@@ -29,6 +30,9 @@ var SceenTitle = function() {
 	sceen.style.opacity = alpha;
 	
 	var animSprites = [];		//アニメーション処理呼び出しスプライト
+	
+	
+	
 	
 	//BG
 	var bg = new DivSprite(640,1138);
@@ -102,7 +106,7 @@ var SceenTitle = function() {
 	var gohan = new DivSprite(286,238);
 	gohan.x=150; gohan.y=541; gohan.z=2;
 	gohan.src = "img/01_title/t_btn_a000.png";
-	gohan.animScale = [1,10, 1.1,2, 1,2, 1,10, 1,10];
+	gohan.animScale = [1,10, 1.1,2, 1,2, 1,10, 1,10, 1,10];
 	gohan.onclick = function(){
 		event.preventDefault();
 		next = NEXT.GOHAN;
@@ -114,7 +118,7 @@ var SceenTitle = function() {
 	var stamp = new DivSprite(286,238);
 	stamp.x=490; stamp.y=541; stamp.z=2;
 	stamp.src = "img/01_title/t_btn_b000.png";
-	stamp.animScale = [1,10, 1,10, 1.1,2, 1,2, 1,10];
+	stamp.animScale = [1,10, 1,10, 1.1,2, 1,2, 1,10, 1,10];
 	stamp.onclick = function(){
 		event.preventDefault();
 		next = NEXT.STAMP;
@@ -123,10 +127,10 @@ var SceenTitle = function() {
 	animSprites.push(stamp);
 	
 	//ショップ
-	var shop = new DivSprite(286,238);
-	shop.x=320; shop.y=722; shop.z=1;
+	var shop = new DivSprite(245,200);
+	shop.x=477; shop.y=761; shop.z=1;
 	shop.src = "img/01_title/t_btn_d000.png";
-	shop.animScale = [1,10, 1,10, 1,10, 1.1,2, 1,2];
+	shop.animScale = [1,10, 1,10, 1,10, 1.1,2, 1,2, 1,10];
 	shop.onclick = function(){
 		event.preventDefault();
 		next = NEXT.SHOP;
@@ -134,6 +138,17 @@ var SceenTitle = function() {
 	sceen.appendChild(shop.div);
 	animSprites.push(shop);
 	
+	//チュートリアル
+	var tutorial = new DivSprite(245,200);
+	tutorial.x=162; tutorial.y=761; tutorial.z=1;
+	tutorial.src = "img/01_title/t_btn_e000.png";
+	tutorial.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
+	tutorial.onclick = function(){
+		event.preventDefault();
+	};
+	sceen.appendChild(tutorial.div);
+	animSprites.push(tutorial);
+
 	// ウィンドウなどの画像の読み込み
 	LoadWindowYesNo();
 	
@@ -163,6 +178,45 @@ var SceenTitle = function() {
 		DummyStampDataSet();
 	}	
 	
+	//
+	// チュートリアル関連初期化
+	//
+	var TUTORIALMODE = {
+		NONE:		0,			//まだチュートリアルモードに入っていない
+		GOHAN:		1,			//ごはんモードのチュートリアル
+		SHOP:		2,			//ショップモードのチュートリアル
+		STAMP:		3,			//スタンプモードのチュートリアル
+	};
+	
+	var isTutorialEnd = false;		//true:チュートリアルを一度終えている
+	var modeTutorial = TUTORIALMODE.NONE;
+	
+	//チュートリアルステータス
+	var TUTORIALST = {
+		INIT:		0,
+		IN:			1,
+		MAIN:		2,
+	};
+	var tutorialSt = TUTORIALST.INIT;
+	
+	var tutorialAlpha = 0;
+	var tutorialWaitFrm = 0;		//チュートリアル開始までのフレームカウンタ
+	
+	//黒マスク用DIV
+	var tutorialDiv = document.createElement("div");
+	tutorialDiv.style.position = "fixed";
+	tutorialDiv.style.overflow = "hidden";
+	tutorialDiv.style.width = "640px";
+	tutorialDiv.style.height ="1138px";
+	tutorialDiv.style.zoom = 1;
+	tutorialDiv.style.backgroundColor = "#000";
+	tutorialDiv.style.zIndex = 10;
+	tutorialDiv.style.left = "0px";
+	tutorialDiv.style.top = "0px";
+	tutorialDiv.style.opacity = 0;
+	//おわるボタン
+	//矢印ボタン
+	//チュートリアルメッセージ
 	
 	//
 	// フレーム処理
@@ -196,10 +250,21 @@ var SceenTitle = function() {
 
 			//メイン処理
 			case STATUS.MAIN:
-				//次の処理がセットされれば次へ
 				if (next != NEXT.NONEXT) {
+/*					//チュートリアルモードでない場合
+					if (modeTutorial == TUTOTIALMODE.NONE) {
+						//チュートリアルが終わっていなければチュートリアルモードへ
+						if (isTutorialEnd != true) {
+							modeTutorial = TUTOTIALMODE.GOHAN;	//チュートリアルご飯モード
+						}
+					} else {
+					//チュートリアルモードの場合は、
+					if (modeTutorial != TUTOTIALMODE.NONE) {
+						//チュートリアル終わっていない
+						
+					}
+*/					//次の処理がセットされれば次へ
 					st = STATUS.FADEOUT;
-					//playSound("sound/se/ok.mp3");
 				}
 				break;
 
@@ -221,26 +286,59 @@ var SceenTitle = function() {
 				switch(next) {
 					case NEXT.GOHAN:
 						nextSceen = new SceenGohan();
-						//nextSceen = new SceenGohanItadaki();
 						break;
 					// ショップ
 					case NEXT.SHOP:
 						nextSceen = new StampShop();
-						break;		
+						break;
 					// ショップセレクト
 					case NEXT.STAMP:
 						nextSceen = new StampSelect();
-						break;					
+						break;
 				}
 				break;
 		}
 		
 		if (st != STATUS.END) {
+			//チュートリアル処理
+			if (modeTutorial != TUTORIALMODE.NONE) {
+				switch (tutorialSt) {
+					//初期化
+					case TUTORIALST.INIT:
+						tutorialSt = TUTORIALST.IN;
+						//黒マスクをDOMに追加
+						sceen.appendChild(tutorialDiv);
+						tutorialSt = TUTORIALST.IN;
+						tutorialAlpha = 0;
+						//該当ボタンのZ座標を黒マスクの手前に
+						switch (modeTutorial) {
+							case TUTORIALMODE.GOHAN:	gohan.z = 11;	break;
+							case TUTORIALMODE.SHOP:		shop.z = 11;	break;
+							case TUTORIALMODE.STAMP:	stamp.z = 11;	break;
+						}
+						break;
+					//イン
+					case TUTORIALST.IN:
+						tutorialAlpha += 0.6/10;
+						if (tutorialAlpha >= 0.6) {
+							tutorialSt = TUTORIALST.MAIN;
+						}
+						tutorialDiv.style.opacity = tutorialAlpha;
+						break;
+				}
+			} else if (isTutorialEnd == false) {
+				//まだチュートリアルをやっていないのでウェイト後チュートリアルへ
+/*				if (tutorialWaitFrm++ >= 10*3) {
+					modeTutorial = TUTORIALMODE.GOHAN;
+				}
+*/			}
+			
 			//アニメーション処理
 			animSprites.forEach(function(s){ s.animExec(); });
 		}
 		
 	};
+	
 	
 };
 
