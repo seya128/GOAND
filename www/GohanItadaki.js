@@ -72,7 +72,7 @@ var SceenGohanItadaki = function() {
 		{src:"k_sak_c.png",	msg1:"g_ita_txt_01_b.png",	msg2:"g_sup_txt_02.png",	msg3:"g_sup_txt_05.png",	msg4:"g_sup_txt_07.png"	},
 	];
 	var scale = 1;
-	var chara = new DivSprite(1512/4,490);
+	var chara = new DivSprite(1890/5,490);
 	chara.src = "img/00_common/" + charaData[gohanChara].src;
 	chara_x=463; chara_y=489;
 	chara.x=chara_x; chara.y=chara_y; chara.z=2;
