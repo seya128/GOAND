@@ -16,10 +16,6 @@ var STAMP_W_REDUCTION	= STAMP_W / REDUCTION_SIZE;
 var STAMP_H_REDUCTION	= STAMP_H / REDUCTION_SIZE;
 var STAMP_W_REDUCTION_W	= STAMP_W_REDUCTION / 2;
 var STAMP_H_REDUCTION_H	= STAMP_H_REDUCTION / 2;
-var BROWSER_HEIGHT		= 0;
-var BROWSER_WIDTH		= 0;
-var BROWSER_RATE		= 0;
-var BROWSER_SCREEN_H	= 0;
 
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
@@ -292,7 +288,13 @@ var StampSelect = function()
 	    this.draw = function() 
 		{
 	        var ofsMax    = 376;
-
+			
+			// ぜったいチュートリアル中は動かさない
+			if(g_TutorialSelectFlg != gTUTORIAL_SELECTFLG.NONE)
+			{
+				ofsX = 0;
+				addX = 0;
+			}
 	        //タッチされていない場合の位置調整
 			if(g_iSwitch == 0 && g_eStatus == G_STATUS.MAIN)
 			{
@@ -409,7 +411,7 @@ var StampSelect = function()
 			var bR = false;
 
 			// 戻るボタン
-			if(g_TutorialSelectFlg != gTUTORIAL_SELECTFLG.NONE)
+			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT || g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE)
 			{
 		      	ctx.drawImage(g_BackImageHandle, 			
 			      	0, 
@@ -457,7 +459,7 @@ var StampSelect = function()
 			}
 
 			// 戻るボタン
-			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.NONE)
+			if(!(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT || g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE))
 			{
 		      	ctx.drawImage(g_BackImageHandle, 			
 			      	0, 
@@ -503,7 +505,7 @@ var StampSelect = function()
 				// 全体を黒くする
 				//DrawBack(ctx);
 				// メッセージファイル
-				ctx.drawImage(sSheetSelectMessage, 320 - (540 / 2), 280 - (225 / 2));				
+				ctx.drawImage(sSheetSelectMessage, 103, 385);				
 				// 何かオス
 				if((!isTouch) && bOldTouch) { g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT; }
     			// 正面決定
@@ -513,7 +515,7 @@ var StampSelect = function()
 				var PosYesW = aSheet.iDrawW + 24;
 				var PosYesH = aSheet.iDrawH + 24;				
 				//DrawWaku(ctx, PosYesX, PosYesY, PosYesW, PosYesH, true);
-				DrawDocumentArrow(ctx, PosYesX + 200, PosYesY + 50);
+				DrawDocumentArrow(ctx, PosYesX + 200, BROWSER_HEIGHT - 150);
 				// 変更
 				g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT;
 			}
@@ -732,15 +734,6 @@ var StampSelect = function()
 	
     // スタンプのロード
     LoadStampGraphic();
-
-	// デバッグ
-	SetTutorialFlg(true);
-	// スタンプセレクト開始
-	g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
-	g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
-	// メインチュートリアル開始
-	g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
-	g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
 	
 	// チュートリアルならプラスα
 	if(g_TutorialFlg)
@@ -785,6 +778,17 @@ var StampSelect = function()
 	//
 	this.onframe = function() 
 	{
+/*
+		//DOMエレメントの削除
+		rootSceen.removeChild(sceen);
+		// 解放
+		g_sTutorialLoadFlg.Delete();				
+		// 選択されているシートをアクティブにする
+		SaveActiveSheetIndex(0);
+		// メインへ移動
+		nextSceen = new StampMain();
+		return;
+*/		
 		switch(g_eStatus) 
 		{
 			//初期化
