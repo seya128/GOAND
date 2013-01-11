@@ -32,6 +32,8 @@ var SceenTitle = function() {
 	var animSprites = [];		//アニメーション処理呼び出しスプライト
 	
 	
+	//デバッグ用裏コマンドカウンタ
+	var debugCount=0;
 	
 	
 	//BG
@@ -61,16 +63,19 @@ var SceenTitle = function() {
 	animSprites.push(megami);
 	megami.onclick = function(){
 		event.preventDefault();
-		window.localStorage.removeItem("CntGochi");
-		window.localStorage.removeItem("CntCoin");
-		DeleteCoin();				// コイン初期化
-		DeleteHaveStampData();		// スタンプ削除
-		DeleteHaveSheetData();		// シート削除
-		AllDeleteStampDrawData();	// スタンプしたデータを削除
-		SaveActiveSheetIndex(0);	// アクティブシートの初期化
-		DummySheetDataSet();
-		DummyStampDataSet();
-		alert("ごちそうさました回数、スタンプデータをリセットしました。");
+		if (debugCount == 9) {
+			if(window.confirm('すべてのデータをクリアします。よろしいですか？')){
+				window.localStorage.removeItem("CntGochi");
+				window.localStorage.removeItem("CntCoin");
+				DeleteCoin();				// コイン初期化
+				DeleteHaveStampData();		// スタンプ削除
+				DeleteHaveSheetData();		// シート削除
+				AllDeleteStampDrawData();	// スタンプしたデータを削除
+				SaveActiveSheetIndex(0);	// アクティブシートの初期化
+				DummySheetDataSet();
+				DummyStampDataSet();
+			}
+		}
 	};
 	
 	//キャラクター
@@ -217,6 +222,46 @@ var SceenTitle = function() {
 	//おわるボタン
 	//矢印ボタン
 	//チュートリアルメッセージ
+	
+	
+	//
+	//裏コマンド
+	//
+	//ピーマン、ナス、トマト、ピーマン、ナス、トマト、ピーマン、ナス、トマト
+	//の順にタッチ後
+	//
+	// めがみ　：　データクリア
+	// ごはん　：　チュートリアルをやったことにする
+	// すたんぷ：　チュートリアル　スタンプモード
+	// ショップ：　チュートリアル　ショップモード
+	//
+	//ぴーまん
+	chara[0].onclick = function() {
+		event.preventDefault();
+		if (debugCount==0 || debugCount==3 || debugCount==6) {
+			debugCount++;
+		} else {
+			debugCount=0;
+		}
+	};
+	//なす
+	chara[1].onclick = function() {
+		event.preventDefault();
+		if (debugCount==1 || debugCount==4 || debugCount==7) {
+			debugCount++;
+		} else {
+			debugCount=0;
+		}
+	};
+	//とまと
+	chara[2].onclick = function() {
+		event.preventDefault();
+		if (debugCount==2 || debugCount==5 || debugCount==8) {
+			debugCount++;
+		} else {
+			debugCount=0;
+		}
+	};
 	
 	//
 	// フレーム処理
