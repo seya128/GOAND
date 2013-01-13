@@ -309,9 +309,11 @@ ShopSheet.prototype.drawWindow = function()
 
 	// -------------------------------------
 	// 矢印とプロック
-	// -------------------------------------  
-	DrawDocumentArrow(this.ctx, 33 + 137 - 56, PosYesY - 63, 0);
-
+	// ------------------------------------- 
+	if(g_TutorialFlg)
+	{
+		DrawDocumentArrow(this.ctx, 33 + 137 - 56, PosYesY - 63, 0);
+	}
 	// 初期化
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
 	{
@@ -415,8 +417,10 @@ ShopSheet.prototype.drawOK= function()
 	// -------------------------------------
 	// 矢印とプロック
 	// -------------------------------------  
-	DrawDocumentArrow(this.ctx, 180 + 137 - 56, PosYesY - 63, 0);
-	
+	if(g_TutorialFlg)
+	{
+		DrawDocumentArrow(this.ctx, 180 + 137 - 56, PosYesY - 63, 0);
+	}
 
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
 	{
@@ -687,7 +691,8 @@ var StampShop = function()
 	var sSheetBuyMessage = null;
 	var sStampBuyMessage = null;
 	var sBackMessage     = null;
-
+	var sModoruMessage   = null;
+	var sTuLookFlg		 = GetTutorialLookFlg();
 	//
 	// メインキャンバス
 	//
@@ -1255,6 +1260,37 @@ var StampShop = function()
 				}	
 			}
 			
+			// ずっと主張
+			if(sTuLookFlg && g_TutorialFlg)
+			{
+				// 489,11
+				var BackYesX = 489;
+				var BackYesY = 11;
+				var BackYesW = 137;
+				var BackYesH = 42;				
+				// ------------------------------------- 
+				// メッセージファイル
+				// ------------------------------------- 
+				ctx.drawImage(sModoruMessage, BackYesX, BackYesY);	
+				// 決定
+				if(bTri && g_eStatus == G_STATUS.MAIN)
+				{		
+					if(
+						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
+						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
+						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
+						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+					{	
+						goTitle();
+						g_iButtonMoveClickIndex 	= -1;
+						g_iButtonStartClickIndex 	= -1;
+						g_iClickDataIndex			= -1;
+						
+						// チュートリアル終了
+						EndTutorial();
+					}	
+				}
+			}	
 			// 遅延
 			if(g_TutorialNextShopFlg != gTUTORIAL_SHOPFLG.NON)
 			{
@@ -1375,14 +1411,17 @@ var StampShop = function()
 	if(g_TutorialFlg)
 	{
 		sSheetBuyMessage = new Image();
-	    sSheetBuyMessage.src = "img/07_shop/test/a_txt_a005.png";
+	    sSheetBuyMessage.src = "img/10_asobikata/a_txt_a005.png";
 		g_sTutorialLoadFlg.AddLoadFile(sSheetBuyMessage);
 		sStampBuyMessage = new Image();
-	    sStampBuyMessage.src = "img/07_shop/test/a_txt_a006.png";
+	    sStampBuyMessage.src = "img/10_asobikata/a_txt_a006.png";
 		g_sTutorialLoadFlg.AddLoadFile(sStampBuyMessage);
 		sBackMessage = new Image();
-	    sBackMessage.src = "img/07_shop/test/a_txt_a007.png";
+	    sBackMessage.src = "img/10_asobikata/a_txt_a007.png";
 		g_sTutorialLoadFlg.AddLoadFile(sBackMessage);
+		sModoruMessage = new Image();
+	    sModoruMessage.src = "img/10_asobikata/a_btn_a000.png";
+		g_sTutorialLoadFlg.AddLoadFile(sModoruMessage);
 	}	
 	g_sTutorialLoadFlg.Loading();
 	
