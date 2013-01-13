@@ -172,6 +172,79 @@ var SceenGohanItadaki = function() {
 	var fukiOutAnimScaleData = [0,3, 0,-1];
 	var wordsOutAnimAlphaData = [0,2, 0,-1];
 	
+	// キャラ応援アニメーション
+	//総合
+	var charaOuenAnim    = [
+			//ばんざい
+			0,10, 1,10, 0,10, 1,10, 0,10, 1,10, 
+			//ジャンプ
+			0,10, 1,5,
+			0,10, 1,5,
+			0,5,
+			//スピン
+			0,1,     4,1,      4,1,      4,1,      0,1,      0,1,       0,3,    
+			0,1,     4,1,      4,1,      4,1,      0,1,      0,1,       0,3,    
+			1,5,		
+			//宙返り
+			0,3,     0,1,     4,1,      4,1,      4,1,      0,1,	 0,1,   0,1,
+			0,3,     0,1,     4,1,      4,1,      4,1,      0,1,	 0,1,   0,1,
+			1,5,
+			//スピン&ジャンプ
+			0,1,     4,1,      4,1,      4,1,      0,1,      0,1,       0,3,    
+			0,10, 1,5,
+			1,5,
+			];
+	var charaOuenScaleXY = [
+			//ばんざい
+			1,1,10*2*3,
+			//ジャンプ
+			1,1,10, 1,1,5,
+			1,1,10, 1,1,5,
+			1,1,5,
+			//スピン
+			+0.7,1,1, -0.7,1,1, -1.0,1,1, -0.7,1,1, +0.7,1,1, +1.0,1,1, +1.0,1,3,
+			+0.7,1,1, -0.7,1,1, -1.0,1,1, -0.7,1,1, +0.7,1,1, +1.0,1,1, +1.0,1,3,
+			1,1,5,			
+			//宙返り
+			1,1,3,   1,0.7,1, 1,-0.7,1, 1,-1.0,1, 1,-0.7,1, 1,0.7,1, 1,1,1, 1,1,1,
+			1,1,3,   1,0.7,1, 1,-0.7,1, 1,-1.0,1, 1,-0.7,1, 1,0.7,1, 1,1,1, 1,1,1,
+			1,1,5,
+			//スピン&ジャンプ
+			+0.7,1,1, -0.7,1,1, -1.0,1,1, -0.7,1,1, +0.7,1,1, +1.0,1,1, +1.0,1,3,
+			1,1,10, 1,1,5,
+			1,1,5,
+			];
+	var charaOuenPos = [
+			//ばんざい
+			0,0,10*2*3,
+			//ジャンプ
+			0,-60,3, 0,-70,2, 0,-60,2, 0,-0,3, 0,0,5,
+			0,-60,3, 0,-70,2, 0,-60,2, 0,-0,3, 0,0,5,
+			0,0,5,
+			//スピン
+			0,0,6, 0,0,3,
+			0,0,6, 0,0,3,
+			0,0,5,
+			//宙返り
+			0,-60,3, 0,-70,2, 0,-60,2, 0,-0,3,
+			0,-60,3, 0,-70,2, 0,-60,2, 0,-0,3,
+			0,0,5,
+			//スピン&ジャンプ
+			0,0,6, 0,0,3,
+			0,-60,3, 0,-70,2, 0,-60,2, 0,-0,3, 0,0,5,
+			0,0,5,
+	];
+	
+	function getCharaOuenPos(x,y, animTbl) {
+		var d=new Array();
+		for (var i=0; i<animTbl.length; i+=3) {
+			d[i+0] = animTbl[i+0] + x;
+			d[i+1] = animTbl[i+1] + y;
+			d[i+2] = animTbl[i+2];
+		}
+		return d;	
+	}
+	
 	//
 	// フレーム処理
 	//
@@ -194,7 +267,7 @@ var SceenGohanItadaki = function() {
 					alpha = 1.0;
 					st = STATUS.JYUNBI;
 					//st = STATUS.ITADAKI;
-					//st = STATUS.OUEN_IN;
+					st = STATUS.OUEN_IN;
 					//st = STATUS.OUEN_IN2;
 					stFrm = 0;
 				}
@@ -406,6 +479,9 @@ var SceenGohanItadaki = function() {
 					words10.alpha = 0;
 					words10.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words10.div);
+					chara.anim = charaOuenAnim;
+					chara.animScaleXY = charaOuenScaleXY;
+					chara.animPos = getCharaOuenPos(chara.x, chara.y, charaOuenPos);
 				} else if (stFrm == 7*10) {
 					fuki1.animScale = fukiOutAnimScaleData;
 					words10.animAlpha = wordsOutAnimAlphaData;
@@ -444,9 +520,10 @@ var SceenGohanItadaki = function() {
 			case STATUS.OUEN_IN2:
 				if (stFrm == 0) {
 					selected = SELECTED.NO_SELECT;
-					chara.anim = null;
+					chara.anim = [0,10];
 					chara.animScale = [1,5];
 					chara.animPos = [chara_x,chara_y,5];
+					chara.animScaleXY = null;
 					megami.x=-10; megami.y=-10; megami.z=1;
 					megami.scale = 0.7;
 					megami.alpha = 0;
@@ -465,6 +542,9 @@ var SceenGohanItadaki = function() {
 					words13.alpha = 0;
 					words13.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words13.div);
+					chara.anim = charaOuenAnim;
+					chara.animScaleXY = charaOuenScaleXY;
+					chara.animPos = getCharaOuenPos(chara.x, chara.y, charaOuenPos);
 				} else if (stFrm == 5*10) {
 					//はい
 					buttonYes.x=168; buttonYes.y=712; buttonYes.z=5;
@@ -538,6 +618,9 @@ var SceenGohanItadaki = function() {
 					words11.animAlpha = [0,5];
 					words12.animAlpha = [0,5];
 					words13.animAlpha = [0,5];
+					chara.anim = [0,10, 1,10];
+					chara.animPos = [chara_x,chara_y,5];
+					chara.animScaleXY = null;
 					if (selected == SELECTED.YES) {
 						buttonYes.animScale = [2.5,7];
 						buttonYes.animAlpha = [1,3, 0,4, 0,-1];

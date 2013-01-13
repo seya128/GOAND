@@ -82,11 +82,16 @@ var DivSprite = function(w,h) {
 	this._animScale = null;
 	this._animPos = null;
 	this._animAlpha = null;
+	this._animScaleXY = null;		//scaleXY別々指定（重いので注意。等倍は大丈夫）
+	this._scalex = 1;
+	this._scaley = 1;
 	this.div.style.position = "fixed";
 	this.div.style.overflow = "hidden";
 	this.div.style.width = w + "px";
 	this.div.style.height = h + "px";
 	this.div.style.zoom = 1;
+	this.div.style.webkitTransform = "scale(1.0, 1.0)";
+	this.div.style.webkitTransformOrigin = "50% 50%";
 //	this.img.style.position = "absolute";
 //	this.img.style.top = "0px";
 //	this.img.style.left = "0px";
@@ -209,6 +214,18 @@ DivSprite.prototype = {
 		if (a!=null)
 			this._animPosFrm = a[2];
 	},
+	//animScaleXY ScaleXYアニメーションセット
+	set animScaleXY(a) {
+		this._animScaleXY = a;
+		this._animScaleXyIx = 0;
+		if (a!=null) {
+			this._animScaleXyFrm = a[2];
+		} else {
+			this._scalex = 1;
+			this._scaley = 1;
+			this.div.style.webkitTransform = "scale(1,1)";
+		}
+	},
 	
 	//animExec() アニメーション処理（フレームごとに呼び出してやる必要あり）
 	animExec : function() {
@@ -228,7 +245,7 @@ DivSprite.prototype = {
 			}
 		}
 		if (this._animScale) {
-			if (this._animScaleFrm <= 0) {
+			if (this._animScaleFrm <= 1) {
 				this.scale = this._animScale[this._animScaleIx+0];
 				if (this._animScale[this._animScaleIx+1] > 0) {
 					this._animScaleIx += 2;
@@ -246,7 +263,7 @@ DivSprite.prototype = {
 			}
 		}
 		if (this._animAlpha) {
-			if (this._animAlphaFrm <= 0) {
+			if (this._animAlphaFrm <= 1) {
 				this.alpha = this._animAlpha[this._animAlphaIx+0];
 				if (this._animAlpha[this._animAlphaIx+1] > 0) {
 					this._animAlphaIx += 2;
@@ -264,7 +281,7 @@ DivSprite.prototype = {
 			}
 		}
 		if (this._animPos) {
-			if (this._animPosFrm <= 0) {
+			if (this._animPosFrm <= 1) {
 				this.x = this._animPos[this._animPosIx+0];
 				this.y = this._animPos[this._animPosIx+1];
 				if (this._animPos[this._animPosIx+2] > 0) {
@@ -281,6 +298,26 @@ DivSprite.prototype = {
 				this.y = this._y + (this._animPos[this._animPosIx+1]-this._y) / this._animPosFrm;
 				this._animPosFrm --;
 			}
+		}
+		if (this._animScaleXY) {
+			if (this._animScaleXyFrm <= 1) {
+				this._scalex = this._animScaleXY[this._animScaleXyIx+0];
+				this._scaley = this._animScaleXY[this._animScaleXyIx+1];
+				if (this._animScaleXY[this._animScaleXyIx+2] > 0) {
+					this._animScaleXyIx += 3;
+					if (this._animScaleXyIx >= this._animScaleXY.length) {
+						this._animScaleXyIx = 0;
+					}
+					this._animScaleXyFrm = this._animScaleXY[this._animScaleXyIx+2];
+				} else {
+					this._animScaleXY = null;
+				}
+			} else {
+				this._scalex += (this._animScaleXY[this._animScaleXyIx+0]-this._scalex) / this._animScaleXyFrm;
+				this._scaley += (this._animScaleXY[this._animScaleXyIx+1]-this._scaley) / this._animScaleXyFrm;
+				this._animScaleXyFrm --;
+			}
+			this.div.style.webkitTransform = "scale("+this._scalex+","+this._scaley+")";
 		}
 		
 	},
