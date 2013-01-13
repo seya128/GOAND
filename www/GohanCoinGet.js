@@ -46,6 +46,15 @@ var SceenGohanCoinGet = function() {
 				//各データが読み込まれるまで待つ
 				if (LoadingCounter <= 0) {
 					st = STATUS.FADEIN;
+					
+					//チュートリアル中は実際のコインは増えない
+					if (g_TutorialStatus==gTUTORIAL_STATUS.GOHAN) {
+						//次のチュートリアルモードへ
+						g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
+					} else {
+						//コイン追加
+						AddCoin(1);
+					}
 				}
 				break;
 

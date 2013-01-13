@@ -19,6 +19,7 @@ var SceenTitle = function() {
 		GOHAN:		1,
 		STAMP:		2,
 		SHOP:		3,
+		TITLE:		4,
 	};
 	var next = NEXT.NONEXT;
 	
@@ -75,8 +76,12 @@ var SceenTitle = function() {
 				DummySheetDataSet();
 				DummyStampDataSet();
 				DeleteTutorialLookFlg();	// チュートリアルを見てないことにする
+				tutorial.isEnd = false;
+				g_TutorialStatus = gTUTORIAL_STATUS.NONE;
+				next = NEXT.TITLE;			// 再度タイトルシーン
 			}
 		}
+		debugCount = 0;
 	};
 	
 	//キャラクター
@@ -145,16 +150,17 @@ var SceenTitle = function() {
 	animSprites.push(shop);
 	
 	//チュートリアル
-	var tutorial = new DivSprite(245,200);
-	tutorial.x=162; tutorial.y=761; tutorial.z=1;
-	tutorial.src = "img/01_title/t_btn_e000.png";
-	tutorial.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
-	tutorial.onclick = function(){
+	var tutorialBtn = new DivSprite(245,200);
+	tutorialBtn.x=162; tutorialBtn.y=761; tutorialBtn.z=1;
+	tutorialBtn.src = "img/01_title/t_btn_e000.png";
+	tutorialBtn.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
+	tutorialBtn.onclick = function(){
 		event.preventDefault();
 		g_TutorialStatus=gTUTORIAL_STATUS.GOHAN;
+		next = NEXT.TITLE;			// 再度タイトルシーン
 	};
-	sceen.appendChild(tutorial.div);
-	animSprites.push(tutorial);
+	sceen.appendChild(tutorialBtn.div);
+	animSprites.push(tutorialBtn);
 
 	// ウィンドウなどの画像の読み込み
 	LoadWindowYesNo();
@@ -186,36 +192,84 @@ var SceenTitle = function() {
 	}	
 	
 	//
-	// チュートリアル関連初期化
+	// チュートリアル関連処理
 	//
-	var isTutorialEnd = GetTutorialLookFlg();		//true:チュートリアルを一度終えている
-	
-	//チュートリアルステータス
-	var TUTORIALST = {
+	var	TUTORIAL_ST = {		//チュートリアルステータス
 		INIT:		0,
 		IN:			1,
 		MAIN:		2,
 	};
-	var tutorialSt = TUTORIALST.INIT;
+	var Tutorial = function() {
+		this.st = TUTORIAL_ST.INIT;
+		this.isEnd = GetTutorialLookFlg();		//true:チュートリアルを一度終えている
+		this.isStart = false;					//true:チュートリアル開始
+		this.alpha = 0;							//チュートリアルα
+		this.type = 0;							//チュートリアルタイプ
+		this.datatbl = [						//タイプ別データテーブル
+			{btn:tutorialBtn,	img:"a_txt_a001",	x:0,   y:380, ax:110, ay:550},		//チュートリアル
+			{btn:gohan,			img:"a_txt_a002",	x:10,  y:120, ax:103, ay:310},		//ごはん
+			{btn:shop,			img:"a_txt_a004_02",x:240, y:380, ax:425, ay:540},		//ショップ
+			{btn:stamp,			img:"a_txt_a008",	x:220, y:120, ax:425, ay:310},		//スタンプ
+		];
+		
+		//黒マスク用DIV
+		this.maskDiv = document.createElement("div");
+		this.maskDiv.style.position = "fixed";
+		this.maskDiv.style.overflow = "hidden";
+		this.maskDiv.style.width = "640px";
+		this.maskDiv.style.height ="1138px";
+		this.maskDiv.style.zoom = 1;
+		this.maskDiv.style.backgroundColor = "#000";
+		this.maskDiv.style.zIndex = 10;
+		this.maskDiv.style.left = "0px";
+		this.maskDiv.style.top = "0px";
+		this.maskDiv.style.opacity = 0;
+		//おわるボタン
+		this.endBtn = new DivSprite(137,42);
+		this.endBtn.src = "img/10_asobikata/a_btn_a000.png";
+		//チュートリアルメッセージ
+		this.msg = {};
+		for (var i=0; i<this.datatbl.length; i++) {
+			this.msg[i] = new DivSprite(432,180);
+			this.msg[i].src = "img/10_asobikata/" + this.datatbl[i].img + ".png";
+			this.msg[i].basePos={x:0, y:0};
+			this.msg[i].x = this.datatbl[i].x;
+			this.msg[i].y = this.datatbl[i].y;
+			this.msg[i].z = 13;
+		}
+		//チュートリアル矢印ボタン
+		this.arrow = new DivSprite(113,125);
+		this.arrow.src = "img/10_asobikata/a_obj_a000.png";
+	};
+	//チュートリアル用矢印をDOMに追加
+	Tutorial.prototype.addDomArrow = function() {		
+		var x=this.datatbl[this.type].ax;
+		var y=this.datatbl[this.type].ay;
+		this.arrow.basePos={x:0, y:0};
+		this.arrow.x = x;
+		this.arrow.y = y;
+		this.arrow.z = 13;
+		this.arrow.animPos = [x,y+0,1, x,y+1,1, x,y+2,1, x,y+3,1, x,y+4,1, x,y+3,1, x,y+2,1, x,y+1,1];
+		sceen.appendChild(this.arrow.div);
+		animSprites.push(this.arrow);
+	};
+	//チュートリアル用「おわる」ボタンをDOMに追加
+	Tutorial.prototype.addDomEnd = function() {
+		//すでに一度見終わっている場合のみ表示
+		if (this.isEnd) {
+			this.endBtn.basePos={x:0, y:0};
+			this.endBtn.x = 489;
+			this.endBtn.y = 11;
+			this.endBtn.z = 12;
+			sceen.appendChild(this.endBtn.div);
+			this.endBtn.onclick = function() {
+				g_TutorialStatus = gTUTORIAL_STATUS.NONE;
+				next = NEXT.TITLE;			// 再度タイトルシーン
+			};
+		}
+	};
 	
-	var tutorialAlpha = 0;
-	var tutorialWaitFrm = 0;		//チュートリアル開始までのフレームカウンタ
-	
-	//黒マスク用DIV
-	var tutorialDiv = document.createElement("div");
-	tutorialDiv.style.position = "fixed";
-	tutorialDiv.style.overflow = "hidden";
-	tutorialDiv.style.width = "640px";
-	tutorialDiv.style.height ="1138px";
-	tutorialDiv.style.zoom = 1;
-	tutorialDiv.style.backgroundColor = "#000";
-	tutorialDiv.style.zIndex = 10;
-	tutorialDiv.style.left = "0px";
-	tutorialDiv.style.top = "0px";
-	tutorialDiv.style.opacity = 0;
-	//おわるボタン
-	//矢印ボタン
-	//チュートリアルメッセージ
+	var tutorial = new Tutorial();
 	
 	
 	//
@@ -293,7 +347,7 @@ var SceenTitle = function() {
 					//デバッグコマンドチェック
 					if (debugCount == 9) {
 						switch (next) {
-							case NEXT.GOHAN:	g_TutorialStatus=gTUTORIAL_STATUS.END; isTutorialEnd=true; break;
+							case NEXT.GOHAN:	g_TutorialStatus=gTUTORIAL_STATUS.END; tutorial.isEnd=true; break;
 							case NEXT.STAMP:	g_TutorialStatus=gTUTORIAL_STATUS.STAMP; break;
 							case NEXT.SHOP:		g_TutorialStatus=gTUTORIAL_STATUS.SHOP; break;
 						}
@@ -302,20 +356,27 @@ var SceenTitle = function() {
 						break;
 					}
 					
-/*					//チュートリアルモードでない場合
-					if (modeTutorial == TUTOTIALMODE.NONE) {
-						//チュートリアルが終わっていなければチュートリアルモードへ
-						if (isTutorialEnd != true) {
-							modeTutorial = TUTOTIALMODE.GOHAN;	//チュートリアルご飯モード
-						}
-					} else {
-					//チュートリアルモードの場合は、
-					if (modeTutorial != TUTOTIALMODE.NONE) {
-						//チュートリアル終わっていない
-						
+					//再度タイトルシーンにいく場合は、特に何もせず次へ
+					if (next == NEXT.TITLE) {
+						st = STATUS.FADEOUT;
+						break;
 					}
-*/					//次の処理がセットされれば次へ
+
+					//まだチュートリアルしたことなければ、チュートリアル開始
+					if (!tutorial.isEnd && !tutorial.isStart) {
+						tutorial.isStart = true;
+						g_TutorialStatus = gTUTORIAL_STATUS.NONE;
+						next = NEXT.NONEXT;
+						break;
+					}
+					
+					//次の処理がセットされれば次へ
 					st = STATUS.FADEOUT;
+				}
+
+				//チュートリアルモードの場合、チュートリアル開始
+				if (g_TutorialStatus!=gTUTORIAL_STATUS.NONE && g_TutorialStatus!=gTUTORIAL_STATUS.END) {
+					tutorial.isStart = true;
 				}
 				break;
 
@@ -332,7 +393,7 @@ var SceenTitle = function() {
 			//終了
 			case STATUS.END:
 				//チュートリアル見たフラグ保存
-				SaveTutorialLookFlg(isTutorialEnd);
+				SaveTutorialLookFlg(tutorial.isEnd);
 				
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
@@ -349,43 +410,51 @@ var SceenTitle = function() {
 					case NEXT.STAMP:
 						nextSceen = new StampSelect();
 						break;
+					// タイトル
+					case NEXT.TITLE:
+						nextSceen = new SceenTitle();
+						break;
 				}
 				break;
 		}
 		
 		if (st != STATUS.END) {
 			//チュートリアル処理
-			if (g_TutorialStatus!=gTUTORIAL_STATUS.NONE && g_TutorialStatus!=gTUTORIAL_STATUS.END) {
-				switch (tutorialSt) {
+			if (tutorial.isStart) {
+				switch (tutorial.st) {
 					//初期化
-					case TUTORIALST.INIT:
-						tutorialSt = TUTORIALST.IN;
-						//黒マスクをDOMに追加
-						sceen.appendChild(tutorialDiv);
-						tutorialSt = TUTORIALST.IN;
-						tutorialAlpha = 0;
-						//該当ボタンのZ座標を黒マスクの手前に
+					case TUTORIAL_ST.INIT:
+						tutorial.st = TUTORIAL_ST.IN;
+						//チュートリアルデータインデックス
 						switch (g_TutorialStatus) {
-							case gTUTORIAL_STATUS.GOHAN:	gohan.z = 11;	break;
-							case gTUTORIAL_STATUS.SHOP:		shop.z = 11;	break;
-							case gTUTORIAL_STATUS.STAMP:	stamp.z = 11;	break;
+							case gTUTORIAL_STATUS.NONE:		tutorial.type = 0;	break;
+							case gTUTORIAL_STATUS.GOHAN:	tutorial.type = 1;	break;
+							case gTUTORIAL_STATUS.SHOP:		tutorial.type = 2;	break;
+							case gTUTORIAL_STATUS.STAMP:	tutorial.type = 3;	break;
 						}
+						//黒マスクをDOMに追加
+						sceen.appendChild(tutorial.maskDiv);
+						tutorial.alpha = 0;
+						//該当ボタンのZ座標を黒マスクの手前に
+						tutorial.datatbl[tutorial.type].btn.z = 11;
+						//メッセージをDOMに追加
+						sceen.appendChild(tutorial.msg[tutorial.type].div);
+						//矢印をDOMに追加
+						tutorial.addDomArrow();
+						//終わるをDOMに追加
+						tutorial.addDomEnd();
+						
 						break;
 					//イン
-					case TUTORIALST.IN:
-						tutorialAlpha += 0.6/10;
-						if (tutorialAlpha >= 0.6) {
-							tutorialSt = TUTORIALST.MAIN;
+					case TUTORIAL_ST.IN:
+						tutorial.alpha += 0.6/10;
+						if (tutorial.alpha >= 0.6) {
+							tutorial.st = TUTORIAL_ST.MAIN;
 						}
-						tutorialDiv.style.opacity = tutorialAlpha;
+						tutorial.maskDiv.style.opacity = tutorial.alpha;
 						break;
 				}
-			} else if (isTutorialEnd == false) {
-				//まだチュートリアルをやっていないのでウェイト後チュートリアルへ
-/*				if (tutorialWaitFrm++ >= 10*3) {
-					modeTutorial = TUTORIALMODE.GOHAN;
-				}
-*/			}
+			}
 			
 			//アニメーション処理
 			if (debugCount != 9) {

@@ -116,6 +116,133 @@ var SceenGohan = function() {
 	var fukiOutAnimScaleData = [0,3, 0,-1];
 	var wordsOutAnimAlphaData = [0,2, 0,-1];
 
+
+	//
+	// チュートリアル関連処理
+	//
+	var	TUTORIAL_ST = {		//チュートリアルステータス
+		INIT:		0,
+		IN:			1,
+		MAIN:		2,
+		OUT:		3,
+	};
+	var Tutorial = function() {
+		this.st = TUTORIAL_ST.INIT;
+		this.cancel = false;					//true:チュートリアル終わる
+		this.isEnd = GetTutorialLookFlg();		//true:チュートリアルを一度終えている
+		this.isStart = false;					//true:チュートリアル開始
+		this.alpha = 0;							//チュートリアルα
+		this.type = 0;							//チュートリアルタイプ
+		
+		//黒マスク用DIV
+		this.maskDiv = document.createElement("div");
+		this.maskDiv.style.position = "fixed";
+		this.maskDiv.style.overflow = "hidden";
+		this.maskDiv.style.width = "640px";
+		this.maskDiv.style.height ="1138px";
+		this.maskDiv.style.zoom = 1;
+		this.maskDiv.style.backgroundColor = "#000";
+		this.maskDiv.style.zIndex = 10;
+		this.maskDiv.style.left = "0px";
+		this.maskDiv.style.top = "0px";
+		this.maskDiv.style.opacity = 0;
+		//おわるボタン
+		this.endBtn = new DivSprite(137,42);
+		this.endBtn.src = "img/10_asobikata/a_btn_a000.png";
+		//チュートリアルメッセージ
+		this.msg = new DivSprite(432,180);
+		this.msg.src = "img/10_asobikata/a_txt_a003.png";
+		this.msg.basePos={x:0, y:0};
+		this.msg.x = 150;
+		this.msg.y = 128;
+		this.msg.z = 20;
+		//チュートリアル矢印ボタン
+		this.arrow = new DivSprite(113,125);
+		this.arrow.src = "img/10_asobikata/a_obj_a000.png";
+	};
+	//チュートリアル用矢印をDOMに追加
+	Tutorial.prototype.addDomArrow = function() {		
+		var x=38;
+		var y=85;
+		this.arrow.basePos={x:0, y:0};
+		this.arrow.x = x;
+		this.arrow.y = y;
+		this.arrow.z = 20;
+		this.arrow.animPos = [x,y+0,1, x,y+1,1, x,y+2,1, x,y+3,1, x,y+4,1, x,y+3,1, x,y+2,1, x,y+1,1];
+		sceen.appendChild(this.arrow.div);
+		animSprites.push(this.arrow);
+	};
+	Tutorial.prototype.delDomArrow = function() {		
+		sceen.removeChild(this.arrow.div);
+	}
+	
+	//チュートリアル用「おわる」ボタンをDOMに追加
+	Tutorial.prototype.addDomEnd = function() {
+		//すでに一度見終わっている場合のみ表示
+		if (this.isEnd) {
+			this.endBtn.basePos={x:0, y:0};
+			this.endBtn.x = 489;
+			this.endBtn.y = 11;
+			this.endBtn.z = 20;
+			sceen.appendChild(this.endBtn.div);
+			var _this = this;
+			this.endBtn.onclick = function() {
+				g_TutorialStatus = gTUTORIAL_STATUS.NONE;
+				_this.cancel = true;
+			};
+		}
+	};
+	Tutorial.prototype.delDomEnd = function() {
+		if (this.isEnd) {
+			sceen.removeChild(this.endBtn.div);
+		}
+	};
+	
+	
+	//チュートリアルフレーム処理
+	Tutorial.prototype.execFrame = function() {
+		if (this.isStart) {
+			switch (this.st) {
+				//初期化
+				case TUTORIAL_ST.INIT:
+					this.st = TUTORIAL_ST.IN;
+					//黒マスクをDOMに追加
+					sceen.appendChild(this.maskDiv);
+					this.alpha = 0;
+					//該当ボタンのZ座標を黒マスクの手前に
+					chara[0].z += 10;
+					//メッセージをDOMに追加
+					sceen.appendChild(this.msg.div);
+					//矢印をDOMに追加
+					this.addDomArrow();
+					//終わるをDOMに追加
+					this.addDomEnd();
+					
+					break;
+				//イン
+				case TUTORIAL_ST.IN:
+					this.alpha += 0.6/10;
+					if (this.alpha >= 0.6) {
+						this.st = TUTORIAL_ST.MAIN;
+					}
+					this.maskDiv.style.opacity = this.alpha;
+					break;
+			}
+		} else {
+			if (this.st != TUTORIAL_ST.INIT) {
+				this.st = TUTORIAL_ST.INIT;
+				//チュートリアル削除
+				chara[0].z -= 10;
+				sceen.removeChild(this.maskDiv);
+				sceen.removeChild(this.msg.div);
+				this.delDomArrow();
+				this.delDomEnd();
+			}
+		}
+	};
+	
+	var tutorial = new Tutorial();
+
 	
 	
 	//
@@ -162,6 +289,9 @@ var SceenGohan = function() {
 					words.alpha = 0;
 					words.animAlpha = wordsInAnimAlphaData;
 					sceen.appendChild(words.div);
+					//チュートリアルモードであれば開始
+					if (g_TutorialStatus == gTUTORIAL_STATUS.GOHAN)
+						tutorial.isStart = true;
 				}
 				stFrm ++;
 				
@@ -170,6 +300,14 @@ var SceenGohan = function() {
 					//選択したキャラクターをグローバル変数にセット
 					gohanChara = selected;
 					st = STATUS.SELECTED_INIT;
+					stFrm = 0;
+					//チュートリアルの後処理
+					tutorial.isStart = false;
+				}
+				
+				//チュートリアル終わりボタン押されたら終了
+				if (tutorial.cancel) {
+					st = STATUS.FADEOUT;
 					stFrm = 0;
 				}
 				break;
@@ -298,11 +436,15 @@ var SceenGohan = function() {
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
-				nextSceen = new SceenGohanItadaki();
+				if (tutorial.cancel)	nextSceen = new SceenTitle();
+				else					nextSceen = new SceenGohanItadaki();
 				break;
 		}
 		
 		if (st != STATUS.END) {
+			//チュートリアル処理
+			tutorial.execFrame();
+			
 			//アニメーション処理
 			animSprites.forEach(function(s){ s.animExec(); });
 		}
