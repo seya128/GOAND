@@ -55,6 +55,7 @@ function SetTutorialStatus(flg)
 // チュートリアルを見てないかフラグの取得
 function GetTutorialLookFlg() 
 {
+	//return true;
 	var data = localStorage.getItem(g_saveTutorialKey);
 	if (!data) { return false; }
 	return JSON.parse(data);
@@ -69,6 +70,38 @@ function SaveTutorialLookFlg(flg)
 function DeleteTutorialLookFlg() 
 {
 	localStorage.removeItem(g_saveTutorialKey);
+}
+
+function DEBUG_TUTORIAL()
+{
+	// ショップから
+	g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
+	// データをすべて削除
+	AllDelHasSheet();
+	// データをすべて削除
+	AllDelHasStamp();
+	// 現状のデータをすべて削除
+	DeleteHaveStampData();
+	// 現状のデータをすべて削除
+	DeleteHaveSheetData();
+
+	// 開始
+	SetTutorialFlg(true);
+	// ショップチュートリアルを開始
+	g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+	g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+	// スタンプセレクト開始
+	g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+	g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+	// メインチュートリアル開始
+	g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+	g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;	
+	
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// お子様ランチゲット
+	AddHasSheet(gStampEnum.GOHAN_01);
+	
 }
 
 // -------------------------------------
@@ -339,11 +372,11 @@ function PresentTutorialStampData()
 	// 現状のデータをすべて削除
 	DeleteHaveStampData();
 	// ハンバーグゲット
-//	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// プリンゲット
 	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
 	// ミニパスタゲット
-//	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
 	// セーブ
 	SaveHaveStampData();
 	
@@ -394,7 +427,11 @@ function GetTutorialFlg()
 {
 	return g_TutorialFlg;
 }
-
+// チュートリアル終了
+function EndTutorial()
+{
+	CheckTutorial();
+}
 // チュートリアル中なら解除する
 function CheckTutorial()
 {
@@ -1509,8 +1546,8 @@ function LoadWindowYesNo()
 	// ロード
 	g_sGraphicLoadFlg.AddLoadFileEx(g_WindowImageHandle, 			 	"img/00_common/g_g01_huk_e000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_YesNoMessageImageHandle, 		 	"img/00_common/g_hand_01.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 	"img/07_shop/k_btn_a.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 	"img/07_shop/k_btn_b.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_YesImageHandle, 				 	"img/00_common/k_btn_a.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_NoImageHandle, 				 	"img/00_common/k_btn_b.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainWindowImageHandle, 	 	"img/08_stamp/s_wak_a000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainKesuImageHandle,	 	 	"img/08_stamp/s_btn_a000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_StampMainEndImageHandle, 		 	"img/08_stamp/s_btn_b000.png");
@@ -1519,8 +1556,8 @@ function LoadWindowYesNo()
 	g_sGraphicLoadFlg.AddLoadFileEx(g_SheetDeleteMessageImageHandle, 	"img/08_stamp/s_txt_d000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_BackImageHandle, 					"img/07_shop/003.png");
 	// LR
-	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowHandle, 				"img/07_shop/test/a_obj_a000.png");
-	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowDHandle, 			"img/07_shop/test/a_obj_b000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowHandle, 				"img/10_asobikata/a_obj_a000.png");
+	g_sGraphicLoadFlg.AddLoadFileEx(g_DocumentArrowDHandle, 			"img/10_asobikata/a_obj_b000.png");
 	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowLHandle, 					"img/08_stamp/s_hid_a.png");	
 	g_sGraphicLoadFlg.AddLoadFileEx(g_ArrowRHandle, 					"img/08_stamp/s_mig_a.png");	
 	// 数値	
