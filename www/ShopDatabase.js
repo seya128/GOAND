@@ -55,7 +55,7 @@ function SetTutorialStatus(flg)
 // チュートリアルを見てないかフラグの取得
 function GetTutorialLookFlg() 
 {
-	//return true;
+//	return true;
 	var data = localStorage.getItem(g_saveTutorialKey);
 	if (!data) { return false; }
 	return JSON.parse(data);
@@ -298,7 +298,8 @@ function SetupShopAllData()
 {
 	// すべて削除
 	AllDelShopData();
-	
+	// デバッグチュートリアル
+	//DEBUG_TUTORIAL();
 	// チュートリアル実行中
 	if(GetTutorialFlg())
 	{
@@ -367,6 +368,21 @@ function SetupShopAllData()
 		//AddShopData(gStampEnum.KAMI_SAKANA,		2);	// 魚の神様
 	}
 }
+
+function M_PRINT(sData)
+{
+//	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
+}
+function M_PRINTB(sData)
+{
+//	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
+}
+function M_PRINTR(sData)
+{
+//	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+}
+
+
 function PresentTutorialStampData()
 {
 	// 現状のデータをすべて削除
@@ -624,7 +640,7 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 // ------------------------------------------------------
 
 // スタンプの最大回数
-var STAMP_LIFE_MAX = 3 * 30;	// 45
+var STAMP_LIFE_MAX = 3 * 15;	// 45
 var g_HaveStampImageData = 
 [
     {"id":0, "ink":STAMP_LIFE_MAX},	// ダミー
@@ -1431,19 +1447,6 @@ function DispMemory()
 	//document.getElementById("memory").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";/* + sActiveSheetNo;*/
 	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
 }
-function M_PRINT(sData)
-{
-	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
-}
-function M_PRINTB(sData)
-{
-	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
-}
-function M_PRINTR(sData)
-{
-	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
-}
-
 
 var g_WindowImageHandle 			= null;
 var g_YesImageHandle 				= null;
@@ -1630,7 +1633,7 @@ function DrawMenu(ctx, bTrigger, sTouchStartX, sTouchStartY,
 	var PosYesY = 0;
 	var PosYesW = 122;
 	var PosYesH = 160;
-	ctx.drawImage(g_StampMainMenuImageHandle,  PosYesX, PosYesY,  PosYesW,  PosYesH);
+	ctx.drawImage(g_StampMainMenuImageHandle,  PosYesX, PosYesY);
 	
 	if(bTrigger)
 	{
@@ -1654,9 +1657,7 @@ function DrawStampWindow(ctx, sScaleRate, bTrigger,
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_StampMainWindowImageHandle, 
 		25, 
-		GPosY + 100, 
-		590, 
-		570);
+		GPosY + 100);
 	
 	// ---------------------------------------------------
 	// YesNo
@@ -1674,9 +1675,9 @@ function DrawStampWindow(ctx, sScaleRate, bTrigger,
 	var PosBackW  = 123;
 	var PosBackH  = 123;
 	ctx.globalAlpha = sScaleRate;
-	ctx.drawImage(g_StampMainKesuImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
-	ctx.drawImage(g_StampMainEndImageHandle,   PosNoX, PosNoY,  PosNoW,  PosNoH);
-	ctx.drawImage(g_StampMainBackImageHandle,   PosBackX, PosBackY,  PosBackW,  PosBackH);
+	ctx.drawImage(g_StampMainKesuImageHandle, PosYesX, PosYesY);
+	ctx.drawImage(g_StampMainEndImageHandle,   PosNoX, PosNoY);
+	ctx.drawImage(g_StampMainBackImageHandle,   PosBackX, PosBackY);
 		
 	// ---------------------------------------------------
 	// アルファブレンド計算
@@ -1721,14 +1722,13 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
 		89, 
-		GPosY + 214, 
+		GPosY + 214,
 		460, 
 		440);
 	ctx.drawImage(g_SheetDeleteMessageImageHandle, 
 		128, 
-		GPosY + 370, 
-		386, 
-		162);
+		GPosY + 370 + 25,
+		520 * 0.75, 120 * 0.75);
 	
 	// ---------------------------------------------------
 	// YesNo
@@ -1742,8 +1742,8 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 	var PosNoW  = 281;
 	var PosNoH  = 184;
 	ctx.globalAlpha = sScaleRate;
-	ctx.drawImage(g_YesImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
-	ctx.drawImage(g_NoImageHandle,   PosNoX, PosNoY,  PosNoW,  PosNoH);
+	ctx.drawImage(g_YesImageHandle, PosYesX, PosYesY);
+	ctx.drawImage(g_NoImageHandle,   PosNoX, PosNoY);
 	
 	// ---------------------------------------------------
 	// アルファブレンド計算
@@ -1783,14 +1783,10 @@ function DrawWindowOk(ctx, sScaleRate, bTrigger,
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
 		89, 
-		GPosY + 214, 
-		460, 
-		440);
+		GPosY + 214);
 	ctx.drawImage(g_YesNoMessageImageHandle, 
 		128, 
-		GPosY + 380, 
-		386, 
-		162);
+		GPosY + 380);
 	
 	// ---------------------------------------------------
 	// YesNo
@@ -1800,7 +1796,7 @@ function DrawWindowOk(ctx, sScaleRate, bTrigger,
 	var PosYesW = 281;
 	var PosYesH = 184;
 	ctx.globalAlpha = sScaleRate;
-	ctx.drawImage(g_YesImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
+	ctx.drawImage(g_YesImageHandle, PosYesX, PosYesY);
 
 	// ---------------------------------------------------
 	// アルファブレンド計算

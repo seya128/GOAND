@@ -1002,6 +1002,8 @@ var StampMain = function()
 	GSetupEffect();
 	// シートを必ずロード
 	LoadSelectSheetGraphic(g_iEditSheetIndex);
+	// デバッグチューチュートリアル
+//	DEBUG_TUTORIAL();
 	
 	// チュートリアルならプラスα
 	if(g_TutorialFlg)
@@ -1398,8 +1400,13 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 					// ------------------------------------- 
 					// メッセージファイル
 					// ------------------------------------- 
-					stamp_ctx.drawImage(sStampClearMessage, 103, 250);
-					stamp_ctx.drawImage(sMenuTouchMessage, 103, 415);
+					// 次は押したスタンプを消してみよう
+					stamp_ctx.drawImage(sStampClearMessage, 103, 250 + 80);
+					// できるよ！メニューを押してね
+					// 画像xywh
+					// 座標xywh
+					stamp_ctx.drawImage(sMenuTouchMessage, 0, 86, 432, 180 - 86, 103 + 20, 415 + 120, 432, 180 - 86);
+					//stamp_ctx.drawImage(sMenuTouchMessage, 103, 415);
 					// ------------------------------------- 
 					// メニュー以外を隠す
 					// ------------------------------------- 					
@@ -1438,8 +1445,10 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 					// ------------------------------------- 
 					// メッセージファイル
 					// ------------------------------------- 
-					stamp_ctx.drawImage(sMenuClear01Message1, 41, 10);	
-					stamp_ctx.drawImage(sMenuClear02Message1, 41, 10);	
+					// 押したスタンプを消すには消すを押してね！
+					stamp_ctx.drawImage(sMenuClear01Message1, 41 + 25 - 47, 0 - 15);
+					// 消すを押すと押したスタンプが全部消えるよ！
+					stamp_ctx.drawImage(sMenuClear02Message1, 41 - 42 - 47, 10 + 107);
 				}	
 				// クリア確認ウィンドウ
 				else if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.STAMP_CLEAR_WINDOW)
@@ -1467,8 +1476,10 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 						// ------------------------------------- 
 						// メッセージファイル
 						// ------------------------------------- 
+						// 最後に初めの画面に戻るには
 						stamp_ctx.drawImage(sMenuEndMessage1, 103, 200);
-						stamp_ctx.drawImage(sMenuEndMessage2, 103, 415);
+						// もう一度メニューを押してね
+						stamp_ctx.drawImage(sMenuEndMessage2, 103 + 20, 415);
 						// ------------------------------------- 
 						// メニュー以外を隠す
 						// ------------------------------------- 					
@@ -1500,7 +1511,8 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 						// ------------------------------------- 
 						// メッセージファイル
 						// ------------------------------------- 
-						stamp_ctx.drawImage(sBackMessage, 41, 10);		
+						// 初めの画面に戻るには終わるを押してね
+						stamp_ctx.drawImage(sBackMessage, 41, 10 + 100);		
 					}					
 				}			
 				// 遅延

@@ -768,11 +768,8 @@ var StampSelect = function()
     LoadStampGraphic();
 	
 	// 強制
-	//if(g_TutorialFlg == false)
-	//{
-	//	DEBUG_TUTORIAL();
-	//	AllLoadStampDrawData();
-	//}
+	//DEBUG_TUTORIAL();
+	//AllLoadStampDrawData();
 	
 	// チュートリアルならプラスα
 	if(g_TutorialFlg)
