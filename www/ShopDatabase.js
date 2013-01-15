@@ -371,15 +371,63 @@ function SetupShopAllData()
 
 function M_PRINT(sData)
 {
-//	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
+	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
 }
 function M_PRINTB(sData)
 {
-//	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
+	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
 }
 function M_PRINTR(sData)
 {
-//	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+}
+
+var g_TimerCounter = 0;
+var g_StartTime    = 0;
+var g_TimeString;
+
+function StartTime()
+{return;
+	g_StartTime = new Date();
+}
+
+function EndTime(str)
+{return;
+	//if(g_TimerCounter == 0)
+	{		
+		// 表示
+		var EndTime = new Date();
+		var MSec    = EndTime.getTime() - g_StartTime.getTime();
+
+		g_TimeString += "[" + str + "][" + MSec + "]<br>";
+	}
+}
+function DrawTime(ctx)
+{return;
+	g_TimerCounter --;
+	if(g_TimerCounter <= 0)
+	{
+		g_TimerCounter = 10;	
+	//	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
+	}
+	// 下地
+	if(ctx != null)
+	{
+		ctx.globalAlpha = 0.5;
+		ctx.fillStyle="#000000";
+		ctx.fillRect(0, 0, 256, 512);
+		ctx.globalAlpha = 1.0;
+	}
+	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
+	g_TimeString = "";
+}
+
+function ClearRect(ctx, x, y, w, h)
+{
+	StartTime();
+	//ctx.width = ctx.width;
+	ctx.clearRect(x, y, w, h);
+	EndTime("ClearRect");
 }
 
 
@@ -1853,7 +1901,7 @@ function DrawBack(ctx)
 {
 	ctx.globalAlpha = 0.6;
 	ctx.fillStyle = 'rgb(0, 0, 0)';
-	ctx.fillRect(0, 0, 640, 1200);
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	ctx.globalAlpha = 1.0;
 }
 /*

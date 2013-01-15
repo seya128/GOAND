@@ -87,10 +87,10 @@ var StampSelect = function()
 		{
 	        var rate = Math.abs(ofs)/320 * 0.25 ;
 			var scl  = (0.65 - rate) * this.fZoomRate;
-	        var w = 640  * scl;
-	        var h = 1138 * scl;
-	        var x = (640 - w) / 2 + ofs - rate*ofs ;
-	        var y = (800 - h) / 2 + g_YOffset;
+	        var w = Math.floor(640  * scl);
+	        var h = Math.floor(1138 * scl);
+	        var x = Math.floor((640 - w) / 2 + ofs - rate*ofs);
+	        var y = Math.floor((800 - h) / 2 + g_YOffset);
 			
 			// -------------------------------------
 			// シートの表示
@@ -98,13 +98,17 @@ var StampSelect = function()
 			var ScreenH = BROWSER_SCREEN_H;		// ローカルのほうが高速・・・？
 			var sh      = ScreenH / REDUCTION_SIZE;
 			
+			StartTime();
+		//	SafeDrawSheet(this.CanvasSheet_2d, this.img, 0, 0);
 			SafeDrawSheetEx(this.CanvasSheet_2d, this.img, 
 				0, 0, 640, ScreenH, 
-				0, 0, CANVAS_WIDTH,          sh)
+				0, 0, CANVAS_WIDTH,          sh);
+			EndTime("DrawBack");
 			
 			// -------------------------------------
 			// シートに張り付けて描画
 			// -------------------------------------  
+			StartTime();
 			var iSheetNo = this.sheetNo;
 			if(GetStampDrawData(iSheetNo) != null && iSheetNo >= 0)
 			{
@@ -157,16 +161,21 @@ var StampSelect = function()
 					}
 				}
 			}
+			EndTime("DrawStamp");
+			
 			// あまった部分は消す
 			// 最終描画
 			//M_PRINT("[" + document.body.clientWidth + "][" + document.documentElement.clientWidth + "][" + window.innerWidth + "]");
 			//M_PRINT("[" + document.body.clientHeight + "][" + document.documentElement.clientHeight + "][" + window.innerHeight + "]");
-	        this.ctx.drawImage(this.CanvasSheet, x, y, w, h);
+	        StartTime();
+			this.ctx.drawImage(this.CanvasSheet, x, y, w, h);
+			//this.ctx.drawImage(this.CanvasSheet, x, y, Math.floor(w*0.5), Math.floor(h*0.5));
+			EndTime("DrawCanvas");
 			this.iDrawX = x;
 			this.iDrawY = y;
 			this.iDrawW = w;
 			this.iDrawH = (ScreenH * scl);
-			
+	        StartTime();			
 			// エッジ表示
 			this.ctx.beginPath();             											// パスのリセット
 			this.ctx.lineWidth = 2;           											// 線の太さ
@@ -177,7 +186,8 @@ var StampSelect = function()
 			this.ctx.lineTo(this.iDrawX + this.iDrawW, this.iDrawY + this.iDrawH);		// 次の位置
 			this.ctx.lineTo(this.iDrawX,               this.iDrawY + this.iDrawH);		// 次の位置
 			this.ctx.closePath();														// パスを閉じる
-			this.ctx.stroke();															// 描画			
+			this.ctx.stroke();															// 描画		
+			EndTime("DrawEdge");
 	    }
 	};
 
@@ -342,10 +352,7 @@ var StampSelect = function()
 		            addX = ofsX - ofsXold;
 		        }
 				
-				// 動き
-				MoveArrowL();
-				MoveArrowR();
-					
+
 				// 代入
 				/*if(iOldSelecterID > this.selectIx)
 				{
@@ -357,6 +364,7 @@ var StampSelect = function()
 				}*/
 				iOldSelecterID = this.selectIx;
 
+				StartTime();
 		        if (ofsX < -ofsMax / 8)
 				{
 					// 前
@@ -406,6 +414,7 @@ var StampSelect = function()
 						sheet[(this.selectIx + 3) % 5].setImage(sheet[this.selectIx].sheetNo - 2);
 					}							
 		        }
+				EndTime("SetImage");
 		        ofsXold = ofsX;
 			}
 			// クリアと背景の表示
@@ -470,10 +479,16 @@ var StampSelect = function()
 					190, 
 					101);
 			}
+				
 			// 矢印を描画
+			StartTime();
+			MoveArrowL();
+			MoveArrowR();			
 			ProcArrow();
 			if(bL) { DrawArrowL(ctx, 60,  450); }
 			if(bR) { DrawArrowR(ctx, 580, 450); }
+			EndTime("DrawArrow");
+			
 			// これにするボタン
  			ctx.drawImage(g_ClaerButtonHandle, 145, BROWSER_HEIGHT - 50/*630*/);
 		
@@ -702,6 +717,7 @@ var StampSelect = function()
 					}	
 				}
 			}	
+			DrawTime(ctx);
 	    };
   
 	    //マウスイベント
@@ -888,7 +904,7 @@ var StampSelect = function()
 				// キャンバスの描画
 				// ----------------------------------------------
 				mainCanvas.draw();
-				
+			
 				// ----------------------------------------------
 				// タイトルへ戻る
 				// ----------------------------------------------
