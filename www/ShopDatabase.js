@@ -640,7 +640,7 @@ GStampGraphic.prototype.LoadImage = function(eStampEnum)
 // ------------------------------------------------------
 
 // スタンプの最大回数
-var STAMP_LIFE_MAX = 3 * 1;	// 45
+var STAMP_LIFE_MAX = 3 * 15;	// 45
 var g_HaveStampImageData = 
 [
     {"id":0, "ink":STAMP_LIFE_MAX},	// ダミー

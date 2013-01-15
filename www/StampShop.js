@@ -1524,6 +1524,8 @@ var StampShop = function()
 
 			//終了
 			case G_STATUS.END:
+				// スタンプへ
+				SetTutorialStatus(gTUTORIAL_STATUS.STAMP);
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
