@@ -366,6 +366,11 @@ StampBar.prototype.setTouchEvent = function()
     //タッチ開始
     var touchStartEvent = function(e) 
 	{
+		// 無視
+		//if(g_TutorialMainFlg > gTUTORIAL_MAINFLG.STAMP_NONE && g_TutorialMainFlg < gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT)
+		//{
+		//	return;
+		//}
 		// 選択禁止
 		_this.bTutorialTouch = true;
 		if(g_TutorialMainFlg <= gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT || g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT || g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT_END)
@@ -1553,10 +1558,10 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				//次のシーンをセット
 				if(nNextEvent == 0)
 				{
-				//	nextSceen = new StampSelect();
-					nextSceen = new SceenTitle();
 					// チュートリアル終了チェック
 					CheckTutorial();
+				//	nextSceen = new StampSelect();
+					nextSceen = new SceenTitle();
 				}
 				else
 				{		

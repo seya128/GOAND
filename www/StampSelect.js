@@ -761,15 +761,14 @@ var StampSelect = function()
 	var next;
 	var alpha = 0;
 	
+	// スタンプシート
+	StartTutorial_Stamp();
+	
 	// セーブされた描画データ
 	AllLoadStampDrawData();
 	
     // スタンプのロード
     LoadStampGraphic();
-	
-	// 強制
-	//DEBUG_TUTORIAL();
-	//AllLoadStampDrawData();
 	
 	// チュートリアルならプラスα
 	if(g_TutorialFlg)

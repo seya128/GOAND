@@ -469,7 +469,6 @@ function CheckTutorial()
 			AllDeleteStampDrawData();
 			PresentTutorialStampData();
 			PresentTutorialSheetData();
-			g_TutorialOneLook = true;
 		}
 		// 違ったら今までのデータを復元
 		else
@@ -524,6 +523,37 @@ function StartTutorial()
 		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
 	}
 }
+
+function StartTutorial_Stamp()
+{
+	// ストレージのフラグを見てチュートリアルかをチェックする
+	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
+	{
+		// 今チュートリアル中
+		if(GetTutorialFlg()) { return; }	
+		// データをすべて削除
+		AllDelHasSheet();
+		// データをすべて削除
+		AllDelHasStamp();
+		// 開始
+		SetTutorialFlg(true);
+		// ショップチュートリアルを開始
+		//g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+		//g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+		// スタンプセレクト開始
+		g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+		// メインチュートリアル開始
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+		// チュートリアルで買うものを強制的に買う
+		// プリンゲット
+		AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+		// お子様ランチゲット
+		AddHasSheet(gStampEnum.GOHAN_01);
+	}
+}
+
 
 // -------------------------------------
 // ショップチュートリアル
