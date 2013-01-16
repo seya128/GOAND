@@ -267,7 +267,7 @@ var SceenGohanItadaki = function() {
 					alpha = 1.0;
 					st = STATUS.JYUNBI;
 					//st = STATUS.ITADAKI;
-					st = STATUS.OUEN_IN;
+					//st = STATUS.OUEN_IN;
 					//st = STATUS.OUEN_IN2;
 					stFrm = 0;
 				}
