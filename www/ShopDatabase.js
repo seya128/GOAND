@@ -502,6 +502,7 @@ function CheckTutorial()
 	if(GetTutorialFlg())
 	{
 		// 解除
+		SaveTutorialLookFlg(true); 
 		SetTutorialStatus(gTUTORIAL_STATUS.END);
 		SetTutorialFlg(0);
 		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;

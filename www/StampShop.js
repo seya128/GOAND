@@ -536,6 +536,7 @@ ShopSheet.prototype.drawWindow = function()
 ShopSheet.prototype.drawOK= function()
 {
 	var GPosY = -84;
+	//ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 	DrawBack(this.ctxEffect);
 	
@@ -548,11 +549,9 @@ ShopSheet.prototype.drawOK= function()
 		380, 
 		0);		
 	DrawStrNum(this.ctxEffect, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
-	
-	
-	this.ctxEffect.globalAlpha = sScaleRate;
-	
+
 	// キャンバスを描画	
+	this.ctxEffect.globalAlpha = sScaleRate;
 	this.ctxEffect.drawImage(this.canvas_Buy, 0, GPosY);
 	
 	// -------------------------------------
@@ -586,7 +585,7 @@ ShopSheet.prototype.drawOK= function()
 		}	
 	}
 
-	this.ctxEffect.globalAlpha = 1.0;
+	//this.ctxEffect.globalAlpha = 1.0;
 	sScaleRate += 0.25;
 	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
 }
