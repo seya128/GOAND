@@ -552,6 +552,7 @@ function StartTutorial()
 	// ストレージのフラグを見てチュートリアルかをチェックする
 	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
 	{
+		if(g_TutorialStatus == gTUTORIAL_STATUS.END) { return; }
 		// ショップから
 		g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
 		// データをすべて削除

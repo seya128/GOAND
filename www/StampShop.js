@@ -781,7 +781,7 @@ var StampShop = function()
 			}
 			// 決定
 			{
-				if(sScaleRate >= 1.0)
+				if(sScaleRate >= 1.0 && GGetEffectNum() == 0)
 				{
 					// 購入
 					if(eSwitch == 1)
