@@ -21,20 +21,43 @@
             	
             }
             
-            function mainLoop() {
-            	if (currentSceen) {
-            		if (currentSceen.onframe) {
+            function mainLoop() 
+            {
+            	// 時間の計測開始
+				var StartTime = new Date();
+
+				// メインループ
+            	if (currentSceen) 
+            	{
+            		if (currentSceen.onframe) 
+            		{
             			currentSceen.onframe();
             		}
             	}
             	
-            	if (nextSceen) {
+            	// 次のシーンへの切り替え
+            	if (nextSceen)
+            	{
             		currentSceen = nextSceen;
             		nextSceen = null;
             	}
-
-            	setTimeout('mainLoop()', 50);
             	
+            	// 処理が遅れた分次は早くする
+            	// 1000/30= 33.3FPS
+            	// 1000/50= 20.0FPS
+             	// 1000/60= 16.6FPS
+             	
+				var EndTime = new Date();
+				var Timer   = 50 - (EndTime.getTime() - StartTime.getTime());
+				if(Timer > 0)
+				{
+            		setTimeout('mainLoop()', Timer);
+            	}
+            	else
+            	{
+            		setTimeout('mainLoop()', 1);
+            	}
+            	//setTimeout('mainLoop()', 50);
             }
             
             

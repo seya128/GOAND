@@ -143,12 +143,126 @@ var timerID;
 //
 // ショップシート
 //
-function ShopSheet(canvas_ctx)
+function ShopSheet(canvas_ctx, ctxEffect)
 {
     var _this = this;
     this.ctx = canvas_ctx;
     this.sheetSrc = "";
+    this.ctxEffect = ctxEffect;
 	
+	// 移動フラグ
+	this.nOldY    = -1000;
+		
+	// 価格表
+	this.canvas_Buy = document.createElement('canvas');
+	this.canvas_Buy.setAttribute('id', 'canvas_Buy');
+ 	this.canvas_Buy.width  = 640;   
+	this.canvas_Buy.height = 900; 	
+    this.ctx_Buy   	= this.canvas_Buy.getContext("2d");	
+	
+	// キャンバス小物
+	this.canvas_Komono = document.createElement('canvas');
+	this.canvas_Komono.setAttribute('id', 'canvas_komono');
+ 	this.canvas_Komono.width  = 640;   
+	this.canvas_Komono.height = 200; 
+    this.ctx_Komono    	= this.canvas_Komono.getContext("2d");
+	
+	// -------------------------------------
+	// 小物の先描画
+	// -------------------------------------  
+	this.DrawKomono();	
+	
+	// -------------------------------------
+	// 32個作成
+	// -------------------------------------  
+	this.canvas_item = new Array();
+	this.ctx_Item    = new Array();
+	for(var i = 0; i < M_MAX_BUY_LIST; i ++)
+	{
+		this.canvas_item[i] 		= document.createElement('canvas');
+		this.canvas_item[i].setAttribute('id', "canvas_item_" + i);	
+ 		this.canvas_item[i].width  	= 214;   
+		this.canvas_item[i].height 	= 256; 
+		this.ctx_Item[i]    		= this.canvas_item[i].getContext("2d");
+		
+		// 購入枠の描画
+   		this.ctx_Item[i].drawImage(g_BuyWakuImage, 0, 32);
+		var id       = gShopBuyListTable[i]["id"];
+		var popImage = GetStampSheetGraphicImage(id);
+		// 画像
+		if(id >= 100)
+		{
+			this.ctx_Item[i].drawImage(popImage, 24,  0);
+		}
+		else
+		{
+			var PopX = Math.floor(68);
+			var PopY = Math.floor(15);
+			var PopW = Math.floor(640  * fBuySheetRate);
+			var PopH = Math.floor(1138 * fBuySheetRate);
+			// 描画
+			//this.ctx, popImage,
+			//SafeDrawSheet(this.ctx, popImage, PopX, PopY, PopW, PopH)
+			if(SafeDrawSheet(this.ctx_Item[i], popImage, PopX, PopY, PopW, PopH) == false)
+			{
+				// エッジ表示
+				this.ctx_Item[i].beginPath();             						// パスのリセット
+				this.ctx_Item[i].lineWidth = 2;           						// 線の太さ
+				this.ctx_Item[i].strokeStyle="#ffffff";   						// 線の色
+				this.ctx_Item[i].moveTo(PopX,			PopY);					// 開始位置
+				this.ctx_Item[i].lineTo(PopX + PopW, 	PopY);					// 次の位置
+				this.ctx_Item[i].lineTo(PopX + PopW, 	PopY + PopH);			// 次の位置
+				this.ctx_Item[i].lineTo(PopX,			PopY + PopH);			// 次の位置
+				this.ctx_Item[i].closePath();									// パスを閉じる
+				this.ctx_Item[i].stroke();										// 描画
+				this.ctx_Item[i].fillStyle = 'rgb(0, 0, 0)';
+				this.ctx_Item[i].fillRect(PopX, PopY, PopW, PopH);
+				this.ctx_Item[i].fillStyle = 'rgb(255, 255, 255)';
+				this.ctx_Item[i].font = g_sFontName;
+				DrawFont(PopX + 36, PopY + 80, this.ctx, "ロード中", true)
+			}
+			else
+			{				
+				// エッジ表示
+				this.ctx_Item[i].beginPath();             						// パスのリセット
+				this.ctx_Item[i].lineWidth = 2;           						// 線の太さ
+				this.ctx_Item[i].strokeStyle="#ffffff";   						// 線の色
+				this.ctx_Item[i].moveTo(PopX,			PopY);					// 開始位置
+				this.ctx_Item[i].lineTo(PopX + PopW, 	PopY);					// 次の位置
+				this.ctx_Item[i].lineTo(PopX + PopW, 	PopY + PopH);			// 次の位置
+				this.ctx_Item[i].lineTo(PopX,			PopY + PopH);			// 次の位置
+				this.ctx_Item[i].closePath();									// パスを閉じる
+				this.ctx_Item[i].stroke();										// 描画
+			}
+		}
+		// お金
+		var gold = gShopBuyListTable[i]["gold"];
+		DrawStrNum(this.ctx_Item[i], 49, 196, gold, false, 0.35, 1.0, 20);		
+	}
+}
+
+ShopSheet.prototype.DrawKomono = function()
+{
+	// -------------------------------------
+	// ショップの描画
+	// -------------------------------------  
+	this.ctx_Komono.drawImage(g_ShopImage, 
+		0, 
+		0);
+	// --------------------------------------    
+    // タイトルへ戻る
+	// --------------------------------------
+	this.ctx_Komono.drawImage(g_BackImageHandle, 
+		0, 
+		0);	
+	
+	// --------------------------------------    
+	// 残り金額の描画
+	// --------------------------------------
+	this.ctx_Komono.drawImage(g_CoinBackImage, 
+		380, 
+		0);		
+	DrawStrNum(this.ctx_Komono, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
 }
 
 // プロック
@@ -159,9 +273,12 @@ ShopSheet.prototype.Proc = function(ofs, no, tri)
 	// 交換を押したとき(38, 170) - (174, 170)
 	//				   (38, 215) - (174, 215)
     var x = 0;
-    var y = 20 + ofs - ofs;
+    var y = 20 + ofs - ofs - 28;
 	if(sTouchAccelerator == 0 && g_bOldMoveList == false && g_bMoveList == false)
 	{
+		// 初期化
+	//	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
+		
 		var vS = (sActiveSheetNo * MAX_SHOP_DISP_HEIGHT) - MAX_SHOP_DISP_HEIGHT;
 		if(vS < 0)  { vS = 0; }
 		var iCounter = (vS * 3);
@@ -178,7 +295,7 @@ ShopSheet.prototype.Proc = function(ofs, no, tri)
 
 				var index = (i * MAX_SHOP_DISP_WIDTH) + j;				
 				if(no != -1) { if(index != no) { continue; } }
-
+				var id = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["id"];	
 				var PopX;
 				var PopY;
 				var PopW;
@@ -197,6 +314,13 @@ ShopSheet.prototype.Proc = function(ofs, no, tri)
 					PopW = 640  * fBuySheetRate;
 					PopH = 1138 * fBuySheetRate;			
 				}
+
+				//this.ctxEffect.font = g_sFontName;			
+				//this.ctxEffect.globalAlpha = 0.5;
+		       // this.ctxEffect.fillStyle = 'rgb(255, 0, 0)';			
+		      //  this.ctxEffect.fillRect(PopX, PopY, PopW, PopH);
+				//this.ctxEffect.globalAlpha = 1.0;
+				
 				if(
 					(PopX < sTouchStartX) && (PopX + PopW > sTouchStartX) &&
 					(PopY < sTouchStartY) && (PopY + PopH > sTouchStartY) &&
@@ -219,8 +343,11 @@ ShopSheet.prototype.Proc = function(ofs, no, tri)
 				var PosH = 54;
 			
 				if(PosY < 135) { continue; }
-
-				var id = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["id"];	
+			
+				//this.ctxEffect.globalAlpha = 0.5;
+		       // this.ctxEffect.fillStyle = 'rgb(255, 0, 0)';			
+		       // this.ctxEffect.fillRect(PosX, PosY, PosW, PosH);
+				//this.ctxEffect.globalAlpha = 1.0;
 				
 				if(
 					(PosX < sTouchStartX) && (PosX + PosW > sTouchStartX) &&
@@ -239,80 +366,135 @@ ShopSheet.prototype.Proc = function(ofs, no, tri)
 		}
 	}
 }
-
-ShopSheet.prototype.drawWindow = function()
+ShopSheet.prototype.drawWindowD = function()
 {
-	DrawBack(this.ctx);
-	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
-	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];	
-	var GPosY = -84 + (1.0 - sScaleRate) * -64;
-
-	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
-	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
-	this.ctx.globalAlpha = sScaleRate;
+	// 初期化
+	ClearRect(this.ctx_Buy, 0, 0, 640, BROWSER_SCREEN_H + 64);
+	this.ctx_Buy.globalAlpha = 1.0;
 	
-	// 購入メッセージ
-	this.ctx.drawImage(g_BuyWindowImage, 
-		20  /*- 460 / 2*/, 
-		GPosY + 214 /*- 440 / 2*/);
+	var id    = gShopBuyListTable[g_iClickDataIndex]["id"];	
+	var gold  = gShopBuyListTable[g_iClickDataIndex]["gold"];	
+ 	this.ctx_Buy.drawImage(g_BuyWindowImage, 20, 214);
 	
 	// スタンプ
 	if(id >= 100)
 	{
 		// 交換する？
-		this.ctx.drawImage(g_StampMessageBottonHandle, 
-			20  /*- 460 / 2*/, 
-			GPosY + 520 /*- 440 / 2*/);
+		this.ctx_Buy.drawImage(g_StampMessageBottonHandle, 20, 520);
 	}
 	// シート
 	else
 	{
 		// 交換する？
-		this.ctx.drawImage(g_SheetMessageHandle, 
-			20  /*- 460 / 2*/, 
-			GPosY + 520 /*- 440 / 2*/);		
+ 		this.ctx_Buy.drawImage(g_SheetMessageHandle, 20, 520);
 	}
 	
 	// 交換する？
-	this.ctx.drawImage(g_YesNoMessageImage, 
-		20  /*- 460 / 2*/, 
-		GPosY + 520 /*- 440 / 2*/);
+	this.ctx_Buy.drawImage(g_YesNoMessageImage, 20, 520);
 
 	// -------------------------------------
 	// 持っている数,販売金額表示,スタンプかシートを表示
 	// -------------------------------------
-	DrawBuyImage(this.ctx, GPosY, id, gold);
+	DrawBuyImage(this.ctx_Buy, 0, id, gold);
 	
+	var PosYesX = 33;
+	var PosYesY = 720;
+	var PosYesW = 281;
+	var PosYesH = 184;
+	var PosNoX  = 320;
+	var PosNoY  = 720;
+	var PosNoW  = 281;
+	var PosNoH  = 184;
+	this.ctx_Buy.drawImage(g_YesImageHandle, PosYesX, PosYesY);
+	this.ctx_Buy.drawImage(g_NoImageHandle, PosNoX, PosNoY);
+}
+// スタンプを購入しました
+// いっぱいですなどなど
+ShopSheet.prototype.drawOkD= function()
+{
+	ClearRect(this.ctx_Buy, 0, 0, 640, BROWSER_SCREEN_H + 64);
+	this.ctx_Buy.globalAlpha = 1.0;
+	
+	// 確認ウィンドウ
+	this.ctx_Buy.drawImage(g_BuyWindowImage, 20, 214);
+
+	// 購入しました
+	if(eSwitch == 2)
+	{
+		this.ctx_Buy.drawImage(g_BuyOkMessageImage, 30, 520);
+	}
+	// お金が足りません
+	else if(eSwitch == 3)
+	{
+		this.ctx_Buy.drawImage(g_BuyNoCoinMessageImage, 30, 520);
+	}
+	// いっぱいです
+	else if(eSwitch == 4)
+	{
+		this.ctx_Buy.drawImage(g_BuyStampIppaiMessageImage, 30, 520);
+	}
+	// シート持ってる
+	else if(eSwitch == 5)
+	{
+		this.ctx_Buy.drawImage(g_HaveMessageBottonHandle, 30, 520);
+	}
+	// -------------------------------------
+	// 持っている数,販売金額表示,スタンプかシートを表示
+	// -------------------------------------
+	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
+	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
+	DrawBuyImage(this.ctx_Buy, 0, id, gold);
+	
+	// -------------------------------------
+	// はいボタン
+	// -------------------------------------
+	var PosYesX = 180;
+	var PosYesY = 720;
+	var PosYesW = 281;
+	var PosYesH = 184;
+	this.ctx_Buy.drawImage(g_YesImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
+}
+
+
+ShopSheet.prototype.drawWindow = function()
+{
+	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
+	DrawBack(this.ctxEffect);
+	
+	// --------------------------------------
+	// 値段上書き
+	// --------------------------------------    
+	// 残り金額の描画
+	// --------------------------------------
+	this.ctxEffect.drawImage(g_CoinBackImage, 
+		380, 
+		0);		
+	DrawStrNum(this.ctxEffect, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
+	
+	
+	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
+	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];	
+	var GPosY = -84 + (1.0 - sScaleRate) * -64;
+	this.ctxEffect.globalAlpha = sScaleRate;
+	
+	// キャンバスを描画
+	this.ctxEffect.drawImage(this.canvas_Buy, 0, GPosY);
+
 	var PosYesX = 33;
 	var PosYesY = GPosY + 720;
 	var PosYesW = 281;
 	var PosYesH = 184;
-	var PosNoX = 320;
-	var PosNoY = GPosY + 720;
-	var PosNoW = 281;
-	var PosNoH = 184;
-	//if(this.ctx.globalAlpha < 0) { this.ctx.globalAlpha = 0; }
-	this.ctx.drawImage(g_YesImageHandle, 
-		PosYesX  /*- 460 / 2*/, 
-		PosYesY);
-	this.ctx.drawImage(g_NoImageHandle, 
-		PosNoX  /*- 460 / 2*/, 
-		PosNoY);
-	
-
-//	this.ctx.fillStyle = 'rgb(255, 255, 255)';
-//	this.ctx.font = g_sFontName;
-//	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
-//	this.ctx.fillText("" + gold, 128 + 320 + 24, GPosY + 335);
-//	DrawFont(128 + 320 + 42, GPosY + 335, this.ctx, "" + gold, true);
-//	DrawCoinL(g_CoinChipImage, this.ctx, 128 + 273, GPosY + 305, gold);
+	var PosNoX  = 320;
+	var PosNoY  = GPosY + 720;
+	var PosNoW  = 281;
+	var PosNoH  = 184;
 
 	// -------------------------------------
 	// 矢印とプロック
 	// ------------------------------------- 
 	if(g_TutorialFlg)
 	{
-		DrawDocumentArrow(this.ctx, 33 + 137 - 56, PosYesY - 63, 0);
+		DrawDocumentArrow(this.ctxEffect, 33 + 137 - 56, PosYesY - 63, 0);
 	}
 	// 初期化
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
@@ -343,7 +525,7 @@ ShopSheet.prototype.drawWindow = function()
 			g_iButtonMoveClickIndex  = 1;	
 		}
 	}
-	this.ctx.globalAlpha = 1.0;
+	this.ctxEffect.globalAlpha = 1.0;
 	sScaleRate += 0.15;
 	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
 }
@@ -354,51 +536,24 @@ ShopSheet.prototype.drawWindow = function()
 ShopSheet.prototype.drawOK= function()
 {
 	var GPosY = -84;
-	DrawBack(this.ctx);
-
-	//var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
-	//var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
-	this.ctx.globalAlpha = sScaleRate;
+	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
+	DrawBack(this.ctxEffect);
 	
-	// 確認ウィンドウ
-	this.ctx.drawImage(g_BuyWindowImage, 
-		20  /*- 460 / 2*/, 
-		GPosY + 214);
-	// 購入しました
-	if(eSwitch == 2)
-	{
-		this.ctx.drawImage(g_BuyOkMessageImage, 
-			30  /*- 460 / 2*/, 
-			GPosY + 520);
-	}
-	// お金が足りません
-	else if(eSwitch == 3)
-	{
-		this.ctx.drawImage(g_BuyNoCoinMessageImage, 
-			30  /*- 460 / 2*/, 
-			GPosY + 520);
-	}
-	// いっぱいです
-	else if(eSwitch == 4)
-	{
-		this.ctx.drawImage(g_BuyStampIppaiMessageImage, 
-			30  /*- 460 / 2*/, 
-			GPosY + 520);
-	}
-	// シート持ってる
-	else if(eSwitch == 5)
-	{
-		this.ctx.drawImage(g_HaveMessageBottonHandle, 
-			30  /*- 460 / 2*/, 
-			GPosY + 520);
-	}
-
-	// -------------------------------------
-	// 持っている数,販売金額表示,スタンプかシートを表示
-	// -------------------------------------
-	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
-	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
-	DrawBuyImage(this.ctx, GPosY, id, gold);
+	// --------------------------------------
+	// 値段上書き
+	// --------------------------------------    
+	// 残り金額の描画
+	// --------------------------------------
+	this.ctxEffect.drawImage(g_CoinBackImage, 
+		380, 
+		0);		
+	DrawStrNum(this.ctxEffect, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
+	
+	
+	this.ctxEffect.globalAlpha = sScaleRate;
+	
+	// キャンバスを描画	
+	this.ctxEffect.drawImage(this.canvas_Buy, 0, GPosY);
 	
 	// -------------------------------------
 	// はいボタン
@@ -408,18 +563,12 @@ ShopSheet.prototype.drawOK= function()
 	var PosYesW = 281;
 	var PosYesH = 184;
 
-	this.ctx.drawImage(g_YesImageHandle, 
-		PosYesX  /*- 460 / 2*/, 
-		PosYesY /*- 440 / 2*/, 
-		PosYesW, 
-		PosYesH);
-
 	// -------------------------------------
 	// 矢印とプロック
 	// -------------------------------------  
 	if(g_TutorialFlg)
 	{
-		DrawDocumentArrow(this.ctx, 180 + 137 - 56, PosYesY - 63, 0);
+		DrawDocumentArrow(this.ctxEffect, 180 + 137 - 56, PosYesY - 63, 0);
 	}
 
 	if(sScaleRate >= 1.0 && (!bTouch) && (bOldTouch))
@@ -437,24 +586,23 @@ ShopSheet.prototype.drawOK= function()
 		}	
 	}
 
-	this.ctx.globalAlpha = 1.0;
+	this.ctxEffect.globalAlpha = 1.0;
 	sScaleRate += 0.25;
 	if(sScaleRate > 1.0) { sScaleRate = 1.0; } 
 }
 
 //描画
 ShopSheet.prototype.drawItem = function(ofs, no)
-{
-    var rate = 0;//Math.abs(ofs)/320 * 0.25 ;
+{		
     var w = SCREEN_WIDTH;
     var h = SCREEN_HEIGHT;
-    var x = (SCREEN_WIDTH - w)  / 2;// + ofs - rate*ofs ;
-    var y = (SCREEN_HEIGHT - h) / 2 + 20 + ofs - rate*ofs ;
-
+    var x = Math.floor((SCREEN_WIDTH - w)  / 2);
+    var y = Math.floor((SCREEN_HEIGHT - h) / 2 - 40 + ofs);
+	
 	// -------------------------------------
 	// 小物を表示[ここは領域に制限をかけてのちのち高速化]
 	// -------------------------------------  
-	var vS       = (sActiveSheetNo * MAX_SHOP_DISP_HEIGHT) - MAX_SHOP_DISP_HEIGHT;
+	var vS = (sActiveSheetNo * MAX_SHOP_DISP_HEIGHT) - MAX_SHOP_DISP_HEIGHT;
 	if(vS < 0)  { vS = 0; }
 	var iCounter = (vS * 3);
 	for(var i = vS; i < vS + (MAX_SHOP_DISP_HEIGHT * 3); i ++)
@@ -462,7 +610,7 @@ ShopSheet.prototype.drawItem = function(ofs, no)
 		var YVal = 0;
 		// できる限り軽くする
 		var YPos = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y/* + YVal*/;
-		if(YPos + y <       50)        { iCounter += MAX_SHOP_LIST_WIDTH; continue; }
+		if(YPos + y <       40)        { iCounter += MAX_SHOP_LIST_WIDTH; continue; }
 		else if(YPos + y > 1280)       { iCounter += MAX_SHOP_LIST_WIDTH; continue; }
 		
 		for(var j = 0; j < MAX_SHOP_LIST_WIDTH; j ++)
@@ -476,141 +624,34 @@ ShopSheet.prototype.drawItem = function(ofs, no)
 			
 			var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 			var yy  = YPos;
-			this.ctx.drawImage(g_BuyWakuImage, 
-				(xx)-214/2 + x, 
-				(yy)-237/2 + y, 
-				214, 
-				237);
-			var id       = gShopBuyListTable[index]["id"];
-			var popImage = GetStampSheetGraphicImage(id);
-
-			if(id >= 100)
-			{
-				this.ctx.drawImage(popImage, 
-					(xx)-STAMP_W/2 + x, 
-					(yy)-STAMP_H/2 + y - 70, 
-					STAMP_W, 
-					STAMP_H);
-			}
-			else
-			{
-				var PopX = (xx)-640  * fBuySheetRate/2 + x;
-				var PopY = (yy)-1138 * fBuySheetRate/2 + y - 70;
-				var PopW = 640  * fBuySheetRate;
-				var PopH = 1138 * fBuySheetRate;
-				// 描画
-				if(SafeDrawSheet(this.ctx, popImage, PopX, PopY, PopW, PopH) == false)
-				{
-					// エッジ表示
-					this.ctx.beginPath();             						// パスのリセット
-					this.ctx.lineWidth = 2;           						// 線の太さ
-					this.ctx.strokeStyle="#ffffff";   						// 線の色
-					this.ctx.moveTo(PopX,			PopY);					// 開始位置
-					this.ctx.lineTo(PopX + PopW, 	PopY);					// 次の位置
-					this.ctx.lineTo(PopX + PopW, 	PopY + PopH);			// 次の位置
-					this.ctx.lineTo(PopX,			PopY + PopH);			// 次の位置
-					this.ctx.closePath();									// パスを閉じる
-					this.ctx.stroke();										// 描画
-					this.ctx.fillStyle = 'rgb(0, 0, 0)';
-					this.ctx.fillRect(PopX, PopY, PopW, PopH);
-					this.ctx.fillStyle = 'rgb(255, 255, 255)';
-					this.ctx.font = g_sFontName;
-					DrawFont(PopX + 36, PopY + 80, this.ctx, "ロード中", true)
-				}
-				else
-				{				
-					// エッジ表示
-					this.ctx.beginPath();             						// パスのリセット
-					this.ctx.lineWidth = 2;           						// 線の太さ
-					this.ctx.strokeStyle="#ffffff";   						// 線の色
-					this.ctx.moveTo(PopX,			PopY);					// 開始位置
-					this.ctx.lineTo(PopX + PopW, 	PopY);					// 次の位置
-					this.ctx.lineTo(PopX + PopW, 	PopY + PopH);			// 次の位置
-					this.ctx.lineTo(PopX,			PopY + PopH);			// 次の位置
-					this.ctx.closePath();									// パスを閉じる
-					this.ctx.stroke();										// 描画
-				}
 			
-			}
-			var gold = gShopBuyListTable[(i * MAX_SHOP_DISP_WIDTH) + j]["gold"];
-			//this.ctx.fillText("" + gold, xx - 25 + x, yy + 35 + y); 
-		
-			//if(GetIsSheetTrue(id) == false)
-			//{
-			//	DrawFont(xx + 3 + x + 10, yy + 35 + y, this.ctx, "うりきれ", true);	
-			//}
-			//else
-			{
-				DrawStrNum(this.ctx, xx + x - 55, yy + 46 + y, gold, false, 0.35, 1.0, 20);
-				//DrawCoin(g_CoinChipImage, this.ctx, xx + x - 12, yy + 5 + y, gold);
-				//DrawFont(xx + 3 + x, yy + 35 + y, this.ctx, "" + gold, true);
-			}
+			StartTime();
+			this.ctx.drawImage(this.canvas_item[index], 
+				Math.floor((xx)-214/2 + x), 
+				Math.floor((yy)-237/2 + y));			
+			EndTime("ItemDraw");
 		}
 	}
-/*
-	for(var i = 0; i < MAX_SHOP_LIST_HEIGHT; i ++)
-	{
-		var YVal = i / MAX_SHOP_DISP_HEIGHT;
-		YVal  = Math.floor(YVal);
-		YVal *= MAX_SHOP_PANEL_INTERVAL_Y;
-		for(var j = 0; j < MAX_SHOP_LIST_WIDTH; j ++)
-		{
-			var xx  = j  *  MAX_SHOP_PANEL_WIDTH  + MAX_SHOP_PANEL_START_X;
-			var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
-			this.ctx.drawImage(GetStampGraphicHandle_Image(((i * MAX_SHOP_DISP_WIDTH) + j)%27), 
-				(xx)-STAMP_W/2 + x, 
-				(yy)-STAMP_H/2 + y - 70, 
-				STAMP_W, 
-				STAMP_H);
-
-			this.ctx.font = g_sFontName;
-			this.ctx.fillText("10", xx - 25 + x, yy + 35 + y); 
-		}
-	}*/
-	// -------------------------------------
-	// 買うボタンの押せる場所をデバック表示
-	// -------------------------------------  
-/*
-	if((eSwitch == 0))
-	{
-		for(var i = 0; i < MAX_SHOP_LIST_HEIGHT; i ++)
-		{
-			var YVal = i / MAX_SHOP_DISP_HEIGHT;
-			YVal  = Math.floor(YVal);
-			YVal *= MAX_SHOP_PANEL_INTERVAL_Y;
-			for(var j = 0; j < MAX_SHOP_LIST_WIDTH; j ++)
-			{
-				var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
-				var yy  = (i * MAX_SHOP_PANEL_HEIGHT) + MAX_SHOP_PANEL_START_Y + YVal;
-		
-				var PosX = (xx)-214/2 + x + 49;
-				var PosY = (yy)-237/2 + y + 170;
-				var PosW = 116;
-				var PosH = 54;
-
-				this.ctx.globalAlpha = 0.5;
-				if(bTouch && 
-					(PosX < sTouchMoveX) && (PosX + PosW > sTouchMoveX) &&
-					(PosY < sTouchMoveY) && (PosY + PosH > sTouchMoveY))
-				{
-		        	this.ctx.fillStyle = 'rgb(255, 0, 0)';		
-				}	
-				else
-				{
-		        	this.ctx.fillStyle = 'rgb(0, 0, 255)';
-				}	
-		        this.ctx.fillRect(PosX, PosY, PosW, PosH);
-				this.ctx.globalAlpha = 1.0;
-
-			}
-		}
-	}
-*/	
 }
 
 //描画
-ShopSheet.prototype.draw = function(ofs)
+ShopSheet.prototype.draw = function(ofs, ctxobj)
 {
+	if(GGetEffectNum() != 0)
+	{
+		this.DrawKomono();
+	}
+	else if(GetTutorialFlg() == false)
+	{
+		if(this.nOldY == ofs) { return; }
+	}
+	this.nOldY = ofs;
+	
+	// 画面クリア
+	StartTime();
+    ctxobj.clear();
+	EndTime("ColorCls");
+	
 	// -------------------------------------
 	// アイテムの描画
 	// -------------------------------------  
@@ -619,29 +660,19 @@ ShopSheet.prototype.draw = function(ofs)
 	// -------------------------------------
 	// ショップの描画
 	// -------------------------------------  
-	this.ctx.drawImage(g_ShopImage, 
+	StartTime();
+	this.ctx.drawImage(this.canvas_Komono, 
 		0, 
-		0, 
-		640, 
-		200);
-	// --------------------------------------    
-    // タイトルへ戻る
-	// --------------------------------------
-	this.ctx.drawImage(g_BackImageHandle, 
-		0, 
-		0, 
-		190, 
-		101);	
+		0);	
+	EndTime("KomonoDraw")			
 	
+	// --------------------------------------	
 	// デバッグ
+	// --------------------------------------
 	var TitleBackYesX = 424;
 	var TitleBackYesY = 40;
 	var TitleBackYesW = 20;
 	var TitleBackYesH = 20;
-	this.ctx.globalAlpha = 0.5;
-    this.ctx.fillRect(TitleBackYesX, TitleBackYesY, TitleBackYesW, TitleBackYesH);
-	this.ctx.globalAlpha = 1.0;
-	
 	if((!bTouch) && (bOldTouch))
 	{
 		if(
@@ -659,6 +690,13 @@ ShopSheet.prototype.draw = function(ofs)
 
 var StampShop = function() 
 {
+	// ウィンドウサイズ
+    BROWSER_WIDTH   = window.innerWidth  || document.body.clientWidth  || document.documentElement.clientWidth;
+    BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
+    BROWSER_HEIGHT  += 30;
+	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
+	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE);	// 画面領域	
+	
 	var mainCanvas = null;
 	sTouchStartX 	= -200;
 	sTouchStartY 	= -200;
@@ -707,32 +745,32 @@ var StampShop = function()
 	    var ofsRate=1.2;
 
 		// デフォルトキャンバス
-	    var canvas = document.getElementById("canvas");
-		var ctx    = canvas.getContext("2d");
-	    var sheet = new ShopSheet(ctx);
+	    var canvas 			= document.getElementById("canvas");
+		var ctx    			= canvas.getContext("2d");
+	    var canvasEffect 	= document.getElementById("canvas_Effect");
+		var ctxEffect    	= canvasEffect.getContext("2d");
+	    var sheet = new ShopSheet(ctx, ctxEffect);
 		
 	    //キャンバスクリア
 	    this.clear = function()
 		{
 	        ctx.beginPath();
 	        //グラデーション領域をセット
-	        var grad  = ctx.createLinearGradient(0,0, 0,1200);
+	        var grad  = ctx.createLinearGradient(0,0, 0, BROWSER_SCREEN_H);
 	        //グラデーション終点のオフセットと色をセット
 	        grad.addColorStop(0,'rgb(10, 10, 50)');
 	        grad.addColorStop(0.7,'rgb(150, 150, 240)');
 	        //グラデーションをfillStyleプロパティにセット
 	        ctx.fillStyle = grad;
 	        /* 矩形を描画 */
-	        ctx.rect(0,0, 640, 1200);
+	        ctx.rect(0,0, 640, BROWSER_SCREEN_H);
 	        ctx.fill();
 	    };
 	    
 		this.draw_BuyWindow = function() 
 		{
-			// 画面クリア
-	        this.clear();
 			// シートの描画
-	        sheet.draw(sScrollY);
+	        sheet.draw(sScrollY, this);
 			// ウィンドウの描画
 			if(eSwitch == 1)
 			{
@@ -767,10 +805,11 @@ var StampShop = function()
 							}
 							for(var i = 0; i < gold; i ++)
 							{
-								AddCoinEffect(ctx, g_CoinChipImage, 395, 26, 60, 60, 1.0, i);
+								AddCoinEffect(ctxEffect, g_CoinChipImage, 405, 26, 60, 60, 1.0, i);
 							}
 							bOldTouch = false; 
 							bTouch = false;
+							sheet.drawOkD();
 						}
 						// No
 						else if(g_iButtonStartClickIndex == 1 && g_iButtonMoveClickIndex == 1)
@@ -778,15 +817,16 @@ var StampShop = function()
 							eSwitch = 0;
 							bOldTouch = false; 
 							bTouch = false;
+							ClearRect(ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 							
 							// チュートリアル中なら戻す
 							if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT_WAIT)
 							{
-								g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT;
+								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT;
 							}
 							if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT_WAIT)
 							{
-								g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT;
+								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT;
 							}
 						}
 					}
@@ -797,15 +837,16 @@ var StampShop = function()
 							eSwitch = 0;
 							bOldTouch = false; 
 							bTouch = false;
+							ClearRect(ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 							
 							// チュートリアル中なら次へ
 							if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT_WAIT)
 							{
-								g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_MESSAGE;
+								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_MESSAGE;
 							}
 							if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT_WAIT)
 							{
-								g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.BACK_MESSAGE;
+								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.BACK_MESSAGE;
 							}
 						}
 					}
@@ -817,6 +858,7 @@ var StampShop = function()
 		}
 	    this.draw_Main = function()
 		{
+			StartTime();
 			// ----------------------------------------------
 	        // タッチされていない場合の位置調整
 			// ----------------------------------------------
@@ -869,26 +911,21 @@ var StampShop = function()
 						if(i == 0)
 						{
 							sChack -= (gHeightSize / 2);							// シート分の高さ
-			//				sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
 							if(sScrollY > sChack) 
 							{ 
 								sChackTargetX  = 0;
 								sActiveSheetNo = i; break; 
 							}
-			//				sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
 						}
 						else
 						{
 							sChack -= (gHeightSize);								// シート分の高さ
-			//				sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
 							if(sScrollY > sChack) 
 							{ 
 								sChack += (gHeightSize / 2);						// シート分の高さ
-			//					sChack += (MAX_SHOP_PANEL_INTERVAL_Y / 2);			// インターバルの半分
 								sChackTargetX = sChack;
 								sActiveSheetNo = i; break;
 							}
-			//				sChack -= (MAX_SHOP_PANEL_INTERVAL_Y / 2);				// インターバルの半分
 						}
 					}
 					
@@ -904,15 +941,15 @@ var StampShop = function()
 						// 線形保管
 						if(sScrollY > 0)
 						{
-							sTouchAccelerator = (0 - sScrollY) * sMoveRate;
-							sScrollY = sScrollY + sTouchAccelerator;
+							sTouchAccelerator = Math.floor((0 - sScrollY) * sMoveRate);
+							sScrollY = Math.floor(sScrollY + sTouchAccelerator);
 							g_bMoveList = true;
 						}	
 						// 線形保管
 						if(sScrollY < sMaxScl)
 						{
-							sTouchAccelerator = (sMaxScl - sScrollY) * sMoveRate;
-							sScrollY = sScrollY + sTouchAccelerator;
+							sTouchAccelerator = Math.floor((sMaxScl - sScrollY) * sMoveRate);
+							sScrollY = Math.floor(sScrollY + sTouchAccelerator);
 							g_bMoveList = true;
 						}	
 						// -----------------------------------------
@@ -925,12 +962,14 @@ var StampShop = function()
 						else
 						{
 							sScrollY += sTouchAccelerator;
+							sScrollY = Math.floor(sScrollY);
 							// マイナス
 							if(sTouchAccelerator < 0)           
 							{ 
 								sTouchAccelerator *= (0.84); 
 								// フリースクロール
 								if(sTouchAccelerator > -3) { sTouchAccelerator = 0; }
+								else { sTouchAccelerator = Math.floor(sTouchAccelerator); }
 							}
 							// プラス
 							else
@@ -938,6 +977,7 @@ var StampShop = function()
 								sTouchAccelerator *= (0.84);
 								// フリースクロール
 								if(sTouchAccelerator < 3) { sTouchAccelerator = 0; }
+								else { sTouchAccelerator = Math.floor(sTouchAccelerator); }
 							}
 							g_bMoveList = true;
 						}
@@ -948,22 +988,23 @@ var StampShop = function()
 					else 
 					{
 						// 移動量
-						sTouchAccelerator = (sTouchMoveY - sTouchLastY) 		// 移動量
-						sScrollY    += sTouchAccelerator; 						// 移動量を算出し移動させる
-						sTouchLastY = sTouchMoveY; 								// 最近の最新座標
+						sTouchAccelerator = Math.floor(sTouchMoveY - sTouchLastY) 		// 移動量
+						sScrollY    += sTouchAccelerator; 								// 移動量を算出し移動させる
+						sScrollY     = Math.floor(sScrollY);
+						sTouchLastY = sTouchMoveY; 										// 最近の最新座標
 						//g_bMoveList = true;
 			        }
 					// 範囲外
 					if(sScrollY > (MAX_SHOP_PANEL_HEIGHT / 2))
 					{
 						sTouchAccelerator 	= 0;
-						sScrollY          	= (MAX_SHOP_PANEL_HEIGHT / 2);
+						sScrollY          	= Math.floor(MAX_SHOP_PANEL_HEIGHT / 2);
 						g_bMoveList			= true;
 					}
 					if(sScrollY < sMaxScl - (MAX_SHOP_PANEL_HEIGHT / 2))
 					{
 						sTouchAccelerator 	= 0;
-						sScrollY          	= sMaxScl - (MAX_SHOP_PANEL_HEIGHT / 2);
+						sScrollY          	= Math.floor(sMaxScl - (MAX_SHOP_PANEL_HEIGHT / 2));
 						g_bMoveList			= true;
 					}
 				}
@@ -985,18 +1026,21 @@ var StampShop = function()
 						var id   = gShopBuyListTable[g_iClickDataIndex]["id"];
 						var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];
 						// 持ってるか？
-						if(GetIsSheetTrue(id) == false)      { eSwitch = 5; }
+						if(GetIsSheetTrue(id) == false)      { eSwitch = 5; sheet.drawOkD(); }
 						// 持っているものが満タンかをチェック
-						if(GetIsBuyMax(id) == false)         { eSwitch = 4; }
+						if(GetIsBuyMax(id) == false)         { eSwitch = 4; sheet.drawOkD(); }
 						// お金はあるかチェック
-						else if(GetIsBuyCoin(gold) == false) { eSwitch = 3; }
+						else if(GetIsBuyCoin(gold) == false) { eSwitch = 3; sheet.drawOkD(); }
+						if(eSwitch == 1)
+						{
+							sheet.drawWindowD();
+						}
 					}
 				}
 			}
-			// 画面クリア
-	        this.clear();
+			EndTime("Proc");	
 			// シートの描画
-	        sheet.draw(sScrollY);
+	        sheet.draw(sScrollY, this);
 			// タッチ
 			bOldTouch = bTouch;
 		}
@@ -1027,21 +1071,7 @@ var StampShop = function()
 			{
 				this.draw_BuyWindow();
 			}
-			
-			// --------------------------------------    
-			// 残り金額の描画
-			// --------------------------------------
-			ctx.drawImage(g_CoinBackImage, 
-				380, 
-				0, 
-				260, 
-				101);		
-			//ctx.font = g_sFontName;
-			//this.ctx.fillText("" + GetCoin(), 500, 70); 
-			//DrawFont(540, 74, ctx, "" + GetCoin(), true);
-			DrawStrNum(ctx, 518, 74, GetCoin(), false, 0.4, 1.0, 30);
-			
-			
+
 			// ２秒待つ 
 			if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.INIT_WAIT)
 			{
@@ -1088,6 +1118,7 @@ var StampShop = function()
 				// -------------------------------------
 				// 黒の描画
 				// ------------------------------------- 
+				//ClearRect(ctx, 0, 0, 640, BROWSER_SCREEN_H);
 				DrawBack(ctx);
 				// ------------------------------------- 
 				// メッセージファイル
@@ -1111,7 +1142,8 @@ var StampShop = function()
 					bTouch		= false;
 					// レート初期化
 					sScaleRate = 0;
-					g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT_WAIT;					
+					g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT_WAIT;
+					sheet.drawWindowD();
 				}
 			}
 			// シート買ってみよう(購入待ち)
@@ -1179,6 +1211,7 @@ var StampShop = function()
 					// レート初期化
 					sScaleRate = 0;
 					g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT_WAIT;
+					sheet.drawWindowD();
 				}				
 			}
 			// スタンプ買ってみよう(購入待ち)
@@ -1271,7 +1304,7 @@ var StampShop = function()
 				// ------------------------------------- 
 				// メッセージファイル
 				// ------------------------------------- 
-				ctx.drawImage(sModoruMessage, BackYesX, BackYesY);	
+				ctxEffect.drawImage(sModoruMessage, BackYesX, BackYesY);	
 				// 決定
 				if(bTri && g_eStatus == G_STATUS.MAIN)
 				{		
@@ -1300,13 +1333,14 @@ var StampShop = function()
 				}
 				g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.NON;
 			}
+			DrawTime(ctx);
 	    };
 		// --------------------------------------    
 	    // マウスイベント
 		// --------------------------------------
 	    this.onTouchStart = function(e)
 		{
-			if(g_eStatus != G_STATUS.MAIN) { return; }
+			if(g_eStatus != G_STATUS.MAIN) { e.preventDefault(); return; }
 	        var pos = getTouchPos(e);
 	        sTouchStartX = pos.x;
 	        sTouchStartY = pos.y;
@@ -1319,7 +1353,7 @@ var StampShop = function()
 	    };
 	    this.onTouchMove = function(e) 
 		{
-			if(g_eStatus != G_STATUS.MAIN) { return; }
+			if(g_eStatus != G_STATUS.MAIN) { e.preventDefault(); return; }
 	        if (bTouch) 
 			{
 	            var pos = getTouchPos(e);
@@ -1330,7 +1364,7 @@ var StampShop = function()
 	    };
 	    this.onTouchEnd = function(e)
 		{
-			if(g_eStatus != G_STATUS.MAIN) { return; }
+			if(g_eStatus != G_STATUS.MAIN) { e.preventDefault(); return; }
 	        bTouch = false;
 	        e.preventDefault(); // デフォルトイベント処理をしない
 	    };
@@ -1342,15 +1376,15 @@ var StampShop = function()
 	        navigator.userAgent.indexOf('iPad')    > 0 ||
 	        navigator.userAgent.indexOf('Android') > 0) 
 		{
-	        canvas.addEventListener("touchstart",this.onTouchStart,false);
-	        canvas.addEventListener("touchmove", this.onTouchMove, false);
-	        canvas.addEventListener("touchend",  this.onTouchEnd,  false);
+	        canvasEffect.addEventListener("touchstart",this.onTouchStart,false);
+	        canvasEffect.addEventListener("touchmove", this.onTouchMove, false);
+	        canvasEffect.addEventListener("touchend",  this.onTouchEnd,  false);
 	    } 
 		else 
 		{
-	        canvas.addEventListener("mousedown", this.onTouchStart,false);
-	        canvas.addEventListener("mousemove", this.onTouchMove, false);
-	        canvas.addEventListener("mouseup",   this.onTouchEnd,  false);
+	        canvasEffect.addEventListener("mousedown", this.onTouchStart,false);
+	        canvasEffect.addEventListener("mousemove", this.onTouchMove, false);
+	        canvasEffect.addEventListener("mouseup",   this.onTouchEnd,  false);
 	    }
 	};
 
@@ -1434,10 +1468,20 @@ var StampShop = function()
 	// キャンバスの作成
 	var im =document.createElement('canvas');
 	im.setAttribute('id', 'canvas');
- 	im.width = 640;   
-	im.height = 1200;  
+ 	im.width  = 640;   
+	im.height = BROWSER_SCREEN_H;  
 	sceen.appendChild(im);	
-	GSetupEffect();
+	
+	// 上にかぶせるキャンバスも追加
+	im =document.createElement('canvas');
+	im.setAttribute('id', 'canvas_Effect');
+	im.style.position = 'absolute';
+ 	im.style.top = "0px"; 
+ 	im.style.left ="0px"; 	
+ 	im.width  = 640;   
+	im.height = BROWSER_SCREEN_H;  
+	sceen.appendChild(im);		
+	GSetupEffect(); 	
 	
 	//
 	// フレーム処理
@@ -1448,11 +1492,11 @@ var StampShop = function()
 		{
 			//初期化
 			case G_STATUS.INIT:
+				// シートのロード
+   				LoadSheetGraphic();
 				// スタンプとシートのロードが終わってる
-				if(g_sStampLoadFlg.bLoadFlg && g_sShopLoadFlg.bLoadFlg && g_sTutorialLoadFlg.bLoadFlg)
+				if(g_sStampLoadFlg.bLoadFlg && g_sShopLoadFlg.bLoadFlg && g_sTutorialLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg)
 				{
-					// シートのロード
-   					LoadSheetGraphic();
 					if(mainCanvas == null)
 					{
 						mainCanvas = new MainCanvas(0);
@@ -1498,14 +1542,14 @@ var StampShop = function()
 				// ----------------------------------------------
 				// ロード中か？
 				// ----------------------------------------------
-				if(g_sSheetLoadFlg.bLoadFlg == false)
+				/*if(g_sSheetLoadFlg.bLoadFlg == false)
 				{	
 					var strDumpdata1 = g_sSheetLoadFlg.GetDump();
 					M_PRINTR("ロード中です！<br>"				+
 							"[Sheet]" + strDumpdata1);
 				}
 				else { M_PRINTB(""); }
-			
+		*/	
 				// メインキャンバスの描画
     			mainCanvas.draw();
 				GExecEffect();
@@ -1525,7 +1569,10 @@ var StampShop = function()
 			//終了
 			case G_STATUS.END:
 				// スタンプへ
-				SetTutorialStatus(gTUTORIAL_STATUS.STAMP);
+				if(GetTutorialFlg())
+				{
+					SetTutorialStatus(gTUTORIAL_STATUS.STAMP);
+				}
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット

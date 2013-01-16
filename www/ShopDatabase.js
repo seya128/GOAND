@@ -371,15 +371,63 @@ function SetupShopAllData()
 
 function M_PRINT(sData)
 {
-//	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
+	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
 }
 function M_PRINTB(sData)
 {
-//	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
+	document.getElementById("memory").innerHTML = "<font color='black'>" + sData + "</font>";
 }
 function M_PRINTR(sData)
 {
-//	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+}
+
+var g_TimerCounter = 0;
+var g_StartTime    = 0;
+var g_TimeString;
+
+function StartTime()
+{return;
+	g_StartTime = new Date();
+}
+
+function EndTime(str)
+{return;
+	//if(g_TimerCounter == 0)
+	{		
+		// 表示
+		var EndTime = new Date();
+		var MSec    = EndTime.getTime() - g_StartTime.getTime();
+
+		g_TimeString += "[" + str + "][" + MSec + "]<br>";
+	}
+}
+function DrawTime(ctx)
+{return;
+	g_TimerCounter --;
+	if(g_TimerCounter <= 0)
+	{
+		g_TimerCounter = 10;	
+	//	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
+	}
+	// 下地
+	if(ctx != null)
+	{
+		ctx.globalAlpha = 0.5;
+		ctx.fillStyle="#000000";
+		ctx.fillRect(0, 0, 256, 512);
+		ctx.globalAlpha = 1.0;
+	}
+	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
+	g_TimeString = "";
+}
+
+function ClearRect(ctx, x, y, w, h)
+{
+	StartTime();
+	//ctx.width = ctx.width;
+	ctx.clearRect(x, y, w, h);
+	EndTime("ClearRect");
 }
 
 
@@ -469,7 +517,6 @@ function CheckTutorial()
 			AllDeleteStampDrawData();
 			PresentTutorialStampData();
 			PresentTutorialSheetData();
-			g_TutorialOneLook = true;
 		}
 		// 違ったら今までのデータを復元
 		else
@@ -524,6 +571,37 @@ function StartTutorial()
 		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
 	}
 }
+
+function StartTutorial_Stamp()
+{
+	// ストレージのフラグを見てチュートリアルかをチェックする
+	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
+	{
+		// 今チュートリアル中
+		if(GetTutorialFlg()) { return; }	
+		// データをすべて削除
+		AllDelHasSheet();
+		// データをすべて削除
+		AllDelHasStamp();
+		// 開始
+		SetTutorialFlg(true);
+		// ショップチュートリアルを開始
+		//g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
+		//g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
+		// スタンプセレクト開始
+		g_TutorialSelectFlg     = gTUTORIAL_SELECTFLG.INIT_WAIT;
+		g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.NON;
+		// メインチュートリアル開始
+		g_TutorialMainFlg     	= gTUTORIAL_MAINFLG.INIT_WAIT;
+		g_TutorialNextMainFlg 	= gTUTORIAL_MAINFLG.NON;
+		// チュートリアルで買うものを強制的に買う
+		// プリンゲット
+		AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+		// お子様ランチゲット
+		AddHasSheet(gStampEnum.GOHAN_01);
+	}
+}
+
 
 // -------------------------------------
 // ショップチュートリアル
@@ -1823,7 +1901,7 @@ function DrawBack(ctx)
 {
 	ctx.globalAlpha = 0.6;
 	ctx.fillStyle = 'rgb(0, 0, 0)';
-	ctx.fillRect(0, 0, 640, 1200);
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	ctx.globalAlpha = 1.0;
 }
 /*
