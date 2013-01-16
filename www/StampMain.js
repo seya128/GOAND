@@ -366,6 +366,11 @@ StampBar.prototype.setTouchEvent = function()
     //タッチ開始
     var touchStartEvent = function(e) 
 	{
+		// 無視
+		//if(g_TutorialMainFlg > gTUTORIAL_MAINFLG.STAMP_NONE && g_TutorialMainFlg < gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT)
+		//{
+		//	return;
+		//}
 		// 選択禁止
 		_this.bTutorialTouch = true;
 		if(g_TutorialMainFlg <= gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT || g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT || g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT_END)
@@ -718,6 +723,9 @@ var StampMain = function()
 	var bTutorialStartY  = -200;
 	var bTutorialEndX    = -200;
 	var bTutorialEndY    = -200;
+	var bTempDrawX = 0;
+	var bTempDrawY = 0;
+	var bTempDrawFlg = false;
 
 	// スタンプをタッチして選んでね
 	var sStampTouchSelectMessage = null;
@@ -818,6 +826,9 @@ var StampMain = function()
 			if(g_iSwitch == 0 && (stampBar.selectedStampId < g_HaveStampImageData.length && stampBar.selectedStampId != -1) && GetDrawOkFlg())
 			{
 				if(stampBar.InkMinus5()) { nInkStlong = nGaugeMaxStlong; }
+				bTempDrawFlg = true;
+				bTempDrawFlgX = pos.x;
+				bTempDrawFlgY = pos.y;
 				drawStamp_t(pos.x, pos.y, nInkStlong);
 				//setTimeout(onTouchDown , 100);
 			}
@@ -860,6 +871,12 @@ var StampMain = function()
 				sTouchMoveY = pos.y;
 				if(g_iSwitch == 0 && GetDrawOkFlg())
 				{
+					if(bTempDrawFlg)
+					{
+						ClearRect(stamp_ctx, bTempDrawFlgX - 100, bTempDrawFlgY - 100, 200, 200);
+						bTempDrawFlgX = pos.x;
+						bTempDrawFlgY = pos.y;	
+					}
 					drawStamp_t(sTouchMoveX, sTouchMoveY, nInkStlong);
 				}
 	        }
@@ -875,6 +892,11 @@ var StampMain = function()
 			{
 				if(g_iSwitch == 0 && GetDrawOkFlg())
 				{
+					if(bTempDrawFlg)
+					{
+						ClearRect(stamp_ctx, bTempDrawFlgX - 100, bTempDrawFlgY - 100, 200, 200);
+						bTempDrawFlg = false;
+					}
 					drawStamp(sTouchMoveX, sTouchMoveY, nInkStlong);
 					//canvas_ctx.drawImage(stamp_canvas, 0, 0, 640, 1200);
 					
@@ -893,9 +915,7 @@ var StampMain = function()
 	function drawStamp(x,y,ink)
 	{
 		if (stampBar.selectedStampId >= 0)
-		{
-			stamp_ctx.globalAlpha = 1.0;
-			stamp_ctx.clearRect(0, 0, 640, 1200);
+		{	
 			stampBar.drawSelectedStamp(canvas_ctx, x, y, ink);
 	        //playAudioSE_Stamp();
 		}
@@ -904,8 +924,6 @@ var StampMain = function()
 	{
 		if (stampBar.selectedStampId >= 0)
 		{
-			stamp_ctx.globalAlpha = 1.0;
-			stamp_ctx.clearRect(0, 0, 640, 1200);
 			stampBar.drawSelectedStamp_t(stamp_ctx, x, y, ink);
 	        //playAudioSE_Stamp();
 		}
@@ -1126,7 +1144,7 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				var bCanvasBackBlack = GetCanvasBackBlack();
 				if((g_iSwitch != 0) || bCanvasBackBlack)
 				{
-					stamp_ctx.clearRect(0, 0, 640, 1200);
+					ClearRect(stamp_ctx, 0, 0, 640, 1200);
 				}
 	        	stampBar.slide();
 	            stampBar.updateDispInfo();
@@ -1177,7 +1195,7 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 					else if(id == 2)
 					{
 						g_iSwitch = 0;
-						stamp_ctx.clearRect(0, 0, 640, 1200);
+						ClearRect(stamp_ctx, 0, 0, 640, 1200);
 						g_WindowsScaleRate = 0;
 					}
 				}
@@ -1311,13 +1329,13 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 						if(CanTri || BarTri)
 						{
 							g_TutorialMainFlg = gTUTORIAL_MAINFLG.SHEET_TOUCH_WRITE;
-							stamp_ctx.clearRect(0, 0, 640, 1200);
+							ClearRect(stamp_ctx, 0, 0, 640, 1200);
 						}
 					
 					}
 					else
 					{
-						stamp_ctx.clearRect(0, 0, 640, 1200);
+						ClearRect(stamp_ctx,0, 0, 640, 1200);
 					}
 				}
 				// シートにスタンプを押してね[---]
@@ -1466,7 +1484,7 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				// メニューセレクト[さいごにはじめの画面にもどるには・・・]
 				else if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.MENU_SELECT_END)
 				{
-					if(iWaitCounter < 20) { stamp_ctx.clearRect(0, 0, 640, 1200); iWaitCounter ++; }
+					if(iWaitCounter < 20) { ClearRect(stamp_ctx,0, 0, 640, 1200); iWaitCounter ++; }
 					else
 					{
 						// -------------------------------------
@@ -1530,6 +1548,7 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				// メモリ
 				DispMemory();
 				bOldTouch = bTouch;
+				DrawTime(null);
 				break;
 			
 			//フェードアウト
@@ -1553,10 +1572,10 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				//次のシーンをセット
 				if(nNextEvent == 0)
 				{
-				//	nextSceen = new StampSelect();
-					nextSceen = new SceenTitle();
 					// チュートリアル終了チェック
 					CheckTutorial();
+				//	nextSceen = new StampSelect();
+					nextSceen = new SceenTitle();
 				}
 				else
 				{		
