@@ -503,7 +503,8 @@ function CheckTutorial()
 	{
 		// 解除
 		SaveTutorialLookFlg(true); 
-		SetTutorialStatus(gTUTORIAL_STATUS.END);
+		//SetTutorialStatus(gTUTORIAL_STATUS.END);
+		SetTutorialStatus(gTUTORIAL_STATUS.NONE);
 		SetTutorialFlg(0);
 		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;
 		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;	
@@ -550,8 +551,20 @@ function CheckTutorial()
 function StartTutorial()
 {
 	// ストレージのフラグを見てチュートリアルかをチェックする
+	//g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
 	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
 	{
+		// 初めて
+		if(GetTutorialLookFlg() == false)
+		{
+			DeleteCoin();				// コイン初期化
+			DeleteHaveStampData();		// スタンプ削除
+			DeleteHaveSheetData();		// シート削除
+			AllDeleteStampDrawData();	// スタンプしたデータを削除
+			SaveActiveSheetIndex(0);	// アクティブシートの初期化
+			DeleteTutorialLookFlg();	// チュートリアルを見てないことにする
+		}	
+		
 		if(g_TutorialStatus == gTUTORIAL_STATUS.END) { return; }
 		// ショップから
 		g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
@@ -562,6 +575,8 @@ function StartTutorial()
 		
 		// 開始
 		SetTutorialFlg(true);
+		// お金ゲット
+		SetCoin(10);
 		// ショップチュートリアルを開始
 		g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
 		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
@@ -581,6 +596,18 @@ function StartTutorial_Stamp()
 	{
 		// 今チュートリアル中
 		if(GetTutorialFlg()) { return; }	
+	
+		// 初めて
+		if(GetTutorialLookFlg() == false)
+		{
+			DeleteCoin();				// コイン初期化
+			DeleteHaveStampData();		// スタンプ削除
+			DeleteHaveSheetData();		// シート削除
+			AllDeleteStampDrawData();	// スタンプしたデータを削除
+			SaveActiveSheetIndex(0);	// アクティブシートの初期化
+			DeleteTutorialLookFlg();	// チュートリアルを見てないことにする
+		}			
+		
 		// データをすべて削除
 		AllDelHasSheet();
 		// データをすべて削除
@@ -1699,10 +1726,10 @@ function DrawCharNum(ctx, x, y, num, size, a)
 {
 	if(num < 0 || num > 9) { return; }
 	ctx.drawImage(g_NumHandleA[num],
-							x - (132 * size),
-							y - (132 * size),
-							(165 * size), 
-							(165 * size));
+		(x - (132 * size)) | 0,
+		(y - (132 * size)) | 0,
+		(165 * size) | 0, 
+		(165 * size) | 0);
 }
 
 // メニュー
@@ -1732,7 +1759,7 @@ function DrawStampWindow(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = (1.0 - sScaleRate) * -64;
+	var GPosY = ((1.0 - sScaleRate) * -64) | 0;
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_StampMainWindowImageHandle, 
@@ -1797,7 +1824,7 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = ((1.0 - sScaleRate) * -64) - 120;
+	var GPosY = (((1.0 - sScaleRate) * -64) - 120) | 0;
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -1858,7 +1885,7 @@ function DrawWindowOk(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = (1.0 - sScaleRate) * -64;
+	var GPosY = ((1.0 - sScaleRate) * -64) | 0;
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -2163,13 +2190,13 @@ GEffectData.prototype.Exec = function()
 				
 				if(this.nCrsFlg)
 				{
-		        	this.sCtx.clearRect (this.nX - (vTargetW / 2) + this.nW / 2, 
-		 								 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        	this.sCtx.clearRect ((this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		        						 (this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        	(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		        	(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0 , vTargetH | 0);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2177,7 +2204,7 @@ GEffectData.prototype.Exec = function()
 				this.bEnd = true;
 				if(this.nCrsW != 0 && this.nCrsW != 0)
 				{
-					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
+					this.sCtx.clearRect(0, 0, this.nCrsW | 0, this.nCrsH | 0);
 				}
 				if(this.EndCallBack != null) { this.EndCallBack(this); }
 				return false;
@@ -2245,13 +2272,14 @@ GEffectData.prototype.Exec = function()
 				
 				if(this.nCrsFlg)
 				{
-		        	this.sCtx.clearRect (this.nX - (vTargetW / 2) + this.nW / 2, 
-		 								 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        	this.sCtx.clearRect (
+		        					(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		        					(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        					(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		        					(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2278,13 +2306,13 @@ GEffectData.prototype.Exec = function()
 		        this.sCtx.globalAlpha = 1.0;
 				if(this.nCrsFlg)
 				{
-		      	  this.sCtx.clearRect( this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							   this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		      	  this.sCtx.clearRect(  (this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		      	  						(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        					(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		        					(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2292,7 +2320,7 @@ GEffectData.prototype.Exec = function()
 				this.bEnd = true;
 				if(this.nCrsW != 0 && this.nCrsW != 0)
 				{
-					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
+					this.sCtx.clearRect(0, 0, this.nCrsW | 0, this.nCrsH | 0);
 				}
 				if(this.EndCallBack != null) { this.EndCallBack(this); }
 				return false;
@@ -2320,8 +2348,8 @@ GEffectData.prototype.Exec = function()
 
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount, vTargetW, vTargetH);
+		        		(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
+		        		(this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount) | 0, vTargetW | 0, vTargetH | 0);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else

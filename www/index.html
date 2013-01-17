@@ -21,7 +21,8 @@
             	
             }
            
-            
+            var timer;
+
             function mainLoop() 
             {
             	// 時間の計測開始
@@ -52,8 +53,18 @@
 				var Timer   = 50 - Min;
 
             	// FPSの表示
-            	//document.getElementById("fps").innerHTML = "<font size='6' color='white'>レート[" + Min + "/50]</font>";
-			
+            	if(Timer <= 0)
+            	{
+            		document.getElementById("fps").innerHTML = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
+				}
+				else if(Timer < 10) 
+            	{
+            		document.getElementById("fps").innerHTML = "<font size='5' color='white' style ='background-color:orange;'>処理[" + Min + "/50]</font>";
+				}
+				else
+            	{
+            		document.getElementById("fps").innerHTML = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
+				}		
 				if(Timer > 0)
 				{
             		setTimeout('mainLoop()', Timer);
@@ -61,8 +72,7 @@
             	else
             	{
             		setTimeout('mainLoop()', 1);
-            	}
-            	//setTimeout('mainLoop()', 50);         	
+            	}         	
             }
             
             

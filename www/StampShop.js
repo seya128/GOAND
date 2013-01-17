@@ -457,7 +457,12 @@ ShopSheet.prototype.drawOkD= function()
 
 
 ShopSheet.prototype.drawWindow = function()
-{
+{  
+	if(this.ctxEffect.canvas.width == 0)
+	{
+		this.ctxEffect.canvas.width = 640;
+		this.ctxEffect.canvas.height= BROWSER_SCREEN_H;
+	}
 	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 	DrawBack(this.ctxEffect);
 	
@@ -535,8 +540,12 @@ ShopSheet.prototype.drawWindow = function()
 // いっぱいですなどなど
 ShopSheet.prototype.drawOK= function()
 {
+	if(this.ctxEffect.canvas.width == 0)
+	{
+		this.ctxEffect.canvas.width = 640;
+		this.ctxEffect.canvas.height= BROWSER_SCREEN_H;
+	}
 	var GPosY = -84;
-	//ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 	DrawBack(this.ctxEffect);
 	
@@ -625,9 +634,9 @@ ShopSheet.prototype.drawItem = function(ofs, no)
 			var yy  = YPos;
 			
 			StartTime();
-			this.ctx.drawImage(this.canvas_item[index], 
-				Math.floor((xx)-214/2 + x), 
-				Math.floor((yy)-237/2 + y));			
+			var dispx =  ((xx)-214/2 + x) | 0;
+			var dispy =  ((yy)-237/2 + y) | 0;
+			this.ctx.drawImage(this.canvas_item[index], dispx, dispy);			
 			EndTime("ItemDraw");
 		}
 	}
@@ -660,9 +669,7 @@ ShopSheet.prototype.draw = function(ofs, ctxobj)
 	// ショップの描画
 	// -------------------------------------  
 	StartTime();
-	this.ctx.drawImage(this.canvas_Komono, 
-		0, 
-		0);	
+	this.ctx.drawImage(this.canvas_Komono, 0, 0);	
 	EndTime("KomonoDraw")			
 	
 	// --------------------------------------	
@@ -694,7 +701,7 @@ var StampShop = function()
     BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
     BROWSER_HEIGHT  += 30;
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
-	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE);	// 画面領域	
+	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE) | 0;	// 画面領域	
 	
 	var mainCanvas = null;
 	sTouchStartX 	= -200;
@@ -730,6 +737,7 @@ var StampShop = function()
 	var sBackMessage     = null;
 	var sModoruMessage   = null;
 	var sTuLookFlg		 = GetTutorialLookFlg();
+	//SetCoin(999);
 	//
 	// メインキャンバス
 	//
@@ -748,7 +756,7 @@ var StampShop = function()
 		var ctx    			= canvas.getContext("2d");
 	    var canvasEffect 	= document.getElementById("canvas_Effect");
 		var ctxEffect    	= canvasEffect.getContext("2d");
-	    var sheet = new ShopSheet(ctx, ctxEffect);
+	    var sheet 			= new ShopSheet(ctx, ctxEffect);
 		
 	    //キャンバスクリア
 	    this.clear = function()
@@ -827,6 +835,8 @@ var StampShop = function()
 							{
 								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT;
 							}
+							canvasEffect.width = 0;
+							canvasEffect.height= 0;
 						}
 					}
 					else
@@ -847,6 +857,8 @@ var StampShop = function()
 							{
 								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.BACK_MESSAGE;
 							}
+							canvasEffect.width = 0;
+							canvasEffect.height= 0;
 						}
 					}
 				}
@@ -1375,12 +1387,18 @@ var StampShop = function()
 	        navigator.userAgent.indexOf('iPad')    > 0 ||
 	        navigator.userAgent.indexOf('Android') > 0) 
 		{
+	        canvas.addEventListener("touchstart",this.onTouchStart,false);
+	        canvas.addEventListener("touchmove", this.onTouchMove, false);
+	        canvas.addEventListener("touchend",  this.onTouchEnd,  false);
 	        canvasEffect.addEventListener("touchstart",this.onTouchStart,false);
 	        canvasEffect.addEventListener("touchmove", this.onTouchMove, false);
 	        canvasEffect.addEventListener("touchend",  this.onTouchEnd,  false);
 	    } 
 		else 
 		{
+	        canvas.addEventListener("mousedown", this.onTouchStart,false);
+	        canvas.addEventListener("mousemove", this.onTouchMove, false);
+	        canvas.addEventListener("mouseup",   this.onTouchEnd,  false);
 	        canvasEffect.addEventListener("mousedown", this.onTouchStart,false);
 	        canvasEffect.addEventListener("mousemove", this.onTouchMove, false);
 	        canvasEffect.addEventListener("mouseup",   this.onTouchEnd,  false);
@@ -1477,8 +1495,8 @@ var StampShop = function()
 	im.style.position = 'absolute';
  	im.style.top = "0px"; 
  	im.style.left ="0px"; 	
- 	im.width  = 640;   
-	im.height = BROWSER_SCREEN_H;  
+ 	im.width  = 0;   
+	im.height = 0;  
 	sceen.appendChild(im);		
 	GSetupEffect(); 	
 	

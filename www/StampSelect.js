@@ -56,6 +56,12 @@ var StampSelect = function()
 	var sModoruMessage   = null;
 	var sTuLookFlg		 = GetTutorialLookFlg();
 	
+	// 全くなければダミー
+	if(g_HaveStampSheetData.length <= 0)
+	{
+		DummySheetDataSet();
+		DummyStampDataSet();
+	}
 	
 	//
 	// スタンプシート
@@ -826,7 +832,7 @@ var StampSelect = function()
 		g_eStatus = G_STATUS.END;
 		next = 1;
 	}
-	
+
 	//
 	// フレーム処理
 	//
