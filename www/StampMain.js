@@ -1547,7 +1547,6 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 				stampBar.bOldTutorialTouch	= stampBar.bTutorialTouch;		
 				// メモリ
 				bOldTouch = bTouch;
-				DrawTime(null);
 				break;
 			
 			//フェードアウト

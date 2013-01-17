@@ -18,13 +18,6 @@ var STAMP_W_REDUCTION_W	= STAMP_W_REDUCTION / 2;
 var STAMP_H_REDUCTION_H	= STAMP_H_REDUCTION / 2;
 var BROWSER_ALL_H		= 0;
 
-// -------------------------------------
-// チュートリアル
-// -------------------------------------
-var g_TutorialBackYesX = 489;
-var g_TutorialBackYesY = 11;
-var g_TutorialBackYesW = 137;
-var g_TutorialBackYesH = 42;	
 				
 // -------------------------------------
 // スタンプの最大数を取得しデバッグ表示
@@ -687,7 +680,6 @@ var StampSelect = function()
 					}	
 				}
 			}	
-			DrawTime(ctx);
 	    };
   
 	    //マウスイベント

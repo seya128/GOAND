@@ -23,6 +23,14 @@ var MAX_SHOP_PANEL_INTERVAL_Y 	= 0;
 var gHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
 
+// -------------------------------------
+// チュートリアル
+// -------------------------------------
+var g_TutorialBackYesX = 489;
+var g_TutorialBackYesY = 11;
+var g_TutorialBackYesW = 137;
+var g_TutorialBackYesH = 42;	
+
 // ------------------------------------------------------
 // セーブキー
 // ------------------------------------------------------
@@ -447,21 +455,13 @@ function EndTime(str)
 		g_TimeString += "[" + str + "][" + MSec + "]<br>";
 	}
 }
-function DrawTime(ctx)
+function DrawTime()
 {return;
 	g_TimerCounter --;
 	if(g_TimerCounter <= 0)
 	{
 		g_TimerCounter = 10;	
 	//	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
-	}
-	// 下地
-	if(ctx != null)
-	{
-		ctx.globalAlpha = 0.5;
-		ctx.fillStyle="#000000";
-		ctx.fillRect(0, 0, 256, 512);
-		ctx.globalAlpha = 1.0;
 	}
 	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
 	g_TimeString = "";
@@ -1714,6 +1714,7 @@ function DrawStrNum(ctx, x, y, num, op0Clear, size, a, space)
 		x += (165 * size) - space;
 		x += (165 * size) - space;
 		DrawCharNum(ctx, x, y, 0, size, a);
+		ctx.globalAlpha = ta;
 		return;
 	}
 	for(var i = 100; i >= 1; i /= 10)
