@@ -1570,7 +1570,6 @@ var StampShop = function()
 				// メインキャンバスの描画
     			mainCanvas.draw();
 				GExecEffect();
-				DispMemory();
 				break;
 			
 			//フェードアウト

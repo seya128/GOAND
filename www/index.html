@@ -53,18 +53,33 @@
 				var Timer   = 50 - Min;
 
             	// FPSの表示
+            	var strMessage;
             	if(Timer <= 0)
             	{
-            		document.getElementById("fps").innerHTML = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
+            		strMessage = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
 				}
 				else if(Timer < 10) 
             	{
-            		document.getElementById("fps").innerHTML = "<font size='5' color='white' style ='background-color:orange;'>処理[" + Min + "/50]</font>";
+            		strMessage = "<font size='5' color='white' style ='background-color:orange;'>処理[" + Min + "/50]</font>";
 				}
 				else
             	{
-            		document.getElementById("fps").innerHTML = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
+            		strMessage = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
 				}		
+				document.getElementById("fps").innerHTML = strMessage;
+				
+				/*
+				// メモリ
+				if(performance)
+				{
+					if(performance.memory)
+					{
+						document.getElementById("fps").innerHTML = strMessage + "<font size='5' color='white' style ='background-color:blue;'>[メモリ]" + "[" + performance.memory.usedJSHeapSize + "]/" + "[" + performance.memory.totalJSHeapSize + "]</font>";
+					}
+					else { document.getElementById("fps").innerHTML = strMessage; }
+				}
+				else { document.getElementById("fps").innerHTML = strMessage; }
+				*/
 				if(Timer > 0)
 				{
             		setTimeout('mainLoop()', Timer);

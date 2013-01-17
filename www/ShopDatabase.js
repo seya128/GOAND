@@ -369,6 +369,47 @@ function SetupShopAllData()
 	}
 }
 
+
+// ------------------------------------------------------
+// デバッグ
+// ------------------------------------------------------
+var g_StartUseMemory      = 0;
+var g_StartTotalMemory    = 0;
+function StartMemory()
+{
+	if(performance)
+	{
+		if(performance.memory)
+		{
+			g_StartUseMemory    = performance.memory.usedJSHeapSize;
+			g_StartTotalMemory  = performance.memory.totalJSHeapSize;
+		}
+	}
+	
+}
+function EndMemory(str)
+{
+	if(performance)
+	{
+		if(performance.memory)
+		{
+			M_PRIN_BW(str + "[差分]" + "[" + (performance.memory.usedJSHeapSize - g_StartUseMemory) + "]");
+		}
+	}
+}
+function DispMemory(str)
+{
+	if(performance)
+	{
+		if(performance.memory)
+		{
+			var Use    = performance.memory.usedJSHeapSize;
+			var Total  = performance.memory.totalJSHeapSize;
+			M_PRIN_BW("[メモリ]" + "[" + Use + "]/" + "[" + Total + "]");
+		}
+	}
+}
+
 function M_PRINT(sData)
 {
 	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
@@ -380,6 +421,10 @@ function M_PRINTB(sData)
 function M_PRINTR(sData)
 {
 	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
+}
+function M_PRIN_BW(sData)
+{
+	document.getElementById("memory").innerHTML = "<font size='5' color='white' style ='background-color:blue;'>" + sData + "</font>";
 }
 
 var g_TimerCounter = 0;
@@ -424,10 +469,7 @@ function DrawTime(ctx)
 
 function ClearRect(ctx, x, y, w, h)
 {
-	StartTime();
-	//ctx.width = ctx.width;
 	ctx.clearRect(x, y, w, h);
-	EndTime("ClearRect");
 }
 
 
@@ -614,6 +656,8 @@ function StartTutorial_Stamp()
 		AllDelHasStamp();
 		// 開始
 		SetTutorialFlg(true);
+		// スタンプ
+		g_TutorialStatus = gTUTORIAL_STATUS.STAMP;
 		// ショップチュートリアルを開始
 		//g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
 		//g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
@@ -1519,41 +1563,6 @@ function SaveActiveStampIndex(sheetno)
 }
 
 
-// ------------------------------------------------------
-// デバッグ
-// ------------------------------------------------------
-function DispMemory()
-{
-	// メモリ内の表示デバッグ
-	//var Use    = performance.memory.usedJSHeapSize;
-	//var Total  = performance.memory.totalJSHeapSize;
-	//var UseM   = Use   / 1024 / 1024;
-	//var TotalM = Total / 1024 / 1024;
-	//var rootSceen = document.getElementById("sceen");
-	//var sceen     = document.createElement("div");
-//	var w = window.innerWidth;
-//	var r = 640 / w;
-//	var h = window.innerHeight * r;
-//	document.getElementById("memory").innerHTML = "[" + w + "][" + h + "]" ;
-	
-//	document.body.scrollLeft - document.body.clientWidth
-	
-/*
-	window.innerWidth
-	document.body.clientWidth				// 実際の表示サイズ
-	document.documentElement.clientWidth	// ??
-	
-	window.innerWidth < window.innerHeight
-	document.body.style.width + "][" + document.body.style.height
- 	im.width = 640;   
-	im.height = 1200;  
-	im.style.position = 'absolute';
- 	im.style.top = "0px"; 
- 	im.style.left ="0px"; 
-*/
-	//document.getElementById("memory").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";/* + sActiveSheetNo;*/
-	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
-}
 
 var g_WindowImageHandle 			= null;
 var g_YesImageHandle 				= null;
