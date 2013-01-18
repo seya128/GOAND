@@ -110,10 +110,10 @@ function DrawBuyImage(ctx, GPosY, id, gold)
 	// シート
 	else
 	{
-		var PopX = 176 			- (640  * fWindowSheetRate)/2;
-		var PopY = GPosY + 300 	- (1138 * fWindowSheetRate)/2;
-		var PopW = 640  * fWindowSheetRate;
-		var PopH = 1138 * fWindowSheetRate;
+		var PopX = Math.floor(176			- (640  * fWindowSheetRate) / 2);
+		var PopY = Math.floor(GPosY + 300 	- (1138 * fWindowSheetRate) / 2);
+		var PopW = Math.floor(640  * fWindowSheetRate);
+		var PopH = Math.floor(1138 * fWindowSheetRate);
 		SafeDrawSheet(ctx, popImage, PopX, PopY, PopW, PopH);	
 		
 		// エッジ表示

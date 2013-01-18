@@ -440,7 +440,7 @@ var StampSelect = function()
 			var bL = false;
 			var bR = false;
 			
-			StartTime();
+			//StartTime();
 			// 前
 			if(sheet[nowid].sheetNo > 0)
 			{
@@ -457,7 +457,7 @@ var StampSelect = function()
 			{
 				sheet[nowid].draw(ofsX);
 			}
-			EndTime("描画");
+			//EndTime("描画");
 			
 			// 一回描画済み
 			vOneTimeDrawFlg = true;
@@ -474,7 +474,7 @@ var StampSelect = function()
 				bOldTouch = false;
 			}
 				
-			StartTime();
+			//StartTime();
 			// 矢印を描画
 			MoveArrowL();
 			MoveArrowR();			
@@ -484,7 +484,7 @@ var StampSelect = function()
 
 			// これにするボタン
  			ctx.drawImage(g_ClaerButtonHandle, 145, BROWSER_HEIGHT - 50/*630*/);
-			EndTime("小物");
+			//EndTime("小物");
 			
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
 	
@@ -497,13 +497,13 @@ var StampSelect = function()
 			// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
 			else if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT || g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE)
 			{	
-				StartTime();
+				//StartTime();
 				// メッセージファイル
 				ctx.drawImage(sSheetSelectMessage, 103, 385);				
 				DrawDocumentArrow(ctx, 320 - 56, BROWSER_HEIGHT - 150);
 				// 変更
 				g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT;
-				EndTime("メッセ");
+				//EndTime("メッセ");
 			}
 			
 			// ------------------------------------------------
