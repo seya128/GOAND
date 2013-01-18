@@ -17,6 +17,13 @@ body {
 #memory {
     position: fixed;
     z-index: 10;
+    top: 50px;
+    left: 10px;
+}
+
+#fps {
+    position: fixed;
+    z-index: 10;
     top: 0px;
     left: 10px;
 }

@@ -20,7 +20,9 @@
             	setTimeout('mainLoop()', 50);
             	
             }
-            
+           
+            var timer;
+
             function mainLoop() 
             {
             	// 時間の計測開始
@@ -46,9 +48,39 @@
             	// 1000/30= 33.3FPS
             	// 1000/50= 20.0FPS
              	// 1000/60= 16.6FPS
-             	
 				var EndTime = new Date();
-				var Timer   = 50 - (EndTime.getTime() - StartTime.getTime());
+				var Min     = (EndTime.getTime() - StartTime.getTime());
+				var Timer   = 50 - Min;
+
+            	// FPSの表示
+            	var strMessage;
+            	if(Timer <= 0)
+            	{
+            		strMessage = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
+				}
+				else if(Timer < 10) 
+            	{
+            		strMessage = "<font size='5' color='white' style ='background-color:orange;'>処理[" + Min + "/50]</font>";
+				}
+				else
+            	{
+            		strMessage = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
+				}		
+				document.getElementById("fps").innerHTML = strMessage;
+				DrawTime();
+				
+				/*
+				// メモリ
+				if(performance)
+				{
+					if(performance.memory)
+					{
+						document.getElementById("fps").innerHTML = strMessage + "<font size='5' color='white' style ='background-color:blue;'>[メモリ]" + "[" + performance.memory.usedJSHeapSize + "]/" + "[" + performance.memory.totalJSHeapSize + "]</font>";
+					}
+					else { document.getElementById("fps").innerHTML = strMessage; }
+				}
+				else { document.getElementById("fps").innerHTML = strMessage; }
+				*/
 				if(Timer > 0)
 				{
             		setTimeout('mainLoop()', Timer);
@@ -56,8 +88,7 @@
             	else
             	{
             		setTimeout('mainLoop()', 1);
-            	}
-            	//setTimeout('mainLoop()', 50);
+            	}         	
             }
             
             
@@ -70,6 +101,8 @@
 		version 0.1.1
 	</div>
 	<div id="memory">
+	</div>
+	<div id="fps">
 	</div>
 	<div id="ad">
 	<div class='accesstrade.net.adnw' id='2'></div>
