@@ -23,6 +23,14 @@ var MAX_SHOP_PANEL_INTERVAL_Y 	= 0;
 var gHeightSize = (MAX_SHOP_PANEL_HEIGHT * MAX_SHOP_DISP_HEIGHT);
 
 
+// -------------------------------------
+// チュートリアル
+// -------------------------------------
+var g_TutorialBackYesX = 489;
+var g_TutorialBackYesY = 11;
+var g_TutorialBackYesW = 137;
+var g_TutorialBackYesH = 42;	
+
 // ------------------------------------------------------
 // セーブキー
 // ------------------------------------------------------
@@ -369,6 +377,47 @@ function SetupShopAllData()
 	}
 }
 
+
+// ------------------------------------------------------
+// デバッグ
+// ------------------------------------------------------
+var g_StartUseMemory      = 0;
+var g_StartTotalMemory    = 0;
+function StartMemory()
+{
+	if(performance)
+	{
+		if(performance.memory)
+		{
+			g_StartUseMemory    = performance.memory.usedJSHeapSize;
+			g_StartTotalMemory  = performance.memory.totalJSHeapSize;
+		}
+	}
+	
+}
+function EndMemory(str)
+{
+	if(performance)
+	{
+		if(performance.memory)
+		{
+			M_PRIN_BW(str + "[差分]" + "[" + (performance.memory.usedJSHeapSize - g_StartUseMemory) + "]");
+		}
+	}
+}
+function DispMemory(str)
+{
+	if(performance)
+	{
+		if(performance.memory)
+		{
+			var Use    = performance.memory.usedJSHeapSize;
+			var Total  = performance.memory.totalJSHeapSize;
+			M_PRIN_BW("[メモリ]" + "[" + Use + "]/" + "[" + Total + "]");
+		}
+	}
+}
+
 function M_PRINT(sData)
 {
 	document.getElementById("memory").innerHTML = "<font color='white'>" + sData + "</font>";
@@ -381,18 +430,22 @@ function M_PRINTR(sData)
 {
 	document.getElementById("memory").innerHTML = "<font color='red'>" + sData + "</font>";
 }
+function M_PRIN_BW(sData)
+{
+	document.getElementById("memory").innerHTML = "<font size='5' color='white' style ='background-color:blue;'>" + sData + "</font>";
+}
 
 var g_TimerCounter = 0;
 var g_StartTime    = 0;
-var g_TimeString;
+var g_TimeString   = "";
 
 function StartTime()
-{return;
+{
 	g_StartTime = new Date();
 }
 
 function EndTime(str)
-{return;
+{
 	//if(g_TimerCounter == 0)
 	{		
 		// 表示
@@ -402,32 +455,24 @@ function EndTime(str)
 		g_TimeString += "[" + str + "][" + MSec + "]<br>";
 	}
 }
-function DrawTime(ctx)
-{return;
+function DrawTime()
+{
 	g_TimerCounter --;
 	if(g_TimerCounter <= 0)
 	{
 		g_TimerCounter = 10;	
 	//	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
 	}
-	// 下地
-	if(ctx != null)
+	if(g_TimeString != "")
 	{
-		ctx.globalAlpha = 0.5;
-		ctx.fillStyle="#000000";
-		ctx.fillRect(0, 0, 256, 512);
-		ctx.globalAlpha = 1.0;
+		document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
+		g_TimeString = "";
 	}
-	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
-	g_TimeString = "";
 }
 
 function ClearRect(ctx, x, y, w, h)
 {
-	StartTime();
-	//ctx.width = ctx.width;
 	ctx.clearRect(x, y, w, h);
-	EndTime("ClearRect");
 }
 
 
@@ -502,7 +547,9 @@ function CheckTutorial()
 	if(GetTutorialFlg())
 	{
 		// 解除
-		SetTutorialStatus(gTUTORIAL_STATUS.END);
+		SaveTutorialLookFlg(true); 
+		//SetTutorialStatus(gTUTORIAL_STATUS.END);
+		SetTutorialStatus(gTUTORIAL_STATUS.NONE);
 		SetTutorialFlg(0);
 		g_TutorialShopFlg 		= gTUTORIAL_SHOPFLG.NONE;
 		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;	
@@ -549,8 +596,21 @@ function CheckTutorial()
 function StartTutorial()
 {
 	// ストレージのフラグを見てチュートリアルかをチェックする
+	//g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
 	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
 	{
+		// 初めて
+		if(GetTutorialLookFlg() == false)
+		{
+			DeleteCoin();				// コイン初期化
+			DeleteHaveStampData();		// スタンプ削除
+			DeleteHaveSheetData();		// シート削除
+			AllDeleteStampDrawData();	// スタンプしたデータを削除
+			SaveActiveSheetIndex(0);	// アクティブシートの初期化
+			DeleteTutorialLookFlg();	// チュートリアルを見てないことにする
+		}	
+		
+		if(g_TutorialStatus == gTUTORIAL_STATUS.END) { return; }
 		// ショップから
 		g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
 		// データをすべて削除
@@ -560,6 +620,8 @@ function StartTutorial()
 		
 		// 開始
 		SetTutorialFlg(true);
+		// お金ゲット
+		SetCoin(10);
 		// ショップチュートリアルを開始
 		g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
 		g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
@@ -579,12 +641,26 @@ function StartTutorial_Stamp()
 	{
 		// 今チュートリアル中
 		if(GetTutorialFlg()) { return; }	
+	
+		// 初めて
+		if(GetTutorialLookFlg() == false)
+		{
+			DeleteCoin();				// コイン初期化
+			DeleteHaveStampData();		// スタンプ削除
+			DeleteHaveSheetData();		// シート削除
+			AllDeleteStampDrawData();	// スタンプしたデータを削除
+			SaveActiveSheetIndex(0);	// アクティブシートの初期化
+			DeleteTutorialLookFlg();	// チュートリアルを見てないことにする
+		}			
+		
 		// データをすべて削除
 		AllDelHasSheet();
 		// データをすべて削除
 		AllDelHasStamp();
 		// 開始
 		SetTutorialFlg(true);
+		// スタンプ
+		g_TutorialStatus = gTUTORIAL_STATUS.STAMP;
 		// ショップチュートリアルを開始
 		//g_TutorialShopFlg     	= gTUTORIAL_SHOPFLG.INIT_WAIT;
 		//g_TutorialNextShopFlg 	= gTUTORIAL_SHOPFLG.NON;
@@ -1490,41 +1566,6 @@ function SaveActiveStampIndex(sheetno)
 }
 
 
-// ------------------------------------------------------
-// デバッグ
-// ------------------------------------------------------
-function DispMemory()
-{
-	// メモリ内の表示デバッグ
-	//var Use    = performance.memory.usedJSHeapSize;
-	//var Total  = performance.memory.totalJSHeapSize;
-	//var UseM   = Use   / 1024 / 1024;
-	//var TotalM = Total / 1024 / 1024;
-	//var rootSceen = document.getElementById("sceen");
-	//var sceen     = document.createElement("div");
-//	var w = window.innerWidth;
-//	var r = 640 / w;
-//	var h = window.innerHeight * r;
-//	document.getElementById("memory").innerHTML = "[" + w + "][" + h + "]" ;
-	
-//	document.body.scrollLeft - document.body.clientWidth
-	
-/*
-	window.innerWidth
-	document.body.clientWidth				// 実際の表示サイズ
-	document.documentElement.clientWidth	// ??
-	
-	window.innerWidth < window.innerHeight
-	document.body.style.width + "][" + document.body.style.height
- 	im.width = 640;   
-	im.height = 1200;  
-	im.style.position = 'absolute';
- 	im.style.top = "0px"; 
- 	im.style.left ="0px"; 
-*/
-	//document.getElementById("memory").innerHTML = "[メモリ]" + "[" + Use + "]/" + "[" + Total + "]";/* + sActiveSheetNo;*/
-	//document.getElementById("memory").innerHTML += "\n[メモリ]" + "[" + UseM + "M]/" + "[" + TotalM + "M]";
-}
 
 var g_WindowImageHandle 			= null;
 var g_YesImageHandle 				= null;
@@ -1676,6 +1717,7 @@ function DrawStrNum(ctx, x, y, num, op0Clear, size, a, space)
 		x += (165 * size) - space;
 		x += (165 * size) - space;
 		DrawCharNum(ctx, x, y, 0, size, a);
+		ctx.globalAlpha = ta;
 		return;
 	}
 	for(var i = 100; i >= 1; i /= 10)
@@ -1697,10 +1739,10 @@ function DrawCharNum(ctx, x, y, num, size, a)
 {
 	if(num < 0 || num > 9) { return; }
 	ctx.drawImage(g_NumHandleA[num],
-							x - (132 * size),
-							y - (132 * size),
-							(165 * size), 
-							(165 * size));
+		Math.floor(x - (132 * size)),
+		Math.floor(y - (132 * size)),
+		Math.floor(165 * size), 
+		Math.floor(165 * size));
 }
 
 // メニュー
@@ -1730,7 +1772,7 @@ function DrawStampWindow(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = (1.0 - sScaleRate) * -64;
+	var GPosY = Math.floor((1.0 - sScaleRate) * -64);
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_StampMainWindowImageHandle, 
@@ -1795,7 +1837,7 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = ((1.0 - sScaleRate) * -64) - 120;
+	var GPosY = Math.floor(((1.0 - sScaleRate) * -64) - 120);
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -1856,7 +1898,7 @@ function DrawWindowOk(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = (1.0 - sScaleRate) * -64;
+	var GPosY = Math.floor((1.0 - sScaleRate) * -64);
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -2152,8 +2194,8 @@ GEffectData.prototype.Exec = function()
 			//	this.nWA    -= 0.2;
 				
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 					
 			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
 			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
@@ -2161,13 +2203,13 @@ GEffectData.prototype.Exec = function()
 				
 				if(this.nCrsFlg)
 				{
-		        	this.sCtx.clearRect (this.nX - (vTargetW / 2) + this.nW / 2, 
-		 								 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        	this.sCtx.clearRect (Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        						 Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        	Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        	Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW , vTargetH);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2234,23 +2276,21 @@ GEffectData.prototype.Exec = function()
 			//	this.nWA    -= 0.2;
 				
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 					
 			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
 			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
-		        this.sCtx.globalAlpha = 1.0;
-				
 				if(this.nCrsFlg)
 				{
-		        	this.sCtx.clearRect (this.nX - (vTargetW / 2) + this.nW / 2, 
-		 								 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        	this.sCtx.clearRect (
+		        					Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        					Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
-		        this.sCtx.globalAlpha = 1.0;
+		        					Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        					Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 			}
 			else
 			{
@@ -2268,21 +2308,22 @@ GEffectData.prototype.Exec = function()
 				this.nCount += 1;
 				
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 					
 			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
 			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
 		        this.sCtx.globalAlpha = 1.0;
 				if(this.nCrsFlg)
 				{
-		      	  this.sCtx.clearRect( this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							   this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+				this.sCtx.globalAlpha = 1.0;
+		      	  this.sCtx.clearRect(  Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		      	  						Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2, vTargetW, vTargetH);
+		        					Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        					Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2312,14 +2353,14 @@ GEffectData.prototype.Exec = function()
 				this.nCount += 1;
 	
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 				this.nA -= 0.1;
 
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-									 this.nX - (vTargetW / 2) + this.nW / 2, 
-		 							 this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount, vTargetW, vTargetH);
+		        		Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        		Math.floor(this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount), vTargetW, vTargetH);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else

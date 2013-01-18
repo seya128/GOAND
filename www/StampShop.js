@@ -41,7 +41,11 @@ var g_BuyStampIppaiMessageImage = null;
 var g_CoinBackImage 			= null;
 var g_ShopImage 				= null;
 var g_CoinChipImage 			= null;
-		
+var g_sForceUpdate				= false;
+var g_sTempCoin					= -100;
+
+// サイズ
+var g_BuyHeight = 900;
 
 function DrawCoinL(img, ctx, x, y, gold)
 {
@@ -149,6 +153,7 @@ function ShopSheet(canvas_ctx, ctxEffect)
     this.ctx = canvas_ctx;
     this.sheetSrc = "";
     this.ctxEffect = ctxEffect;
+	g_sTempCoin    = -100;
 	
 	// 移動フラグ
 	this.nOldY    = -1000;
@@ -157,7 +162,7 @@ function ShopSheet(canvas_ctx, ctxEffect)
 	this.canvas_Buy = document.createElement('canvas');
 	this.canvas_Buy.setAttribute('id', 'canvas_Buy');
  	this.canvas_Buy.width  = 640;   
-	this.canvas_Buy.height = 900; 	
+	this.canvas_Buy.height = g_BuyHeight; 	
     this.ctx_Buy   	= this.canvas_Buy.getContext("2d");	
 	
 	// キャンバス小物
@@ -166,6 +171,7 @@ function ShopSheet(canvas_ctx, ctxEffect)
  	this.canvas_Komono.width  = 640;   
 	this.canvas_Komono.height = 200; 
     this.ctx_Komono    	= this.canvas_Komono.getContext("2d");
+    this.sTuLookFlg		 = GetTutorialLookFlg();
 	
 	// -------------------------------------
 	// 小物の先描画
@@ -252,18 +258,48 @@ ShopSheet.prototype.DrawKomono = function()
 	// --------------------------------------    
     // タイトルへ戻る
 	// --------------------------------------
-	this.ctx_Komono.drawImage(g_BackImageHandle, 
-		0, 
-		0);	
-	
+	if((g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_SELECT || g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_MESSAGE) == false)
+	{
+		this.ctx_Komono.drawImage(g_BackImageHandle, 
+			0, 
+			0);
+	}
 	// --------------------------------------    
 	// 残り金額の描画
 	// --------------------------------------
-	this.ctx_Komono.drawImage(g_CoinBackImage, 
+	if(eSwitch == 0)
+	{
+		// --------------------------------------    
+		// 残り金額の描画
+		// --------------------------------------
+		this.ctx_Komono.drawImage(g_CoinBackImage, 
+			380, 
+			0);		
+		DrawStrNum(this.ctx_Komono, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
+	}
+}
+
+ShopSheet.prototype.DrawKomono_DrawBack = function(ctx)
+{
+	// --------------------------------------    
+	// 残り金額の描画
+	// --------------------------------------
+	ctx.drawImage(g_BackImageHandle, 
+		0, 
+		0);
+}
+
+ShopSheet.prototype.DrawKomono_DrawCoin = function(ctx)
+{
+	// --------------------------------------    
+	// 残り金額の描画
+	// --------------------------------------
+	ctx.drawImage(g_CoinBackImage, 
 		380, 
 		0);		
-	DrawStrNum(this.ctx_Komono, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
+	DrawStrNum(ctx, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
 }
+
 
 // プロック
 ShopSheet.prototype.Proc = function(ofs, no, tri)
@@ -369,7 +405,7 @@ ShopSheet.prototype.Proc = function(ofs, no, tri)
 ShopSheet.prototype.drawWindowD = function()
 {
 	// 初期化
-	ClearRect(this.ctx_Buy, 0, 0, 640, BROWSER_SCREEN_H + 64);
+	ClearRect(this.ctx_Buy, 0, 0, 640, g_BuyHeight);
 	this.ctx_Buy.globalAlpha = 1.0;
 	
 	var id    = gShopBuyListTable[g_iClickDataIndex]["id"];	
@@ -407,12 +443,13 @@ ShopSheet.prototype.drawWindowD = function()
 	var PosNoH  = 184;
 	this.ctx_Buy.drawImage(g_YesImageHandle, PosYesX, PosYesY);
 	this.ctx_Buy.drawImage(g_NoImageHandle, PosNoX, PosNoY);
+	g_sForceUpdate = true;
 }
 // スタンプを購入しました
 // いっぱいですなどなど
 ShopSheet.prototype.drawOkD= function()
 {
-	ClearRect(this.ctx_Buy, 0, 0, 640, BROWSER_SCREEN_H + 64);
+	ClearRect(this.ctx_Buy, 0, 0, 640, g_BuyHeight);
 	this.ctx_Buy.globalAlpha = 1.0;
 	
 	// 確認ウィンドウ
@@ -453,24 +490,31 @@ ShopSheet.prototype.drawOkD= function()
 	var PosYesW = 281;
 	var PosYesH = 184;
 	this.ctx_Buy.drawImage(g_YesImageHandle, PosYesX, PosYesY, PosYesW, PosYesH);
+	g_sForceUpdate = true;
 }
 
 
 ShopSheet.prototype.drawWindow = function()
-{
-	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
-	DrawBack(this.ctxEffect);
+{  
+	if(this.ctxEffect.canvas.width == 0)
+	{
+		this.ctxEffect.canvas.width = 640;
+		this.ctxEffect.canvas.height= g_BuyHeight;
+	}
+	ClearRect(this.ctxEffect, 0, 0, 640, g_BuyHeight);
+	//DrawBack(this.ctxEffect);
 	
 	// --------------------------------------
 	// 値段上書き
 	// --------------------------------------    
 	// 残り金額の描画
 	// --------------------------------------
+	/*this.ctxEffect.globalAlpha = 1.0;
 	this.ctxEffect.drawImage(g_CoinBackImage, 
 		380, 
 		0);		
 	DrawStrNum(this.ctxEffect, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
-	
+	*/
 	
 	var id = gShopBuyListTable[g_iClickDataIndex]["id"];	
 	var gold = gShopBuyListTable[g_iClickDataIndex]["gold"];	
@@ -535,24 +579,27 @@ ShopSheet.prototype.drawWindow = function()
 // いっぱいですなどなど
 ShopSheet.prototype.drawOK= function()
 {
+	if(this.ctxEffect.canvas.width == 0)
+	{
+		this.ctxEffect.canvas.width = 640;
+		this.ctxEffect.canvas.height= g_BuyHeight;
+	}
 	var GPosY = -84;
-	ClearRect(this.ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
-	DrawBack(this.ctxEffect);
+	ClearRect(this.ctxEffect, 0, 0, 640, g_BuyHeight);
+	//DrawBack(this.ctxEffect);
 	
 	// --------------------------------------
 	// 値段上書き
 	// --------------------------------------    
 	// 残り金額の描画
 	// --------------------------------------
-	this.ctxEffect.drawImage(g_CoinBackImage, 
-		380, 
-		0);		
-	DrawStrNum(this.ctxEffect, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
-	
-	
-	this.ctxEffect.globalAlpha = sScaleRate;
-	
+	//this.ctxEffect.drawImage(g_CoinBackImage, 
+	//	380, 
+	//	0);		
+	//DrawStrNum(this.ctxEffect, 548, 74, GetCoin(), false, 0.4, 1.0, 30);	
+
 	// キャンバスを描画	
+	this.ctxEffect.globalAlpha = sScaleRate;
 	this.ctxEffect.drawImage(this.canvas_Buy, 0, GPosY);
 	
 	// -------------------------------------
@@ -625,33 +672,67 @@ ShopSheet.prototype.drawItem = function(ofs, no)
 			var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 			var yy  = YPos;
 			
-			StartTime();
-			this.ctx.drawImage(this.canvas_item[index], 
-				Math.floor((xx)-214/2 + x), 
-				Math.floor((yy)-237/2 + y));			
-			EndTime("ItemDraw");
+			var dispx =  Math.floor((xx)-214/2 + x);
+			var dispy =  Math.floor((yy)-237/2 + y);
+			this.ctx.drawImage(this.canvas_item[index], dispx, dispy);			
 		}
 	}
 }
 
 //描画
-ShopSheet.prototype.draw = function(ofs, ctxobj)
+ShopSheet.prototype.draw = function(ofs, ctxobj, back)
 {
-	if(GGetEffectNum() != 0)
+	// エフェクト出てるときはショップウィンドウのみ切り替える
+	if(g_sForceUpdate == false)
 	{
+		var sChangeCoin = false;
+		// お金が変化した
+		if((g_sTempCoin != GetCoin()) && eSwitch != 0)
+		{
+			sChangeCoin = true;
+		}
+		
+		// 一切動いていない
+		if(this.nOldY == ofs) 
+		{ 
+			// もしお金が変わっていたら上書き
+			if(sChangeCoin)
+			{
+				// ------------------------------------- 
+				// お金
+				// ------------------------------------- 
+				this.DrawKomono_DrawCoin(this.ctx);
+				// ------------------------------------- 
+				// メッセージファイル
+				// ------------------------------------- 
+				if(GetTutorialFlg() && this.sTuLookFlg)
+				{
+					this.ctx.drawImage(back, g_TutorialBackYesX, g_TutorialBackYesY);
+				}				
+				g_sTempCoin = GetCoin();
+			}
+			return; 
+		}
+		// チェンジコイン
+		if(sChangeCoin)
+		{
+			this.DrawKomono();
+			g_sTempCoin = GetCoin();
+		}
+
+		this.nOldY = ofs;
+	}
+	else
+	{
+		this.nOldY = ofs;
 		this.DrawKomono();
+		g_sForceUpdate = false;
+		g_sTempCoin = GetCoin();
 	}
-	else if(GetTutorialFlg() == false)
-	{
-		if(this.nOldY == ofs) { return; }
-	}
-	this.nOldY = ofs;
-	
+
 	// 画面クリア
-	StartTime();
     ctxobj.clear();
-	EndTime("ColorCls");
-	
+
 	// -------------------------------------
 	// アイテムの描画
 	// -------------------------------------  
@@ -660,11 +741,29 @@ ShopSheet.prototype.draw = function(ofs, ctxobj)
 	// -------------------------------------
 	// ショップの描画
 	// -------------------------------------  
-	StartTime();
-	this.ctx.drawImage(this.canvas_Komono, 
-		0, 
-		0);	
-	EndTime("KomonoDraw")			
+	this.ctx.drawImage(this.canvas_Komono, 0, 0);	
+	
+	if(eSwitch != 0)
+	{
+		DrawBack(this.ctx);
+		this.DrawKomono_DrawCoin(this.ctx);
+	}
+	if(GetTutorialFlg())
+	{
+		if(eSwitch == 0) { DrawBack(this.ctx); }
+		// ------------------------------------- 
+		// メッセージファイル
+		// ------------------------------------- 
+		if(this.sTuLookFlg)
+		{
+			this.ctx.drawImage(back, g_TutorialBackYesX, g_TutorialBackYesY);
+		}
+	}
+	// 例外
+	if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_SELECT || g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_MESSAGE)
+	{
+		this.DrawKomono_DrawBack(this.ctx);		
+	}
 	
 	// --------------------------------------	
 	// デバッグ
@@ -695,7 +794,7 @@ var StampShop = function()
     BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
     BROWSER_HEIGHT  += 30;
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
-	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE);	// 画面領域	
+	BROWSER_SCREEN_H 	= Math.floor(BROWSER_HEIGHT * BROWSER_RATE);	// 画面領域	
 	
 	var mainCanvas = null;
 	sTouchStartX 	= -200;
@@ -731,6 +830,7 @@ var StampShop = function()
 	var sBackMessage     = null;
 	var sModoruMessage   = null;
 	var sTuLookFlg		 = GetTutorialLookFlg();
+	//SetCoin(999);
 	//
 	// メインキャンバス
 	//
@@ -749,7 +849,7 @@ var StampShop = function()
 		var ctx    			= canvas.getContext("2d");
 	    var canvasEffect 	= document.getElementById("canvas_Effect");
 		var ctxEffect    	= canvasEffect.getContext("2d");
-	    var sheet = new ShopSheet(ctx, ctxEffect);
+	    var sheet 			= new ShopSheet(ctx, ctxEffect);
 		
 	    //キャンバスクリア
 	    this.clear = function()
@@ -770,7 +870,7 @@ var StampShop = function()
 		this.draw_BuyWindow = function() 
 		{
 			// シートの描画
-	        sheet.draw(sScrollY, this);
+	        sheet.draw(sScrollY, this, sModoruMessage);
 			// ウィンドウの描画
 			if(eSwitch == 1)
 			{
@@ -782,7 +882,7 @@ var StampShop = function()
 			}
 			// 決定
 			{
-				if(sScaleRate >= 1.0)
+				if(sScaleRate >= 1.0 && GGetEffectNum() == 0)
 				{
 					// 購入
 					if(eSwitch == 1)
@@ -828,6 +928,12 @@ var StampShop = function()
 							{
 								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT;
 							}
+							if(GetTutorialFlg() == false)
+							{
+								canvasEffect.width = 0;
+								canvasEffect.height= 0;
+							}
+							g_sForceUpdate = true;
 						}
 					}
 					else
@@ -835,6 +941,7 @@ var StampShop = function()
 						if(g_iButtonStartClickIndex == 0 && g_iButtonMoveClickIndex == 0)
 						{	
 							eSwitch = 0;
+							sheet.DrawKomono();
 							bOldTouch = false; 
 							bTouch = false;
 							ClearRect(ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
@@ -848,6 +955,12 @@ var StampShop = function()
 							{
 								g_TutorialShopFlg = gTUTORIAL_SHOPFLG.BACK_MESSAGE;
 							}
+							if(GetTutorialFlg() == false)
+							{
+								canvasEffect.width = 0;
+								canvasEffect.height= 0;
+							}
+							g_sForceUpdate = true;
 						}
 					}
 				}
@@ -858,7 +971,6 @@ var StampShop = function()
 		}
 	    this.draw_Main = function()
 		{
-			StartTime();
 			// ----------------------------------------------
 	        // タッチされていない場合の位置調整
 			// ----------------------------------------------
@@ -1038,9 +1150,8 @@ var StampShop = function()
 					}
 				}
 			}
-			EndTime("Proc");	
 			// シートの描画
-	        sheet.draw(sScrollY, this);
+	        sheet.draw(sScrollY, this, sModoruMessage);
 			// タッチ
 			bOldTouch = bTouch;
 		}
@@ -1075,55 +1186,21 @@ var StampShop = function()
 			// ２秒待つ 
 			if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.INIT_WAIT)
 			{
-				iWaitCounter ++;
-				// 50*40=2秒
-				if(iWaitCounter > 10)
-				{
-					g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_MESSAGE;
-					//g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT;
-				}
+				g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT;
 			}
 			// シート買ってみよう(メッセージ)
-			/*
-			else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.SHEET_BUY_MESSAGE)
-			{
-				// 全体を黒くする
-				DrawBack(ctx);
-				// この上にメッセージをかぶせる
-				// メッセージファイル
-				ctx.drawImage(sSheetBuyMessage, 320 - (540 / 2), 280 - (225 / 2));				
-				// 何かオス
-				if(bTri) { g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT; }
-			}
-			*/
 			// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
-			else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT || g_TutorialShopFlg == gTUTORIAL_SHOPFLG.SHEET_BUY_MESSAGE)
+			else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT)
 			{	
-				// 押してください的なアニメーションをさせる
-				// 範囲
-				//ctx.globalAlpha = 0.6;
-				//ctx.fillStyle = 'rgb(0, 0, 0)';
-				
-				/*
-				// 上
-				ctx.fillRect(0, 0, 640, 195);
-				
-				// 横
-				ctx.fillRect(212, 195, 640, 470 - 195);
-				//ctx.fillRect(200, 0, 640, 1200);
-				
-				// 下
-				ctx.fillRect(0, 470, 640, 1200);
-				*/
 				// -------------------------------------
 				// 黒の描画
 				// ------------------------------------- 
-				//ClearRect(ctx, 0, 0, 640, BROWSER_SCREEN_H);
-				DrawBack(ctx);
+				ClearRect(ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
+				//DrawBack(ctx);
 				// ------------------------------------- 
 				// メッセージファイル
 				// ------------------------------------- 
-				ctx.drawImage(sSheetBuyMessage, 248 - 50, 189);	
+				ctxEffect.drawImage(sSheetBuyMessage, 248 - 50, 189);	
 				// -------------------------------------
 				// アイテムの描画
 				// -------------------------------------  
@@ -1131,7 +1208,7 @@ var StampShop = function()
 				// -------------------------------------
 				// 矢印とプロック
 				// -------------------------------------  
-				DrawDocumentArrow(ctx, 50, 140, 0);
+				DrawDocumentArrow(ctxEffect, 50, 140, 0);
 				sheet.Proc(sScrollY, 0, bTri);
 				if(g_iButtonMoveClickIndex == 0)
 				{
@@ -1144,6 +1221,7 @@ var StampShop = function()
 					sScaleRate = 0;
 					g_TutorialShopFlg = gTUTORIAL_SHOPFLG.SHEET_BUY_SELECT_WAIT;
 					sheet.drawWindowD();
+					iWaitCounter = 0;
 				}
 			}
 			// シート買ってみよう(購入待ち)
@@ -1152,45 +1230,17 @@ var StampShop = function()
 				
 			}
 			// スタンプ買ってみよう(メッセージ)
-			/*else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.STAMP_BUY_MESSAGE)
-			{
-				// 全体を黒くする
-				DrawBack(ctx);
-				// この上にメッセージをかぶせる
-				// メッセージファイル
-				ctx.drawImage(sStampBuyMessage, 320 - (540 / 2), 280 - (225 / 2));
-				
-				// 何かオス
-				if(bTri) { g_TutorialShopFlg = gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT; }
-			}*/
 			// スタンプ買ってみよう(セレクト)「プリン以外は押せない」
 			else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.STAMP_BUY_SELECT || g_TutorialShopFlg == gTUTORIAL_SHOPFLG.STAMP_BUY_MESSAGE)
 			{	
-				// 押してください的なアニメーションをさせる
-				// 範囲
-				/*
-				ctx.globalAlpha = 0.6;
-				ctx.fillStyle = 'rgb(0, 0, 0)';
-				
-				// 上
-				ctx.fillRect(0, 0, 640, 464);
-				
-				// 左右
-				ctx.fillRect(0, 464, 214, 716 - 464);
-				ctx.fillRect(426, 464, 640, 716 - 464);
-				
-				// 下
-				ctx.fillRect(0, 716, 640, 1200);
-				ctx.globalAlpha = 1.0;
-				*/
 				// -------------------------------------
-				// 黒の描画
+				// クリア
 				// ------------------------------------- 
-				DrawBack(ctx);
+				ClearRect(ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 				// ------------------------------------- 
 				// メッセージファイル
 				// ------------------------------------- 
-				ctx.drawImage(sStampBuyMessage, 248 - 50, 189);	
+				ctxEffect.drawImage(sStampBuyMessage, 248 - 50, 189);	
 				// -------------------------------------
 				// アイテムの描画
 				// -------------------------------------  
@@ -1199,9 +1249,10 @@ var StampShop = function()
 				// -------------------------------------
 				// 矢印とプロック
 				// -------------------------------------  
-				DrawDocumentArrow(ctx, 264, 390, 0);
+				DrawDocumentArrow(ctxEffect, 264, 390, 0);
 				sheet.Proc(sScrollY, 4, bTri);
-				if(g_iButtonMoveClickIndex == 4)
+				if(iWaitCounter < 2) { iWaitCounter ++; }
+				if(g_iButtonMoveClickIndex == 4 && iWaitCounter == 2)
 				{
 					// 購入画面へ
  					eSwitch = 1;
@@ -1219,64 +1270,27 @@ var StampShop = function()
 			{
 			}
 			// もどる(メッセージ)
-			/*
-			else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_MESSAGE)
-			{
-				// 全体を黒くする
-				DrawBack(ctx);
-				// この上にメッセージをかぶせる
-				// メッセージファイル
-				ctx.drawImage(sBackMessage, 320 - (540 / 2), 280 - (225 / 2));					
-				// 何かオス
-				if(bTri) { g_TutorialShopFlg = gTUTORIAL_SHOPFLG.BACK_SELECT; }
-			}		
-			*/
 			// もどる(セレクト)「もどる以外は押せない」
 			else if(g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_SELECT || g_TutorialShopFlg == gTUTORIAL_SHOPFLG.BACK_MESSAGE)
-			{	
-				var TitleBackYesX = 0;
-				var TitleBackYesY = 0;
-				var TitleBackYesW = 200;
-				var TitleBackYesH = 101;				
-				// 押してください的なアニメーションをさせる
-				// 範囲
-				/*
-				ctx.globalAlpha = 0.6;
-				ctx.fillStyle = 'rgb(0, 0, 0)';
-				
-				// 横
-				ctx.fillRect(200, 0, 640, 200);
-				
-				// 下
-				ctx.fillRect(0, 101, 640, 1200);
-				ctx.globalAlpha = 1.0;
-				*/
+			{				
 				// -------------------------------------
-				// 黒の描画
+				// クリア
 				// ------------------------------------- 
-				DrawBack(ctx);
+				ClearRect(ctxEffect, 0, 0, 640, BROWSER_SCREEN_H);
 				// ------------------------------------- 
 				// メッセージファイル
 				// ------------------------------------- 
 				ctx.drawImage(sBackMessage, 248 - 50, 189);	
-				// --------------------------------------    
-			    // タイトルへ戻る
-				// --------------------------------------
-				ctx.drawImage(g_BackImageHandle, 
-					0, 
-					0, 
-					190, 
-					101);	
-	
-				
-				//DrawWaku(ctx, 0, 195, 212, 470 - 195, true);			
-				//DrawWaku(ctx, TitleBackYesX, TitleBackYesY, TitleBackYesW, TitleBackYesH, true);
 				// -------------------------------------
 				// 矢印とプロック
 				// -------------------------------------  
-				DrawDocumentArrowD(ctx, 20 + 60 - 56, 100 - 50, 0);
+				DrawDocumentArrowD(ctxEffect, 20 + 60 - 56, 100 - 50, 0);
 				
 				// 決定
+				var TitleBackYesX = 0;
+				var TitleBackYesY = 0;
+				var TitleBackYesW = 200;
+				var TitleBackYesH = 101;					
 				if(bTri)
 				{		
 					if(
@@ -1296,23 +1310,14 @@ var StampShop = function()
 			// ずっと主張
 			if(sTuLookFlg && g_TutorialFlg)
 			{
-				// 489,11
-				var BackYesX = 489;
-				var BackYesY = 11;
-				var BackYesW = 137;
-				var BackYesH = 42;				
-				// ------------------------------------- 
-				// メッセージファイル
-				// ------------------------------------- 
-				ctxEffect.drawImage(sModoruMessage, BackYesX, BackYesY);	
 				// 決定
 				if(bTri && g_eStatus == G_STATUS.MAIN)
 				{		
 					if(
-						(BackYesX < sTouchMoveX)  && (BackYesX + BackYesW > sTouchMoveX)  &&
-						(BackYesY < sTouchMoveY)  && (BackYesY + BackYesH > sTouchMoveY)  &&
-						(BackYesX < sTouchStartX) && (BackYesX + BackYesW > sTouchStartX) &&
-						(BackYesY < sTouchStartY) && (BackYesY + BackYesH > sTouchStartY))
+						(g_TutorialBackYesX < sTouchMoveX)  && (g_TutorialBackYesX + g_TutorialBackYesW > sTouchMoveX)  &&
+						(g_TutorialBackYesY < sTouchMoveY)  && (g_TutorialBackYesY + g_TutorialBackYesH > sTouchMoveY)  &&
+						(g_TutorialBackYesX < sTouchStartX) && (g_TutorialBackYesX + g_TutorialBackYesW > sTouchStartX) &&
+						(g_TutorialBackYesY < sTouchStartY) && (g_TutorialBackYesY + g_TutorialBackYesH > sTouchStartY))
 					{	
 						goTitle();
 						g_iButtonMoveClickIndex 	= -1;
@@ -1333,7 +1338,6 @@ var StampShop = function()
 				}
 				g_TutorialNextShopFlg = gTUTORIAL_SHOPFLG.NON;
 			}
-			DrawTime(ctx);
 	    };
 		// --------------------------------------    
 	    // マウスイベント
@@ -1376,12 +1380,18 @@ var StampShop = function()
 	        navigator.userAgent.indexOf('iPad')    > 0 ||
 	        navigator.userAgent.indexOf('Android') > 0) 
 		{
+	        canvas.addEventListener("touchstart",this.onTouchStart,false);
+	        canvas.addEventListener("touchmove", this.onTouchMove, false);
+	        canvas.addEventListener("touchend",  this.onTouchEnd,  false);
 	        canvasEffect.addEventListener("touchstart",this.onTouchStart,false);
 	        canvasEffect.addEventListener("touchmove", this.onTouchMove, false);
 	        canvasEffect.addEventListener("touchend",  this.onTouchEnd,  false);
 	    } 
 		else 
 		{
+	        canvas.addEventListener("mousedown", this.onTouchStart,false);
+	        canvas.addEventListener("mousemove", this.onTouchMove, false);
+	        canvas.addEventListener("mouseup",   this.onTouchEnd,  false);
 	        canvasEffect.addEventListener("mousedown", this.onTouchStart,false);
 	        canvasEffect.addEventListener("mousemove", this.onTouchMove, false);
 	        canvasEffect.addEventListener("mouseup",   this.onTouchEnd,  false);
@@ -1478,8 +1488,16 @@ var StampShop = function()
 	im.style.position = 'absolute';
  	im.style.top = "0px"; 
  	im.style.left ="0px"; 	
- 	im.width  = 640;   
-	im.height = BROWSER_SCREEN_H;  
+	if(GetTutorialFlg() == false)
+	{
+		im.width = 0;
+		im.height= 0;
+	}
+	else
+	{
+ 		im.width  = 640;   
+		im.height = BROWSER_SCREEN_H;  		
+	}
 	sceen.appendChild(im);		
 	GSetupEffect(); 	
 	
@@ -1553,7 +1571,6 @@ var StampShop = function()
 				// メインキャンバスの描画
     			mainCanvas.draw();
 				GExecEffect();
-				DispMemory();
 				break;
 			
 			//フェードアウト
