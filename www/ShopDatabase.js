@@ -597,6 +597,7 @@ function StartTutorial()
 {
 	// ストレージのフラグを見てチュートリアルかをチェックする
 	//g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
+	//SetCoin(999);
 	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
 	{
 		// 初めて
