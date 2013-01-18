@@ -7,7 +7,7 @@
 // 2.5 256 480
 // 3   213 400
 // 4   160 300
-var REDUCTION_SIZE 		= 2.5;
+var REDUCTION_SIZE 		= 3.3;
 var SCREEN_WIDTH   		= 640;
 var SCREEN_HEIGHT  		= 1138;
 var CANVAS_WIDTH   		= SCREEN_WIDTH  / REDUCTION_SIZE;
@@ -53,18 +53,18 @@ var StampSelect = function()
     BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
     BROWSER_HEIGHT  += 30;
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
-	BROWSER_SCREEN_H 	= ((BROWSER_HEIGHT * BROWSER_RATE) - (STAMP_H * BROWSER_RATE)) | 0;	// 画面領域
-	BROWSER_ALL_H 		= (BROWSER_HEIGHT * BROWSER_RATE) | 0;								// 画面領域
+	BROWSER_SCREEN_H 	= Math.floor((BROWSER_HEIGHT * BROWSER_RATE) - (STAMP_H * BROWSER_RATE));	// 画面領域
+	BROWSER_ALL_H 		= Math.floor(BROWSER_HEIGHT * BROWSER_RATE);								// 画面領域
 	
 	// 再セット
 	SCREEN_WIDTH   		= 640;
 	SCREEN_HEIGHT  		= BROWSER_SCREEN_H;
-	CANVAS_WIDTH   		= (SCREEN_WIDTH  / REDUCTION_SIZE) | 0;
-	CANVAS_HEIGHT 		= (SCREEN_HEIGHT / REDUCTION_SIZE) | 0;
-	STAMP_W_REDUCTION	= (STAMP_W / REDUCTION_SIZE) | 0;
-	STAMP_H_REDUCTION	= (STAMP_H / REDUCTION_SIZE) | 0;
-	STAMP_W_REDUCTION_W	= (STAMP_W_REDUCTION / 2) | 0;
-	STAMP_H_REDUCTION_H	= (STAMP_H_REDUCTION / 2) | 0;
+	CANVAS_WIDTH   		= Math.floor(SCREEN_WIDTH  / REDUCTION_SIZE);
+	CANVAS_HEIGHT 		= Math.floor(SCREEN_HEIGHT / REDUCTION_SIZE);
+	STAMP_W_REDUCTION	= Math.floor(STAMP_W / REDUCTION_SIZE);
+	STAMP_H_REDUCTION	= Math.floor(STAMP_H / REDUCTION_SIZE);
+	STAMP_W_REDUCTION_W	= Math.floor(STAMP_W_REDUCTION / 2);
+	STAMP_H_REDUCTION_H	= Math.floor(STAMP_H_REDUCTION / 2);
 	
 	
 	var sModoruMessage   = null;
@@ -133,8 +133,8 @@ var StampSelect = function()
 				var iDrawX = (x/REDUCTION_SIZE)-STAMP_W_REDUCTION_W;
 				var iDrawY = (y/REDUCTION_SIZE)-STAMP_H_REDUCTION_H;
 				this.CanvasSheet_2d.drawImage(GetStampGraphicHandle_Image(id), 
-					iDrawX | 0, 
-					iDrawY | 0, 
+					Math.floor(iDrawX), 
+					Math.floor(iDrawY), 
 					STAMP_W_REDUCTION, 
 					STAMP_H_REDUCTION);
 			}
@@ -156,10 +156,10 @@ var StampSelect = function()
 		// 画像全体のサイズ
         var rate = Math.abs(ofs) / 320 * 0.25 ;
 		var scl  = (0.65 - rate) * this.fZoomRate;
-        var w = (640  * scl) | 0;
-        var h = (BROWSER_SCREEN_H * scl) | 0;
-        var x = ((640 - w) / 2 + ofs - rate*ofs) | 0;
-        var y = ((800 - h) / 2 + g_YOffset) | 0;
+        var w = Math.floor(640  * scl);
+        var h = Math.floor(BROWSER_SCREEN_H * scl);
+        var x = Math.floor((640 - w) / 2 + ofs - rate*ofs);
+        var y = Math.floor((800 - h) / 2 + g_YOffset);
 		
 		// -------------------------------------
 		// シートの表示
@@ -200,7 +200,7 @@ var StampSelect = function()
 	    var canvasBack 	= document.getElementById("canvas");
 		var ctxBack   	 = canvasBack.getContext("2d");
 		var sheet 		= new Array();
-		
+		//ctx.scale(0.5,0.5);
 	    //スタンプシート準備
 		if(g_HaveStampSheetData.length - 1 <= no) { no = g_HaveStampSheetData.length - 1; }
 
@@ -344,7 +344,6 @@ var StampSelect = function()
 				}*/
 				iOldSelecterID = this.selectIx;
 
-				StartTime();
 		        if (ofsX < -ofsMax / 8)
 				{
 					// 前
@@ -392,7 +391,6 @@ var StampSelect = function()
 						sheet[(this.selectIx + 3) % 5].setImage(sheet[this.selectIx].sheetNo - 2);
 					}							
 		        }
-				EndTime("SetImage");
 		        ofsXold = ofsX;
 			}
 			// 画面のクリア[チュートリアル時はクリアしない]
@@ -400,8 +398,8 @@ var StampSelect = function()
 			{
 		        var rate = Math.abs(0) / 320 * 0.25 ;
 				var scl  = (0.65 - rate) * 1.15;
-		        var clsh = (BROWSER_SCREEN_H * scl) | 0;
-		        var clsy = ((800 - clsh) / 2 + g_YOffset) | 0;
+		        var clsh = Math.floor(BROWSER_SCREEN_H * scl);
+		        var clsy = Math.floor((800 - clsh) / 2 + g_YOffset);
 				ctx.clearRect(0, clsy - 5, 640, clsh + 10);
 			}
 			// 一部分
@@ -426,6 +424,7 @@ var StampSelect = function()
 			if(sheet[nextid].fZoomRate < 0.85) { sheet[nextid].fZoomRate = 0.85; }
 			if(sheet[nowid].fZoomRate > 1.15)  { sheet[nowid].fZoomRate = 1.15;  }
 			
+			StartTime();
 			// 前
 			if(sheet[nowid].sheetNo > 0)
 			{
@@ -439,6 +438,7 @@ var StampSelect = function()
 				bR = true;
 			}
 			sheet[nowid].draw(ofsX);
+			EndTime("描画");
 	    	
 	    	if(ofsX == 0 && iForceTouch)
 	    	{
@@ -452,48 +452,30 @@ var StampSelect = function()
 				bOldTouch = false;
 			}
 				
-			// 矢印を描画
 			StartTime();
+			// 矢印を描画
 			MoveArrowL();
 			MoveArrowR();			
 			ProcArrow();
 			if(bL) { DrawArrowL(ctx, 60,  450); }
 			if(bR) { DrawArrowR(ctx, 580, 450); }
-			EndTime("DrawArrow");
-			
+
 			// これにするボタン
  			ctx.drawImage(g_ClaerButtonHandle, 145, BROWSER_HEIGHT - 50/*630*/);
-		
+			EndTime("小物");
 			
 			if(g_eStatus != G_STATUS.MAIN) { g_WindowsScaleRate = 0; return; }
 	
 			// ２秒待つ 
 			if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.INIT_WAIT)
 			{
-				//iWaitCounter ++;
-				////// 50*40=2秒
-				//if(iWaitCounter > 10)
-				//{
-					g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE;
-				//}
+				g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE;
 			}
 			// シート買ってみよう(メッセージ)
-			/*
-			else if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE)
-			{
-				// 全体を黒くする
-				DrawBack(ctx);
-				// メッセージファイル
-				ctx.drawImage(sSheetSelectMessage, 320 - (540 / 2), 280 - (225 / 2));				
-				// 何かオス
-				if((!isTouch) && bOldTouch) { g_TutorialNextSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT; }
-			}
-			*/
 			// シート買ってみよう(セレクト)「ランチノーマル以外は押せない」
 			else if(g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT || g_TutorialSelectFlg == gTUTORIAL_SELECTFLG.SHEET_TOUCH_MESSAGE)
 			{	
-				// 全体を黒くする
-				//DrawBack(ctx);
+				StartTime();
 				// メッセージファイル
 				ctx.drawImage(sSheetSelectMessage, 103, 385);				
 				// 何かオス
@@ -508,6 +490,7 @@ var StampSelect = function()
 				DrawDocumentArrow(ctx, 320 - 56, BROWSER_HEIGHT - 150);
 				// 変更
 				g_TutorialSelectFlg = gTUTORIAL_SELECTFLG.SHEET_TOUCH_NEXT;
+				EndTime("メッセ");
 			}
 			
 			// ------------------------------------------------
@@ -813,7 +796,7 @@ var StampSelect = function()
 			//初期化
 			case G_STATUS.INIT:
 				// スタンプとシートのロードが終わってる
-				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg && g_sTutorialLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg)
+				if(g_sStampLoadFlg.bLoadFlg && g_sSheetLoadFlg.bLoadFlg && g_sTutorialLoadFlg.bLoadFlg)
 				{			
 					if(mainCanvas == null)
 					{
@@ -925,6 +908,8 @@ var StampSelect = function()
 
 			//終了
 			case G_STATUS.END:
+				// コメント解放
+				M_PRINTB("");
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				// 解放

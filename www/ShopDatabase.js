@@ -437,15 +437,15 @@ function M_PRIN_BW(sData)
 
 var g_TimerCounter = 0;
 var g_StartTime    = 0;
-var g_TimeString;
+var g_TimeString   = "";
 
 function StartTime()
-{return;
+{
 	g_StartTime = new Date();
 }
 
 function EndTime(str)
-{return;
+{
 	//if(g_TimerCounter == 0)
 	{		
 		// 表示
@@ -456,15 +456,18 @@ function EndTime(str)
 	}
 }
 function DrawTime()
-{return;
+{
 	g_TimerCounter --;
 	if(g_TimerCounter <= 0)
 	{
 		g_TimerCounter = 10;	
 	//	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
 	}
-	document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
-	g_TimeString = "";
+	if(g_TimeString != "")
+	{
+		document.getElementById("memory").innerHTML = "<font size='4' color='white'>" + g_TimeString + "</font>";
+		g_TimeString = "";
+	}
 }
 
 function ClearRect(ctx, x, y, w, h)
@@ -1736,10 +1739,10 @@ function DrawCharNum(ctx, x, y, num, size, a)
 {
 	if(num < 0 || num > 9) { return; }
 	ctx.drawImage(g_NumHandleA[num],
-		(x - (132 * size)) | 0,
-		(y - (132 * size)) | 0,
-		(165 * size) | 0, 
-		(165 * size) | 0);
+		Math.floor(x - (132 * size)),
+		Math.floor(y - (132 * size)),
+		Math.floor(165 * size), 
+		Math.floor(165 * size));
 }
 
 // メニュー
@@ -1769,7 +1772,7 @@ function DrawStampWindow(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = ((1.0 - sScaleRate) * -64) | 0;
+	var GPosY = Math.floor((1.0 - sScaleRate) * -64);
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_StampMainWindowImageHandle, 
@@ -1834,7 +1837,7 @@ function DrawWindowYesNo(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = (((1.0 - sScaleRate) * -64) - 120) | 0;
+	var GPosY = Math.floor(((1.0 - sScaleRate) * -64) - 120);
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -1895,7 +1898,7 @@ function DrawWindowOk(ctx, sScaleRate, bTrigger,
 {
 	DrawBack(ctx);
 	
-	var GPosY = ((1.0 - sScaleRate) * -64) | 0;
+	var GPosY = Math.floor((1.0 - sScaleRate) * -64);
 
 	ctx.globalAlpha = sScaleRate;
 	ctx.drawImage(g_WindowImageHandle, 
@@ -2191,8 +2194,8 @@ GEffectData.prototype.Exec = function()
 			//	this.nWA    -= 0.2;
 				
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 					
 			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
 			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
@@ -2200,13 +2203,13 @@ GEffectData.prototype.Exec = function()
 				
 				if(this.nCrsFlg)
 				{
-		        	this.sCtx.clearRect ((this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		        						 (this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
+		        	this.sCtx.clearRect (Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        						 Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-		        	(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		        	(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0 , vTargetH | 0);
+		        	Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        	Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW , vTargetH);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2214,7 +2217,7 @@ GEffectData.prototype.Exec = function()
 				this.bEnd = true;
 				if(this.nCrsW != 0 && this.nCrsW != 0)
 				{
-					this.sCtx.clearRect(0, 0, this.nCrsW | 0, this.nCrsH | 0);
+					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
 				}
 				if(this.EndCallBack != null) { this.EndCallBack(this); }
 				return false;
@@ -2273,24 +2276,21 @@ GEffectData.prototype.Exec = function()
 			//	this.nWA    -= 0.2;
 				
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 					
 			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
 			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
-		        this.sCtx.globalAlpha = 1.0;
-				
 				if(this.nCrsFlg)
 				{
 		        	this.sCtx.clearRect (
-		        					(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		        					(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
+		        					Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        					Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-		        					(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		        					(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
-		        this.sCtx.globalAlpha = 1.0;
+		        					Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        					Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 			}
 			else
 			{
@@ -2308,21 +2308,22 @@ GEffectData.prototype.Exec = function()
 				this.nCount += 1;
 				
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 					
 			//	var ww = this.nW / 1.0 + (this.nCount * 2.0);
 			//	var hh = this.nH / 1.0 + (this.nCount * 2.0);
 		        this.sCtx.globalAlpha = 1.0;
 				if(this.nCrsFlg)
 				{
-		      	  this.sCtx.clearRect(  (this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		      	  						(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
+				this.sCtx.globalAlpha = 1.0;
+		      	  this.sCtx.clearRect(  Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		      	  						Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 				}
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-		        					(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		        					(this.nY - (vTargetH / 2) + this.nH / 2) | 0, vTargetW | 0, vTargetH | 0);
+		        					Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        					Math.floor(this.nY - (vTargetH / 2) + this.nH / 2), vTargetW, vTargetH);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else
@@ -2330,7 +2331,7 @@ GEffectData.prototype.Exec = function()
 				this.bEnd = true;
 				if(this.nCrsW != 0 && this.nCrsW != 0)
 				{
-					this.sCtx.clearRect(0, 0, this.nCrsW | 0, this.nCrsH | 0);
+					this.sCtx.clearRect(0, 0, this.nCrsW, this.nCrsH);
 				}
 				if(this.EndCallBack != null) { this.EndCallBack(this); }
 				return false;
@@ -2352,14 +2353,14 @@ GEffectData.prototype.Exec = function()
 				this.nCount += 1;
 	
 				// 描画
-				var vTargetW = (this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
-				var vTargetH = (this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetW = Math.floor(this.nW * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
+				var vTargetH = Math.floor(this.nH * ((this.nNowTime * 0.05) + this.nMaxTime / this.nMaxTime));
 				this.nA -= 0.1;
 
 		        this.sCtx.globalAlpha = this.nA;
 		        this.sCtx.drawImage(this.sImage, 
-		        		(this.nX - (vTargetW / 2) + this.nW / 2) | 0, 
-		        		(this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount) | 0, vTargetW | 0, vTargetH | 0);
+		        		Math.floor(this.nX - (vTargetW / 2) + this.nW / 2), 
+		        		Math.floor(this.nY - (vTargetH / 2) + this.nH / 2 - this.nCount * 5 * this.nCount), vTargetW, vTargetH);
 		        this.sCtx.globalAlpha = 1.0;
 			}
 			else

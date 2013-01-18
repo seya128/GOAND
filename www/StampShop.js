@@ -672,11 +672,9 @@ ShopSheet.prototype.drawItem = function(ofs, no)
 			var xx  = j  * MAX_SHOP_PANEL_WIDTH   + MAX_SHOP_PANEL_START_X;
 			var yy  = YPos;
 			
-			StartTime();
-			var dispx =  ((xx)-214/2 + x) | 0;
-			var dispy =  ((yy)-237/2 + y) | 0;
+			var dispx =  Math.floor((xx)-214/2 + x);
+			var dispy =  Math.floor((yy)-237/2 + y);
 			this.ctx.drawImage(this.canvas_item[index], dispx, dispy);			
-			EndTime("ItemDraw");
 		}
 	}
 }
@@ -796,7 +794,7 @@ var StampShop = function()
     BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
     BROWSER_HEIGHT  += 30;
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
-	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE) | 0;	// 画面領域	
+	BROWSER_SCREEN_H 	= Math.floor(BROWSER_HEIGHT * BROWSER_RATE);	// 画面領域	
 	
 	var mainCanvas = null;
 	sTouchStartX 	= -200;
