@@ -342,8 +342,9 @@ var SceenTitle = function() {
 	sceen.appendChild(shop.div);	
 	sceen.appendChild(tutorialBtn.div);
 	
-	var xmaskDiv = null;
-	var Bana     = null;
+	var xmaskDiv    = null;
+	var dorasulogo  = null;
+	var Bana        = null;
 	
 	// バナーを見せる
 	if(g_BanaEndFlg == false)
@@ -359,12 +360,12 @@ var SceenTitle = function() {
 		xmaskDiv.style.zIndex = 10;
 		xmaskDiv.style.left = "0px";
 		xmaskDiv.style.top = "0px";
-		xmaskDiv.style.opacity = 0.85;
+		xmaskDiv.style.opacity = 0.95;
 		sceen.appendChild(xmaskDiv);
 		
 		// バナー
 		Bana = new DivSprite(480,186);
-		Bana.x=640/2; Bana.y=200; Bana.z=20;
+		Bana.x=640/2; Bana.y=600; Bana.z=20;
 		Bana.src = "img/01_title/bana.png";
 		//Bana.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
 		Bana.onclick = function()
@@ -374,6 +375,12 @@ var SceenTitle = function() {
 			win.moveTo(0,0);		
 		};
 		sceen.appendChild(Bana.div);
+		
+		// ロゴ
+		dorasulogo = new DivSprite(480,186);
+		dorasulogo.x=640/2; dorasulogo.y=150; dorasulogo.z=20;
+		dorasulogo.src = "img/01_title/k_rogo_a000.png";
+		sceen.appendChild(dorasulogo.div);		
 	}
 	// バナーは一回見たからなし
 	else
@@ -454,14 +461,16 @@ var SceenTitle = function() {
 					// 広告バナーが開ける
 					else
 					{
-						xmaskDiv.style.opacity  -= 0.15;
-						Bana.div.style.opacity 	-= 0.2;
+						xmaskDiv.style.opacity  	-= 0.15;
+						Bana.div.style.opacity 		-= 0.2;
+						dorasulogo.div.style.opacity 	-= 0.2;
 						
 						if(xmaskDiv.style.opacity <= 0)
 						{
 							g_BanaEndFlg = true;
 							sceen.removeChild(xmaskDiv);
 							sceen.removeChild(Bana.div);
+							sceen.removeChild(dorasulogo.div);
 						}
 					}
 					
