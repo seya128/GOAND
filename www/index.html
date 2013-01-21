@@ -21,13 +21,23 @@
             	
             }
            
-            var timer;
-
+            var g_strDebugMessage = "";
+			var g_sStartTime = null;
+			var g_sEndTime   = null;
+			var g_sXTime     = null;			
             function mainLoop() 
             {
+            /*
+          		if(g_sEndTime != null)
+          		{
+	 				g_sXTime = new Date();
+					g_strDebugMessage += "<font size='5' color='white' style ='background-color:blue;'>アイドル[" + (g_sXTime.getTime() - g_sEndTime.getTime()) + "/50]</font>";   
+	 				document.getElementById("fps").innerHTML = g_strDebugMessage;
+ 				}
+ 			*/
             	// 時間の計測開始
-				var StartTime = new Date();
-
+				g_sStartTime = new Date();
+			
 				// メインループ
             	if (currentSceen) 
             	{
@@ -48,26 +58,26 @@
             	// 1000/30= 33.3FPS
             	// 1000/50= 20.0FPS
              	// 1000/60= 16.6FPS
-				var EndTime = new Date();
-				var Min     = (EndTime.getTime() - StartTime.getTime());
+				g_sEndTime	= new Date();
+				var Min     = (g_sEndTime.getTime() - g_sStartTime.getTime());
 				var Timer   = 50 - Min;
 
             	// FPSの表示
-            	var strMessage;
+            	/*
             	if(Timer <= 0)
             	{
-            		strMessage = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
+            		g_strDebugMessage = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
 				}
 				else if(Timer < 10) 
             	{
-            		strMessage = "<font size='5' color='white' style ='background-color:orange;'>処理[" + Min + "/50]</font>";
+            		g_strDebugMessage = "<font size='5' color='white' style ='background-color:orange;'>処理[" + Min + "/50]</font>";
 				}
 				else
             	{
-            		strMessage = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
+            		g_strDebugMessage = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
 				}		
-				document.getElementById("fps").innerHTML = strMessage;
 				DrawTime();
+				*/
 				
 				/*
 				// メモリ
@@ -108,6 +118,7 @@
 	<div class='accesstrade.net.adnw' id='2'></div>
 	</div>
         <script type="text/javascript" src="title.js"></script>
+        <script type="text/javascript" src="help.js"></script>
         <script type="text/javascript" src="Gohan.js"></script>
         <script type="text/javascript" src="GohanItadaki.js"></script>
         <script type="text/javascript" src="GohanCoinGet.js"></script>

@@ -597,6 +597,21 @@ function StartTutorial()
 {
 	// ストレージのフラグを見てチュートリアルかをチェックする
 	//g_TutorialStatus = gTUTORIAL_STATUS.SHOP;
+	//SetCoin(999);
+	/*PresentTutorialStampData();
+	// ハンバーグゲット
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// ミニパスタゲット
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// ハンバーグゲット
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// ミニパスタゲット
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);*/
+	
 	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
 	{
 		// 初めて
@@ -637,6 +652,20 @@ function StartTutorial()
 function StartTutorial_Stamp()
 {
 	// ストレージのフラグを見てチュートリアルかをチェックする
+	/*PresentTutorialStampData();
+	// ハンバーグゲット
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// ミニパスタゲット
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// ハンバーグゲット
+	AddHasStamp(gStampEnum.NIKU  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	// プリンゲット
+	AddHasStamp(gStampEnum.PURIN - M_OFFSET_STAMP, STAMP_LIFE_MAX);	
+	// ミニパスタゲット
+	AddHasStamp(gStampEnum.SUPA  - M_OFFSET_STAMP, STAMP_LIFE_MAX);
+	*/
 	if(g_TutorialStatus != gTUTORIAL_STATUS.NONE)
 	{
 		// 今チュートリアル中

@@ -18,6 +18,7 @@ var stamp_ctx;
 	
 //
 var g_iEditSheetIndex = 0;					//シート番号
+var BROWSER_STAMP_H = 0;
 
 //持ってるスタンプ
 function getHasStampData(no){
@@ -133,9 +134,9 @@ function GetMenuSelectOkFlg()
 //
 var NUM_STAMPBAR_W = 5+2;   //スタンプバーが表示用に管理するスタンプの数
 
-function StampBar(ofs) 
+function StampBar() 
 {
-    this.offset    = ofs;                      //オフセット座標
+    this.offset    = 0;                      //オフセット座標
     this.offsetAdd = 0;
     this.leftHasStampId = 0;                //左端に表示されている所持スタンプＩＤ
     this.leftStampIx = 0;                   //左端のスタンプオブジェクトのインデックス
@@ -148,6 +149,9 @@ function StampBar(ofs)
 	this.iSelectedX = 0;
 	this.bTutorialTouch     = false;
 	this.bOldTutorialTouch  = false;
+	// キャンバスをスタンプの種類分作成
+	this.sStampSheetCanvas = new Array();
+	this.sStampSheetCtx    = new Array();	
 	
  	SBarbTouch			= false;
  	SBarbOldTouch		= false;
@@ -158,13 +162,16 @@ function StampBar(ofs)
 	
     this.canvas = document.getElementById("stamp_bar");
     this.ctx = this.canvas.getContext("2d");
+	
+	// イベントのセット
     this.updateDispInfo();
     this.imageLoad();
-    this.setTouchEvent();
+    this.setTouchEvent();	
 }
 
 //スタンプバー表示情報更新
-StampBar.prototype.updateDispInfo = function(){
+StampBar.prototype.updateDispInfo = function()
+{
     
 	// 3つ以下なら固定する
 	if(g_HaveStampImageData.length <= 0) 
@@ -216,6 +223,155 @@ StampBar.prototype.imageLoad = function()
 	if(iDrawNum > g_HaveStampImageData.length) { iDrawNum = g_HaveStampImageData.length; }
     if(iDrawNum <= 0) { return; }
 };
+
+StampBar.prototype.SetupStampCanvas = function()
+{
+	// 手持ちのスタンプをインスタンス化
+	for(var i = 0; i < g_HaveStampImageData.length; i ++)
+	{
+		// 一個づつ
+		var s = getHasStampData(i);
+		//var index = s.id;
+		var index = i;		
+		if(!this.sStampSheetCanvas[index])
+		{
+			// シート作成
+		    this.sStampSheetCanvas[index] = document.createElement("canvas");
+			this.sStampSheetCanvas[index].setAttribute("id","MoveCanvas" + index);
+			this.sStampSheetCanvas[index].setAttribute("width", "" + STAMP_W);
+			this.sStampSheetCanvas[index].setAttribute("height","" + STAMPS_H);
+		    this.sStampSheetCtx[index]    = this.sStampSheetCanvas[index].getContext("2d");
+			
+			// 白バック
+			this.sStampSheetCtx[index].fillStyle = 'rgb(255, 255, 255)';
+			this.sStampSheetCtx[index].fillRect(0, 0, STAMP_W, STAMPS_H);	
+			// 中身黒
+			this.sStampSheetCtx[index].fillStyle = 'rgb(0, 0, 0)';
+	        this.sStampSheetCtx[index].fillRect(2, 2, STAMP_W-4, STAMPS_H-4)		
+			// スタンプの表示
+			this.sStampSheetCtx[index].drawImage(GetStampGraphicHandle_Image(s.id), 0, 0, STAMP_W, STAMPS_H);
+			// 耐久値の表示
+			DrawStrNum(this.sStampSheetCtx[index], 110, 150, s.ink / 3, false, 0.25, 1.0, 22);
+			
+		}
+	}
+}
+
+StampBar.prototype.ChangeStampCanvas = function(id, ink)
+{
+	if(!this.sStampSheetCanvas[id])
+	{
+		// シート作成
+	    this.sStampSheetCanvas[id] = document.createElement("canvas");
+		this.sStampSheetCanvas[id].setAttribute("id","MoveCanvas" + id);
+		this.sStampSheetCanvas[id].setAttribute("width", "" + STAMP_W);
+		this.sStampSheetCanvas[id].setAttribute("height","" + STAMPS_H);
+	    this.sStampSheetCtx[id]    = this.sStampSheetCanvas[id].getContext("2d");
+	}
+	var s = getHasStampData(id);
+	// 白バック
+	this.sStampSheetCtx[id].fillStyle = 'rgb(255, 255, 255)';
+	this.sStampSheetCtx[id].fillRect(0, 0, STAMP_W, STAMPS_H);	
+	// 中身黒
+	this.sStampSheetCtx[id].fillStyle = 'rgb(0, 0, 0)';
+    this.sStampSheetCtx[id].fillRect(2, 2, STAMP_W-4, STAMPS_H-4)		
+	// スタンプの表示
+	this.sStampSheetCtx[id].drawImage(GetStampGraphicHandle_Image(s.id), 0, 0, STAMP_W, STAMPS_H);
+	// 耐久値の表示
+	DrawStrNum(this.sStampSheetCtx[id], 110, 150, ink / 3, false, 0.25, 1.0, 22);	
+}
+StampBar.prototype.DeleteStampCanvas = function(id)
+{
+	//this.sStampSheetCanvas[id] = null;
+	this.sStampSheetCanvas.splice(id, 1);
+	//this.sStampSheetCtx[id] = null;
+	this.sStampSheetCtx.splice(id, 1);
+}
+
+StampBar.prototype.draw = function()
+{
+
+	var x  = Math.floor(this.leftDispOfs);
+    var ix = this.leftStampIx;
+    var id = this.leftHasStampId;
+    
+//    this.ctx.fillStyle = 'rgb(255, 255, 255)';
+//   this.ctx.fillRect(0, 0, 640, STAMPS_H);
+	// ------------------------------------------
+	// スタンプの描画
+	// ------------------------------------------    
+	var iDrawNum = NUM_STAMPBAR_W - 2;
+    for (i = 0; i < iDrawNum; i ++)
+	{
+		// ------------------------------------------
+		// 空データ
+		// ------------------------------------------
+		if(id >= g_HaveStampImageData.length)
+		{
+	        this.ctx.fillStyle = 'rgb(0, 0, 0)';
+	        this.ctx.fillRect(x, 0, STAMP_W, STAMPS_H);
+			x += STAMP_W;
+			continue;
+		}	
+		
+		// ------------------------------------------
+		// スタンプデータ
+		// ------------------------------------------
+        var s = getHasStampData(id);
+		{
+			// キャンバスを描画
+			this.ctx.drawImage(this.sStampSheetCanvas[id], x, 0);
+			
+			// 選択時(赤色)
+			if(id == this.selectedStampId) 
+			{
+		        this.selectedStampIx = ix;
+				this.iSelectedX      = x;
+			
+				var LineSize  = 6;
+				var LineSizeH = 3;
+				this.ctx.lineWidth = LineSize; 
+				this.ctx.strokeStyle="#ff0000";
+				this.ctx.beginPath();
+				this.ctx.moveTo(x + LineSizeH, 		 		1);
+				this.ctx.lineTo(x + STAMP_W - LineSizeH, 	1);
+				this.ctx.lineTo(x + STAMP_W - LineSizeH, 	0 + STAMPS_H - LineSizeH);
+				this.ctx.lineTo(x + LineSizeH, 		 		0 + STAMPS_H - LineSizeH);
+				this.ctx.closePath();
+				this.ctx.stroke();				
+			}
+			
+			// スタンプの表示
+		//	this.ctx.drawImage(GetStampGraphicHandle_Image(s.id), x, 0, STAMP_W, STAMPS_H);
+			// 耐久値の表示
+		//	DrawStrNum(this.ctx, x + 114, 154, s.ink / 3, false, 0.25, 1.0, 22);
+        }
+        x += STAMP_W;
+        ix ++;
+        id ++;
+    }
+	// 矢印を描画
+	ProcArrow();
+	MoveArrowL();
+	MoveArrowR();
+	if(g_HaveStampImageData.length <= 3)
+	{
+	}
+	else if(this.offset <= 0)
+	{
+		DrawArrowRM(this.ctx, 468, 88);
+	}
+	else if(this.offset >= (g_HaveStampImageData.length - 3) * STAMP_W)
+	{
+		DrawArrowLM(this.ctx, 32,  88);
+	}
+	else
+	{
+		DrawArrowLM(this.ctx, 32,  88);	
+		DrawArrowRM(this.ctx, 468, 88);
+	}
+};
+
 
 //スタンプバー描画
 StampBar.prototype.drawmenu = function()
@@ -282,78 +438,6 @@ StampBar.prototype.drawmenu = function()
 	}
 	SBarbOldTouch = SBarbTouch;	
 }
-StampBar.prototype.draw = function(){
-
-    var x = this.leftDispOfs;
-    var ix = this.leftStampIx;
-    var id = this.leftHasStampId;
-    
-    this.ctx.fillStyle = 'rgb(255, 255, 255)';
-    this.ctx.fillRect(0, 0, 640, STAMPS_H);
-    
-	var iDrawNum = /*g_HaveStampImageData.length;//*/NUM_STAMPBAR_W-2;
-    for (i=0; i<iDrawNum; i++)
-	{
-		// 空データ
-		if(id >= g_HaveStampImageData.length)
-		{
-	        this.ctx.fillStyle = 'rgb(0, 0, 0)';
-	        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMPS_H-4);
-		//	this.ctx.fillRect(x, 0, STAMP_W, STAMPS_H);
-			x += STAMP_W;
-			continue;
-		}		
-        var s = getHasStampData(id);
-		{
-			//バック
-			if (id == this.selectedStampId) 
-			{
-		        this.ctx.fillStyle = 'rgb(255, 0, 0)';
-		        this.ctx.fillRect(x+0, 0, STAMP_W-0, STAMPS_H-0);
-		        this.ctx.fillStyle = 'rgb(0, 0, 0)';
-		        this.ctx.fillRect(x+6, 6, STAMP_W-12, STAMPS_H-12);
-		        this.selectedStampIx = ix;
-				this.iSelectedX      = x;
-			} 
-			else 
-			{
-		        this.ctx.fillStyle = 'rgb(0, 0, 0)';
-		        this.ctx.fillRect(x+2, 2, STAMP_W-4, STAMPS_H-4);
-	    	}	    
-			// インク
-		    var a = 1.0;		        
-	        this.ctx.globalAlpha = a;
-			this.ctx.drawImage(GetStampGraphicHandle_Image(s.id), x, 0, STAMP_W, STAMPS_H);
-	        this.ctx.globalAlpha = 1.0;
-			
-			// HP
-			DrawStrNum(this.ctx, x + 114, 154, s.ink / 3, false, 0.25, 1.0, 22);
-        }
-        x += STAMP_W;
-        ix ++;
-        id ++;
-    }
-	// 矢印を描画
-	ProcArrow();
-	MoveArrowL();
-	MoveArrowR();
-	if(g_HaveStampImageData.length <= 3)
-	{
-	}
-	else if(this.offset <= 0)
-	{
-		DrawArrowRM(this.ctx, 468, 88);
-	}
-	else if(this.offset >= (g_HaveStampImageData.length - 3) * STAMP_W)
-	{
-		DrawArrowLM(this.ctx, 32,  88);
-	}
-	else
-	{
-		DrawArrowLM(this.ctx, 32,  88);	
-		DrawArrowRM(this.ctx, 468, 88);
-	}
-};
 
 //タッチイベントリスナーの追加
 StampBar.prototype.setTouchEvent = function() 
@@ -516,12 +600,10 @@ StampBar.prototype.selectStamp = function(x)
 {	
 	var offset = x + this.offset;
 	if(offset > g_HaveStampImageData.length*STAMP_W) { offset = g_HaveStampImageData.length*STAMP_W; }
-  //  offset %= g_HaveStampImageData.length*STAMP_W;
-    if (offset < 0)    offset = 0;
+	if (offset < 0) { offset = 0; }
 	
 	var id = Math.floor(offset/STAMP_W);
 	this.selectedStampId = id;
-	
 					
 	// スタンプをタッチして選んでね
 	if(g_TutorialMainFlg == gTUTORIAL_MAINFLG.STAMP_TOUCH_SELECT)
@@ -539,68 +621,50 @@ StampBar.prototype.drawSelectedStamp_t = function(ctx,x,y, ink)
 {
 	var ix = this.selectedStampIx;		//選択された手持ちスタンプのID
 	var id = this.selectedStampId;		//選択されたスタンプオブジェクトのインデックス
-	// 持っているスタンプデータの取得
     var s = getHasStampData(id);
 	
-	// インクは０－５
-    var a = ink;  //残りインクを５段階に(6-1)
-	if (a >= nGaugeMaxStlong)		{ a = 1.0;					}
-	else if (a > 0)					{ a = a / nGaugeMaxStlong;	}
-	else	 						{ a = 0;					}
-	
-        
-    ctx.globalAlpha = a;
-	//ctx.drawImage(this.stamp[ix].img, x-STAMP_W/2,y-STAMPS_H/2, STAMP_W,STAMPS_H);
-	ctx.drawImage(GetStampGraphicHandle_Image(s.id), x - STAMP_W / 2, y - STAMP_H / 2, STAMP_W, STAMP_H);
-    ctx.globalAlpha = 1.0;
+	ctx.drawImage(GetStampGraphicHandle_Image(s.id), Math.floor(x - STAMP_W / 2), Math.floor(y - STAMP_H / 2), STAMP_W, STAMP_H);
 }
 
 StampBar.prototype.DeleteStamp = function(_This)
 {
+	// スタンプデータを外す
+	_This.nVal3.DeleteStampCanvas(_This.nVal2);
 	DelHasStamp(_This.nVal2);
 	SaveHaveStampData();
-	// 選択解除
 	this.selectedStampId = -1;
+
 }
 
-
 StampBar.prototype.AddStamp = function(_This)
-//StampBar.prototype.AddStamp(_this)
 {
 	var ix = _This.nVal1;		//選択された手持ちスタンプのID
 	var id = _This.nVal2;		//選択されたスタンプオブジェクトのインデックス
 
 	// 持っているスタンプデータの取得
     var s = getHasStampData(id);
-	
-	// インクは０－５
-    var a = _This.nVal4;  //残りインクを５段階に(6-1)
-	if (a >= nGaugeMaxStlong)		{ a = 1.0;					}
-	else if (a > 0)					{ a = a / nGaugeMaxStlong;	}
-	else	 						{ a = 0;					}
-	
 	var x = _This.nX;
 	var y = _This.nY;
 	
-    _This.nVal3.globalAlpha = a;
-	_This.nVal3.drawImage(_This.sImage, x,
-										y, 
+	// 描画
+	_This.nVal3.drawImage(_This.sImage, Math.floor(x),
+										Math.floor(y), 
 										STAMP_W,
 										STAMP_H);
-    _This.nVal3.globalAlpha = 1.0;
 	
     //描画データ保存
-    g_sActiveDrawData.Add(x + (STAMP_W / 2), y + (STAMP_H / 2), s.id, a);
+    g_sActiveDrawData.Add(Math.floor(x + (STAMP_W / 2)), Math.floor(y + (STAMP_H / 2)), s.id, 1.0);
     g_sActiveDrawData.Save();	//オートセーブ
-    
+
 	// インク切れの瞬間
 	if(s.ink <= 0)      
 	{
-		var vData = AddScaleZoomEffect(stampBar.ctx, GetStampGraphicHandle_Image(s.id), stampBar.iSelectedX, 0, STAMP_W, STAMP_H, a);
+		var vData = AddScaleZoomEffect(stampBar.ctx, GetStampGraphicHandle_Image(s.id), Math.floor(stampBar.iSelectedX), 0, STAMP_W, STAMP_H, 1.0);
 		vData.nCrsFlg 		= false;
 		vData.nCrsW			= 0;
 	    vData.nVal1 		= ix;
 		vData.nVal2 		= id;
+		vData.nVal3 		= _This.nVal4;
 		vData.nMaxTime		= 2;
 		vData.nStatus 		= G_EFFECT_STATUS.SCALE_FADE_ZOOM;
 		vData.EndCallBack	= StampBar.prototype.DeleteStamp;
@@ -644,14 +708,15 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y,ink)
     var s = getHasStampData(id);
 	
 	// インクは０－５
+/*
     var a = ink;  //残りインクを５段階に(6-1)
 	if (a >= nGaugeMaxStlong)		{ a = 1.0;					}
 	else if (a > 0)					{ a = a / nGaugeMaxStlong;	}
 	else	 						{ a = 0;					}
-        
-    ctx.globalAlpha = a;
-	ctx.drawImage(GetStampGraphicHandle_Image(s.id), x - STAMP_W / 2, y - STAMP_H / 2, STAMP_W, STAMP_H);
-    ctx.globalAlpha = 1.0;
+  */      
+ //   ctx.globalAlpha = a;
+	ctx.drawImage(GetStampGraphicHandle_Image(s.id), Math.floor(x - STAMP_W / 2), Math.floor(y - STAMP_H / 2), STAMP_W, STAMP_H);
+ //   ctx.globalAlpha = 1.0;
 	
 	//if((g_TutorialMainFlg == gTUTORIAL_MAINFLG.SHEET_TOUCH_WRITE) && ink <= nGaugeMaxStlong)
 	/*{
@@ -670,13 +735,15 @@ StampBar.prototype.drawSelectedStamp = function(ctx,x,y,ink)
 	{
 		var vData = AddScaleZoomEffect(stamp_ctx, GetStampGraphicHandle_Image(s.id), 
 							x - STAMP_W / 2,
-							y - STAMP_H / 2, STAMP_W, STAMP_H, a);
+							y - STAMP_H / 2, STAMP_W, STAMP_H, 1.0);
 	    vData.nVal1 		= ix;
 		vData.nVal2 		= id;
 		vData.nVal3 		= ctx;	
-		vData.nVal4 		= ink;	
+		vData.nVal4 		= this;	
 		vData.EndCallBack	= StampBar.prototype.AddStamp;
 	}
+	this.ChangeStampCanvas(id, s.ink);
+
 }
 
 
@@ -745,14 +812,16 @@ var StampMain = function()
 	var sMenuClear01Message1 = null;
 	var sMenuClear02Message1 = null;
 	var sModoruMessage   = null;
+	var sSmafo           = false;
 	
 	// ウィンドウサイズ
     BROWSER_WIDTH   = window.innerWidth  || document.body.clientWidth  || document.documentElement.clientWidth;
     BROWSER_HEIGHT  = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
     BROWSER_HEIGHT  += 30;
 	BROWSER_RATE 		= (640 / BROWSER_WIDTH);
-	BROWSER_SCREEN_H 	= (BROWSER_HEIGHT * BROWSER_RATE) - (STAMP_H * BROWSER_RATE);	// 画面領域
-		
+	BROWSER_STAMP_H 	= Math.floor(STAMP_H * BROWSER_RATE);
+	BROWSER_SCREEN_H 	= Math.floor((BROWSER_HEIGHT * BROWSER_RATE) - BROWSER_STAMP_H);	// 画面領域
+	
 	//背景描画
 	function canvas_Draw() 
 	{
@@ -774,17 +843,22 @@ var StampMain = function()
 	        navigator.userAgent.indexOf('iPod')>0 ||
 	        navigator.userAgent.indexOf('iPad')>0 ||
 	        navigator.userAgent.indexOf('Android')>0) {
-	        stamp_canvas.addEventListener("touchstart", onTouchStart, true);
-	        stamp_canvas.addEventListener("touchmove" , onTouchMove, true);
-	        stamp_canvas.addEventListener("touchend"  , onTouchEnd,  true);
-       // 	stamp_canvas.addEventListener("touchdown"  , onTouchDown,true);	       
+	        //canvas_canvas.addEventListener("touchstart", onTouchStart, false);
+	        //canvas_canvas.addEventListener("touchmove" , onTouchMove,  false);
+	        //canvas_canvas.addEventListener("touchend"  , onTouchEnd,   false);       
+	        stamp_canvas.addEventListener("touchstart", onTouchStart, false);
+	        stamp_canvas.addEventListener("touchmove" , onTouchMove,  false);
+	        stamp_canvas.addEventListener("touchend"  , onTouchEnd,   false);  
+	        sSmafo = true;
 	    } 
 		else 
 		{
-	        stamp_canvas.addEventListener("mousedown", onTouchStart, true);
-	        stamp_canvas.addEventListener("mousemove", onTouchMove, true);
-	        stamp_canvas.addEventListener("mouseup"  , onTouchEnd, true);
-		//	stamp_canvas.addEventListener("mousedown"  , onTouchDown,true);	
+	        //canvas_canvas.addEventListener("mousedown", onTouchStart, false);
+	        //canvas_canvas.addEventListener("mousemove", onTouchMove,  false);
+	        //canvas_canvas.addEventListener("mouseup"  , onTouchEnd,   false);
+	        stamp_canvas.addEventListener("mousedown", onTouchStart, false);
+	        stamp_canvas.addEventListener("mousemove", onTouchMove,  false);
+	        stamp_canvas.addEventListener("mouseup"  , onTouchEnd,   false);
 	    }
 		
 	    //背景ロード
@@ -800,15 +874,17 @@ var StampMain = function()
 			var d = g_sActiveDrawData.Get(canvas_load_ix);
 			if (d == null) { return; }
 
-		    canvas_ctx.globalAlpha = d.alpha;
-			canvas_ctx.drawImage(GetStampGraphicHandle_Image(d.id), d.x-STAMP_W/2,d.y-STAMP_H/2, STAMP_W,STAMP_H);
-		    canvas_ctx.globalAlpha = 1.0;
+		   // canvas_ctx.globalAlpha = d.alpha;
+			canvas_ctx.drawImage(GetStampGraphicHandle_Image(d.id), Math.floor(d.x-STAMP_W/2),
+																	Math.floor(d.y-STAMP_H/2), STAMP_W,STAMP_H);
+		   // canvas_ctx.globalAlpha = 1.0;
 			canvas_load_ix++;
 		}
 	}
     //マウスイベント
     function onTouchStart(e)
-	{
+	{	e.preventDefault(); //デフォルトイベント処理をしない
+		if(sSmafo && e.touches.length > 1) { return; }
 		bTutorialTouch = true;
 		var pos = getTouchPos(e);
 	    bTutorialStartX = pos.x;
@@ -826,6 +902,11 @@ var StampMain = function()
 			if(g_iSwitch == 0 && (stampBar.selectedStampId < g_HaveStampImageData.length && stampBar.selectedStampId != -1) && GetDrawOkFlg())
 			{
 				if(stampBar.InkMinus5()) { nInkStlong = nGaugeMaxStlong; }
+				if(bTempDrawFlg)
+				{
+					ClearRect(stamp_ctx, bTempDrawFlgX - 100, bTempDrawFlgY - 100, 200, 200);
+				}
+				
 				bTempDrawFlg = true;
 				bTempDrawFlgX = pos.x;
 				bTempDrawFlgY = pos.y;
@@ -834,7 +915,6 @@ var StampMain = function()
 			}
 			else if(g_iSwitch == 0) { bTouch = false; }
 		} else { bTouch = false; }
-        e.preventDefault(); //デフォルトイベント処理をしない
     };
 /*
 	function onTouchDown()
@@ -860,6 +940,8 @@ var StampMain = function()
 */
     function onTouchMove(e) 
 	{
+		e.preventDefault(); //デフォルトイベント処理をしない
+		if(sSmafo && e.touches.length > 1) { return; }
 		var pos = getTouchPos(e);
 	    bTutorialEndX = pos.x;
 	    bTutorialEndY = pos.y;
@@ -878,13 +960,16 @@ var StampMain = function()
 						bTempDrawFlgY = pos.y;	
 					}
 					drawStamp_t(sTouchMoveX, sTouchMoveY, nInkStlong);
+					bTempDrawFlg = true;
 				}
 	        }
 		} else { bTouch = false; }
-        e.preventDefault(); //デフォルトイベント処理をしない
+        
     };
     function onTouchEnd(e)
 	{
+		e.preventDefault(); //デフォルトイベント処理をしない
+		if(sSmafo && e.touches.length > 1) { return; }
 		bTutorialTouch = false;
 		if(GGetEffectNum() == 0)
 		{
@@ -906,7 +991,6 @@ var StampMain = function()
 				bTouch = false;
 			}
 		} else { bTouch = false; }
-        e.preventDefault(); //デフォルトイベント処理をしない
     };
 	
 
@@ -1011,7 +1095,7 @@ var StampMain = function()
 */
 
     canvas_Init();
-    stampBar = new StampBar(0);	
+    stampBar = new StampBar();	
 	g_iSwitch = 0;
 	g_eStatus = G_STATUS.INIT;
 	var next;
@@ -1071,31 +1155,7 @@ var StampMain = function()
 		g_sTutorialLoadFlg.AddLoadFile(sModoruMessage);
 	}	
 	g_sTutorialLoadFlg.Loading();
-/*
-// -------------------------------------
-// スタンプセレクト画面のチュートリアル
-// -------------------------------------
-var gTUTORIAL_MAINFLG = 
-{
-	NON:					-1,	// なし
-	NONE:					0,	// 何も
-	INIT_WAIT:				1,	// 初めのウェイト(2秒)
-	STAMP_TOUCH_SELECT:		2,	// スタンプをタッチして選んでね
-	SHEET_TOUCH_WRITE:		3,	// シートにスタンプを押してね
-	STAMP_TOUCH_DEAD:		4,	// スタンプがなくなった
-	MENU_SELECT:			5,	// メニューセレクト
-	MENU_WAIT:				6,	// メニュー表示にて少し待つ
-	STAMP_CLEAR:			7,	// スタンプをクリア
-	STAMP_CLEAR_WINDOW:		8,	// クリア確認ウィンドウ
-	MENU_SELECT_END:		9,	// メニューセレクト	
-	MENU_SELECT_END_WAIT:	10,	// メニューセレクトにて少し待つ
-	BACK:					11,	// 戻る
-};
 
-var g_TutorialMainFlg     = gTUTORIAL_MAINFLG.NONE;
-var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
-
-*/
 	var ArrowDocY 	= BROWSER_SCREEN_H - 140;
 	var sTuLookFlg	= GetTutorialLookFlg();
 	//
@@ -1113,6 +1173,8 @@ var g_TutorialNextMainFlg = gTUTORIAL_MAINFLG.NON;
 					//各データが読み込まれるまで待つ
 					if (LoadingCounter <= 0) 
 					{
+						// スタンプのセットアップ
+						stampBar.SetupStampCanvas();
 						canvas_Draw();
 						g_eStatus = G_STATUS.FADEIN;
 			        	stampBar.slide();

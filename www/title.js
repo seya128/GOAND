@@ -1,7 +1,8 @@
 //
 // タイトル
 //
-
+var g_BanaEndFlg = false;
+var M_MAX_BANA_TIME = 30;
 
 var SceenTitle = function() {
 	var STATUS = {
@@ -20,9 +21,11 @@ var SceenTitle = function() {
 		STAMP:		2,
 		SHOP:		3,
 		TITLE:		4,
+		HELP:		5,	
 	};
+	var BanaStatus = 0;
+	var BanaTime = 0;
 	var next = NEXT.NONEXT;
-	
 	var alpha = 0;
 	
 	var rootSceen = document.getElementById("sceen");
@@ -42,7 +45,6 @@ var SceenTitle = function() {
 	bg.basePos={x:0, y:0};
 	bg.x=0; bg.y=0; bg.z=0;
 	bg.src = "img/01_title/t_bgd_a.png";
-	sceen.appendChild(bg.div);
 	
 	//ロゴ
 	var logo = new DivSprite(344,89);
@@ -52,19 +54,18 @@ var SceenTitle = function() {
 	logo.animAlpha = [0,10, 1,4, 1,-1];
 	logo.scale = 2;
 	logo.animScale = [2,10, 1,4, 1.1,1, 1,1, 1.05,1, 1,-1];
-	sceen.appendChild(logo.div);
-	animSprites.push(logo);
 	
 	//女神
 	var megami = new DivSprite(150,432);
 	megami.x=320; megami.y=166; megami.z=2;
 	megami.src = "img/01_title/t_bgd_a000.png";
 	megami.anim = [0,40, 1,40];
-	sceen.appendChild(megami.div);
-	animSprites.push(megami);
-	megami.onclick = function(){
+	
+	megami.onclick = function()
+	{
 		event.preventDefault();
-		if (debugCount == 9) {
+		if (debugCount == 9) 
+		{
 			if(window.confirm('すべてのデータをクリアします。よろしいですか？')){
 				window.localStorage.removeItem("CntGochi");
 				window.localStorage.removeItem("CntCoin");
@@ -98,7 +99,8 @@ var SceenTitle = function() {
 	
 	var chara = {};
 	
-	for (var i=0; i<charaData.length; i++) {
+	for (var i=0; i<charaData.length; i++) 
+	{
 		chara[i] = new DivSprite(2704/16,180);
 		chara[i].src = "img/00_common/k_zen_a.png"
 		chara[i].x = charaData[i].x;
@@ -108,8 +110,9 @@ var SceenTitle = function() {
 		chara[i].anim = charaData[i].anim;
 		chara[i].alpha = 1;
 		chara[i].rotate = charaData[i].rot;
-		sceen.appendChild(chara[i].div);
-		animSprites.push(chara[i]);
+		chara[i].animExec();
+		//sceen.appendChild(chara[i].div);
+		//animSprites.push(chara[i]);
 	}
 	
 	
@@ -118,49 +121,65 @@ var SceenTitle = function() {
 	gohan.x=150; gohan.y=541; gohan.z=2;
 	gohan.src = "img/01_title/t_btn_a000.png";
 	gohan.animScale = [1,10, 1.1,2, 1,2, 1,10, 1,10, 1,10];
-	gohan.onclick = function(){
+	gohan.onclick = function()
+	{
 		event.preventDefault();
-		next = NEXT.GOHAN;
+		if(g_BanaEndFlg) { next = NEXT.GOHAN; }
 	};
-	sceen.appendChild(gohan.div);
-	animSprites.push(gohan);
 	
 	//スタンプ
 	var stamp = new DivSprite(286,238);
 	stamp.x=490; stamp.y=541; stamp.z=2;
 	stamp.src = "img/01_title/t_btn_b000.png";
 	stamp.animScale = [1,10, 1,10, 1.1,2, 1,2, 1,10, 1,10];
-	stamp.onclick = function(){
+	stamp.onclick = function()
+	{
 		event.preventDefault();
-		next = NEXT.STAMP;
+		if(g_BanaEndFlg) { next = NEXT.STAMP; }
 	};
-	sceen.appendChild(stamp.div);
-	animSprites.push(stamp);
+
 	
 	//ショップ
 	var shop = new DivSprite(245,200);
 	shop.x=477; shop.y=761; shop.z=1;
 	shop.src = "img/01_title/t_btn_d000.png";
 	shop.animScale = [1,10, 1,10, 1,10, 1.1,2, 1,2, 1,10];
-	shop.onclick = function(){
+	shop.onclick = function()
+	{
 		event.preventDefault();
-		next = NEXT.SHOP;
+		if(g_BanaEndFlg) { next = NEXT.SHOP; }
 	};
-	sceen.appendChild(shop.div);
-	animSprites.push(shop);
+
 	
-	//チュートリアル
-	var tutorialBtn = new DivSprite(245,200);
-	tutorialBtn.x=162; tutorialBtn.y=761; tutorialBtn.z=1;
-	tutorialBtn.src = "img/01_title/t_btn_e000.png";
-	tutorialBtn.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
-	tutorialBtn.onclick = function(){
-		event.preventDefault();
-		g_TutorialStatus=gTUTORIAL_STATUS.GOHAN;
-		next = NEXT.TITLE;			// 再度タイトルシーン
-	};
-	sceen.appendChild(tutorialBtn.div);
-	animSprites.push(tutorialBtn);
+	
+	// チュートリアル or ヘルプ
+	var tutorialBtn = null;
+	// 初めての場合チュートリアルの表示
+	if(GetTutorialLookFlg() == false)
+	{
+		var tutorialBtn = new DivSprite(245,200);
+		tutorialBtn.x=162; tutorialBtn.y=761; tutorialBtn.z=1;
+		tutorialBtn.src = "img/01_title/t_btn_e000.png";
+		tutorialBtn.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
+		tutorialBtn.onclick = function()
+		{
+			event.preventDefault();
+			if(g_BanaEndFlg) { g_TutorialStatus = gTUTORIAL_STATUS.GOHAN; next = NEXT.TITLE; }
+		};
+	}
+	// 二回目はヘルプ
+	else
+	{
+		var tutorialBtn = new DivSprite(245,200);
+		tutorialBtn.x=162; tutorialBtn.y=761; tutorialBtn.z=1;
+		tutorialBtn.src = "img/01_title/t_btn_f000.png";
+		tutorialBtn.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
+		tutorialBtn.onclick = function()
+		{
+			event.preventDefault();
+			if(g_BanaEndFlg) { next = NEXT.HELP; }
+		};
+	}
 
 	// ウィンドウなどの画像の読み込み
 	LoadWindowYesNo();
@@ -311,6 +330,72 @@ var SceenTitle = function() {
 		}
 	};
 	
+	for (var i=0; i<charaData.length; i++) 
+	{
+		sceen.appendChild(chara[i].div);
+	}	
+	sceen.appendChild(megami.div);
+	sceen.appendChild(bg.div);	
+	sceen.appendChild(logo.div);	
+	sceen.appendChild(gohan.div);	
+	sceen.appendChild(stamp.div);	
+	sceen.appendChild(shop.div);	
+	sceen.appendChild(tutorialBtn.div);
+	
+	var xmaskDiv    = null;
+	var dorasulogo  = null;
+	var Bana        = null;
+	
+	// バナーを見せる
+	if(g_BanaEndFlg == false)
+	{
+		//白マスク用DIV
+		xmaskDiv = document.createElement("div");
+		xmaskDiv.style.position = "fixed";
+		xmaskDiv.style.overflow = "hidden";
+		xmaskDiv.style.width = "640px";
+		xmaskDiv.style.height ="1138px";
+		xmaskDiv.style.zoom = 1;
+		xmaskDiv.style.backgroundColor = "#ffffff";
+		xmaskDiv.style.zIndex = 10;
+		xmaskDiv.style.left = "0px";
+		xmaskDiv.style.top = "0px";
+		xmaskDiv.style.opacity = 0.95;
+		sceen.appendChild(xmaskDiv);
+		
+		// バナー
+		Bana = new DivSprite(480,186);
+		Bana.x=640/2; Bana.y=600; Bana.z=20;
+		Bana.src = "img/01_title/bana.png";
+		//Bana.animScale = [1,10, 1,10, 1,10, 1,10, 1.1,2, 1,2];
+		Bana.onclick = function()
+		{
+			event.preventDefault();
+			var win=window.open("http://www.cowcowfoodsystem.com/","new");
+			win.moveTo(0,0);		
+		};
+		sceen.appendChild(Bana.div);
+		
+		// ロゴ
+		dorasulogo = new DivSprite(480,186);
+		dorasulogo.x=640/2; dorasulogo.y=150; dorasulogo.z=20;
+		dorasulogo.src = "img/01_title/k_rogo_a000.png";
+		sceen.appendChild(dorasulogo.div);		
+	}
+	// バナーは一回見たからなし
+	else
+	{
+		animSprites.push(megami);
+		animSprites.push(logo);
+		animSprites.push(gohan);	
+		animSprites.push(stamp);	
+		animSprites.push(shop);	
+		animSprites.push(tutorialBtn);
+		for (var i=0; i<charaData.length; i++) 
+		{
+			animSprites.push(chara[i]);
+		}
+	}	
 	//
 	// フレーム処理
 	//
@@ -328,6 +413,11 @@ var SceenTitle = function() {
 					if (LoadingCounter <= 0) {
 						st = STATUS.FADEIN;
 					}
+					else
+					{
+						// ロード中
+						
+					}
 				}
 				break;
 
@@ -343,40 +433,87 @@ var SceenTitle = function() {
 
 			//メイン処理
 			case STATUS.MAIN:
-				if (next != NEXT.NONEXT) {
-					//デバッグコマンドチェック
-					if (debugCount == 9) {
-						switch (next) {
-							case NEXT.GOHAN:	g_TutorialStatus=gTUTORIAL_STATUS.END; tutorial.isEnd=true; break;
-							case NEXT.STAMP:	g_TutorialStatus=gTUTORIAL_STATUS.STAMP; break;
-							case NEXT.SHOP:		g_TutorialStatus=gTUTORIAL_STATUS.SHOP; break;
+			
+				// バナー表示中
+				if(g_BanaEndFlg == false)
+				{
+					// 待つ
+					if(BanaStatus == 0)
+					{
+						BanaTime ++;
+						if(BanaTime > M_MAX_BANA_TIME)
+						{
+							BanaStatus ++;
+							animSprites.push(megami);
+							animSprites.push(logo);
+							animSprites.push(gohan);	
+							animSprites.push(stamp);	
+							animSprites.push(shop);	
+							animSprites.push(tutorialBtn);
+							for (var i=0; i<charaData.length; i++) 
+							{
+								animSprites.push(chara[i]);
+							}			
+							BanaTime = 0;
 						}
-						debugCount = 0;
-						next = NEXT.NONEXT;
-						break;
+						
+					}
+					// 広告バナーが開ける
+					else
+					{
+						xmaskDiv.style.opacity  	-= 0.15;
+						Bana.div.style.opacity 		-= 0.2;
+						dorasulogo.div.style.opacity 	-= 0.2;
+						
+						if(xmaskDiv.style.opacity <= 0)
+						{
+							g_BanaEndFlg = true;
+							sceen.removeChild(xmaskDiv);
+							sceen.removeChild(Bana.div);
+							sceen.removeChild(dorasulogo.div);
+						}
 					}
 					
-					//再度タイトルシーンにいく場合は、特に何もせず次へ
-					if (next == NEXT.TITLE) {
-						st = STATUS.FADEOUT;
-						break;
-					}
-
-					//まだチュートリアルしたことなければ、チュートリアル開始
-					if (!tutorial.isEnd && !tutorial.isStart) {
-						tutorial.isStart = true;
-						g_TutorialStatus = gTUTORIAL_STATUS.NONE;
-						next = NEXT.NONEXT;
-						break;
-					}
-					
-					//次の処理がセットされれば次へ
-					st = STATUS.FADEOUT;
 				}
+				else
+				{
+					if (next != NEXT.NONEXT) 
+					{
+						//デバッグコマンドチェック
+						if (debugCount == 9) 
+						{
+							switch (next) 
+							{
+								case NEXT.GOHAN:	g_TutorialStatus=gTUTORIAL_STATUS.END; tutorial.isEnd=true; break;
+								case NEXT.STAMP:	g_TutorialStatus=gTUTORIAL_STATUS.STAMP; break;
+								case NEXT.SHOP:		g_TutorialStatus=gTUTORIAL_STATUS.SHOP; break;
+							}
+							debugCount = 0;
+							next = NEXT.NONEXT;
+							break;
+						}
+						
+						//再度タイトルシーンにいく場合は、特に何もせず次へ
+						if (next == NEXT.TITLE) {
+							st = STATUS.FADEOUT;
+							break;
+						}
 
-				//チュートリアルモードの場合、チュートリアル開始
-				if (g_TutorialStatus!=gTUTORIAL_STATUS.NONE && g_TutorialStatus!=gTUTORIAL_STATUS.END) {
-					tutorial.isStart = true;
+						//まだチュートリアルしたことなければ、チュートリアル開始
+						if (!tutorial.isEnd && !tutorial.isStart) {
+							tutorial.isStart = true;
+							g_TutorialStatus = gTUTORIAL_STATUS.NONE;
+							next = NEXT.NONEXT;
+							break;
+						}
+						
+						//次の処理がセットされれば次へ
+						st = STATUS.FADEOUT;
+					}
+					//チュートリアルモードの場合、チュートリアル開始
+					if (g_TutorialStatus!=gTUTORIAL_STATUS.NONE && g_TutorialStatus!=gTUTORIAL_STATUS.END) {
+						tutorial.isStart = true;
+					}
 				}
 				break;
 
@@ -393,8 +530,10 @@ var SceenTitle = function() {
 			//終了
 			case STATUS.END:
 				//チュートリアル見たフラグ保存
-				SaveTutorialLookFlg(tutorial.isEnd);
-				
+				if(tutorial.isEnd == true)
+				{
+					SaveTutorialLookFlg(tutorial.isEnd);
+				}
 				//DOMエレメントの削除
 				rootSceen.removeChild(sceen);
 				//次のシーンをセット
@@ -413,6 +552,10 @@ var SceenTitle = function() {
 					// タイトル
 					case NEXT.TITLE:
 						nextSceen = new SceenTitle();
+						break;
+					// ヘルプ
+					case NEXT.HELP:
+						nextSceen = new SceenHelp();
 						break;
 				}
 				break;
