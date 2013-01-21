@@ -27,15 +27,17 @@
 			var g_sXTime     = null;			
             function mainLoop() 
             {
+            /*
           		if(g_sEndTime != null)
           		{
 	 				g_sXTime = new Date();
 					g_strDebugMessage += "<font size='5' color='white' style ='background-color:blue;'>アイドル[" + (g_sXTime.getTime() - g_sEndTime.getTime()) + "/50]</font>";   
 	 				document.getElementById("fps").innerHTML = g_strDebugMessage;
  				}
+ 			*/
             	// 時間の計測開始
 				g_sStartTime = new Date();
-
+			
 				// メインループ
             	if (currentSceen) 
             	{
@@ -61,6 +63,7 @@
 				var Timer   = 50 - Min;
 
             	// FPSの表示
+            	/*
             	if(Timer <= 0)
             	{
             		g_strDebugMessage = "<font size='5' color='white' style ='background-color:red;'>処理[" + Min + "/50]</font>";
@@ -73,8 +76,8 @@
             	{
             		g_strDebugMessage = "<font size='5' color='white' style ='background-color:blue;'>処理[" + Min + "/50]</font>";
 				}		
-
 				DrawTime();
+				*/
 				
 				/*
 				// メモリ
@@ -115,6 +118,7 @@
 	<div class='accesstrade.net.adnw' id='2'></div>
 	</div>
         <script type="text/javascript" src="title.js"></script>
+        <script type="text/javascript" src="help.js"></script>
         <script type="text/javascript" src="Gohan.js"></script>
         <script type="text/javascript" src="GohanItadaki.js"></script>
         <script type="text/javascript" src="GohanCoinGet.js"></script>
